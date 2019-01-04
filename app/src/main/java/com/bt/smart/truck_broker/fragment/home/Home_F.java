@@ -1,17 +1,11 @@
 package com.bt.smart.truck_broker.fragment.home;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.utils.SoundPoolUtil;
@@ -43,18 +37,17 @@ public class Home_F extends Fragment implements View.OnClickListener {
     }
 
     private void initData() {
-        tv_mine.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
-        //获取天气信息
-        //申请定位权限
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {//未开启定位权限
-            Toast.makeText(getContext(), "未开启定位权限,不能获取到天气信息", Toast.LENGTH_LONG).show();
-            //开启定位权限,200是标识码
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_FINE_LOACTION);
-        } else {
-
-        }
+//        //获取天气信息
+//        //申请定位权限
+//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {//未开启定位权限
+//            Toast.makeText(getContext(), "未开启定位权限,不能获取到天气信息", Toast.LENGTH_LONG).show();
+//            //开启定位权限,200是标识码
+//            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_FINE_LOACTION);
+//        } else {
+//
+//        }
     }
 
     @Override

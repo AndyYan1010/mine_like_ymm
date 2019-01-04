@@ -37,13 +37,14 @@
             <ImageView
                 android:id="@+id/iv_menu_0"
                 android:layout_width="match_parent"
-                android:layout_height="24dp"
+                android:layout_height="20dp"
                 android:src="@drawable/bt_menu_0_select"/>
 
             <TextView
                 android:id="@+id/tv_menu_0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="任务大厅"
                 android:textColor="@color/lin_black"
                 android:textSize="12sp"/>
@@ -60,13 +61,14 @@
             <ImageView
                 android:id="@+id/iv_menu_1"
                 android:layout_width="match_parent"
-                android:layout_height="24dp"
+                android:layout_height="20dp"
                 android:src="@drawable/bt_menu_1_select"/>
 
             <TextView
                 android:id="@+id/tv_menu_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="配送货源"
                 android:textColor="@color/lin_black"
                 android:textSize="12sp"/>
@@ -83,13 +85,14 @@
             <ImageView
                 android:id="@+id/iv_menu_2"
                 android:layout_width="match_parent"
-                android:layout_height="24dp"
+                android:layout_height="20dp"
                 android:src="@drawable/bt_menu_2_select"/>
 
             <TextView
                 android:id="@+id/tv_menu_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="定制服务"
                 android:textColor="@color/lin_black"
                 android:textSize="12sp"/>
@@ -106,13 +109,14 @@
             <ImageView
                 android:id="@+id/iv_menu_3"
                 android:layout_width="match_parent"
-                android:layout_height="24dp"
+                android:layout_height="20dp"
                 android:src="@drawable/bt_menu_3_select"/>
 
             <TextView
                 android:id="@+id/tv_menu_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="个人中心"
                 android:textColor="@color/lin_black"
                 android:textSize="12sp"/>
