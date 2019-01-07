@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void changeTVColor(int item) {
         for (int i = 0; i < tv_menu.size(); i++) {
             if (i == item) {
-                tv_menu.get(i).setTextColor(getResources().getColor(R.color.blue_54));
+                tv_menu.get(i).setTextColor(getResources().getColor(R.color.blue_icon));
             } else {
                 tv_menu.get(i).setTextColor(getResources().getColor(R.color.lin_black));
             }

@@ -12,94 +12,82 @@ package com.bt.smart.truck_broker.messageInfo;
 public class LoginInfo {
 
     /**
-     * {
-     "message": "用户登录成功",
-     "memberInfo": {
-     "fname": "haha",
-     "fstatus": "0",
-     "head_pic": "http://112.90.178.68:8081/upFiles/1544055659244.jpeg",
-     "bpmstatus": "1",
-     "id": "b35e098dddb511e89c91000c2950df04",
-     "fpassword": "e10adc3949ba59abbe56e057f20f883e",
-     "create_date": {
-     "date": 1,
-     "day": 4,
-     "hours": 17,
-     "minutes": 8,
-     "month": 10,
-     "nanos": 0,
-     "seconds": 30,
-     "time": 1541063310000,
-     "timezoneOffset": -480,
-     "year": 118
-     },
-     "ftelephone": "18036215611"
-     },
-     "code": 1
-     }
+     * registerDriver : {"fid":"","faccountEncryption":"","fname":"","fphoto":"","companyName":"","checkReason":"","faccount":0,"fpassword":"e10adc3949ba59abbe56e057f20f883e","idNumber":"","fmobile":"18036215618","fpoints":0,"checkStatus":"","drivingLicense":"","idCard1":"","idCard2":"","driverLicense":"","id":"4d2881f66826449b016826502c9c0003"}
+     * token : eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxODAzNjIxNTYxOCIsInN1YiI6IjE4MDM2MjE1NjE4IiwiaWF0IjoxNTQ2ODQzOTk5fQ.j5nIqA70w2sEyRknmcuZkRGw-O-ECZc4lRbI3koyXY4
      */
 
-    private String         message;
-    private MemberInfoBean memberInfo;
-    private int            code;
+    private RegisterDriverBean registerDriver;
+    private String token;
 
-    public String getMessage() {
-        return message;
+    public RegisterDriverBean getRegisterDriver() {
+        return registerDriver;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setRegisterDriver(RegisterDriverBean registerDriver) {
+        this.registerDriver = registerDriver;
     }
 
-    public MemberInfoBean getMemberInfo() {
-        return memberInfo;
+    public String getToken() {
+        return token;
     }
 
-    public void setMemberInfo(MemberInfoBean memberInfo) {
-        this.memberInfo = memberInfo;
+    public void setToken(String token) {
+        this.token = token;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public static class MemberInfoBean {
+    public static class RegisterDriverBean {
         /**
-         * wx_name : QW5keSBZYW4=
-         * fname : undefined
-         * fstatus : 0
-         * wx_openid : oGm3u0BHZwOPxMrEs-187NnVIquM
-         * wx_pic : https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJSoHRiasmEsSO62akEkah2pWGbicFPjeOWlL69alkicTOrvicVciaE8OYqHPMXQUFJNlsTovQu2LtK4rw/132
-         * head_pic : http://112.90.178.68:8081/upFiles/1542796099214.jpeg
-         * bpmstatus : 1
-         * id : 74ee5a6bdb5911e8813c000c2950df04
+         * fid :
+         * faccountEncryption :
+         * fname :
+         * fphoto :
+         * companyName :
+         * checkReason :
+         * faccount : 0.0
          * fpassword : e10adc3949ba59abbe56e057f20f883e
-         * create_date : {"date":29,"day":1,"hours":17,"minutes":4,"month":9,"nanos":0,"seconds":30,"time":1540803870000,"timezoneOffset":-480,"year":118}
-         * ftelephone : 18036215618
+         * idNumber :
+         * fmobile : 18036215618
+         * fpoints : 0
+         * checkStatus :
+         * drivingLicense :
+         * idCard1 :
+         * idCard2 :
+         * driverLicense :
+         * id : 4d2881f66826449b016826502c9c0003
          */
 
-        private String         wx_name;
-        private String         fname;
-        private String         fstatus;
-        private String         wx_openid;
-        private String         wx_pic;
-        private String         head_pic;
-        private String         bpmstatus;
-        private String         id;
-        private String         fpassword;
-        private CreateDateBean create_date;
-        private String         ftelephone;
+        private String fid;
+        private String faccountEncryption;
+        private String fname;
+        private String fphoto;
+        private String companyName;
+        private String checkReason;
+        private double faccount;
+        private String fpassword;
+        private String idNumber;
+        private String fmobile;
+        private int    fpoints;
+        private String checkStatus;
+        private String drivingLicense;
+        private String idCard1;
+        private String idCard2;
+        private String driverLicense;
+        private String id;
 
-        public String getWx_name() {
-            return wx_name;
+        public String getFid() {
+            return fid;
         }
 
-        public void setWx_name(String wx_name) {
-            this.wx_name = wx_name;
+        public void setFid(String fid) {
+            this.fid = fid;
+        }
+
+        public String getFaccountEncryption() {
+            return faccountEncryption;
+        }
+
+        public void setFaccountEncryption(String faccountEncryption) {
+            this.faccountEncryption = faccountEncryption;
         }
 
         public String getFname() {
@@ -110,52 +98,36 @@ public class LoginInfo {
             this.fname = fname;
         }
 
-        public String getFstatus() {
-            return fstatus;
+        public String getFphoto() {
+            return fphoto;
         }
 
-        public void setFstatus(String fstatus) {
-            this.fstatus = fstatus;
+        public void setFphoto(String fphoto) {
+            this.fphoto = fphoto;
         }
 
-        public String getWx_openid() {
-            return wx_openid;
+        public String getCompanyName() {
+            return companyName;
         }
 
-        public void setWx_openid(String wx_openid) {
-            this.wx_openid = wx_openid;
+        public void setCompanyName(String companyName) {
+            this.companyName = companyName;
         }
 
-        public String getWx_pic() {
-            return wx_pic;
+        public String getCheckReason() {
+            return checkReason;
         }
 
-        public void setWx_pic(String wx_pic) {
-            this.wx_pic = wx_pic;
+        public void setCheckReason(String checkReason) {
+            this.checkReason = checkReason;
         }
 
-        public String getHead_pic() {
-            return head_pic;
+        public double getFaccount() {
+            return faccount;
         }
 
-        public void setHead_pic(String head_pic) {
-            this.head_pic = head_pic;
-        }
-
-        public String getBpmstatus() {
-            return bpmstatus;
-        }
-
-        public void setBpmstatus(String bpmstatus) {
-            this.bpmstatus = bpmstatus;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
+        public void setFaccount(double faccount) {
+            this.faccount = faccount;
         }
 
         public String getFpassword() {
@@ -166,126 +138,76 @@ public class LoginInfo {
             this.fpassword = fpassword;
         }
 
-        public CreateDateBean getCreate_date() {
-            return create_date;
+        public String getIdNumber() {
+            return idNumber;
         }
 
-        public void setCreate_date(CreateDateBean create_date) {
-            this.create_date = create_date;
+        public void setIdNumber(String idNumber) {
+            this.idNumber = idNumber;
         }
 
-        public String getFtelephone() {
-            return ftelephone;
+        public String getFmobile() {
+            return fmobile;
         }
 
-        public void setFtelephone(String ftelephone) {
-            this.ftelephone = ftelephone;
+        public void setFmobile(String fmobile) {
+            this.fmobile = fmobile;
         }
 
-        public static class CreateDateBean {
-            /**
-             * date : 29
-             * day : 1
-             * hours : 17
-             * minutes : 4
-             * month : 9
-             * nanos : 0
-             * seconds : 30
-             * time : 1540803870000
-             * timezoneOffset : -480
-             * year : 118
-             */
+        public int getFpoints() {
+            return fpoints;
+        }
 
-            private int  date;
-            private int  day;
-            private int  hours;
-            private int  minutes;
-            private int  month;
-            private int  nanos;
-            private int  seconds;
-            private long time;
-            private int  timezoneOffset;
-            private int  year;
+        public void setFpoints(int fpoints) {
+            this.fpoints = fpoints;
+        }
 
-            public int getDate() {
-                return date;
-            }
+        public String getCheckStatus() {
+            return checkStatus;
+        }
 
-            public void setDate(int date) {
-                this.date = date;
-            }
+        public void setCheckStatus(String checkStatus) {
+            this.checkStatus = checkStatus;
+        }
 
-            public int getDay() {
-                return day;
-            }
+        public String getDrivingLicense() {
+            return drivingLicense;
+        }
 
-            public void setDay(int day) {
-                this.day = day;
-            }
+        public void setDrivingLicense(String drivingLicense) {
+            this.drivingLicense = drivingLicense;
+        }
 
-            public int getHours() {
-                return hours;
-            }
+        public String getIdCard1() {
+            return idCard1;
+        }
 
-            public void setHours(int hours) {
-                this.hours = hours;
-            }
+        public void setIdCard1(String idCard1) {
+            this.idCard1 = idCard1;
+        }
 
-            public int getMinutes() {
-                return minutes;
-            }
+        public String getIdCard2() {
+            return idCard2;
+        }
 
-            public void setMinutes(int minutes) {
-                this.minutes = minutes;
-            }
+        public void setIdCard2(String idCard2) {
+            this.idCard2 = idCard2;
+        }
 
-            public int getMonth() {
-                return month;
-            }
+        public String getDriverLicense() {
+            return driverLicense;
+        }
 
-            public void setMonth(int month) {
-                this.month = month;
-            }
+        public void setDriverLicense(String driverLicense) {
+            this.driverLicense = driverLicense;
+        }
 
-            public int getNanos() {
-                return nanos;
-            }
+        public String getId() {
+            return id;
+        }
 
-            public void setNanos(int nanos) {
-                this.nanos = nanos;
-            }
-
-            public int getSeconds() {
-                return seconds;
-            }
-
-            public void setSeconds(int seconds) {
-                this.seconds = seconds;
-            }
-
-            public long getTime() {
-                return time;
-            }
-
-            public void setTime(long time) {
-                this.time = time;
-            }
-
-            public int getTimezoneOffset() {
-                return timezoneOffset;
-            }
-
-            public void setTimezoneOffset(int timezoneOffset) {
-                this.timezoneOffset = timezoneOffset;
-            }
-
-            public int getYear() {
-                return year;
-            }
-
-            public void setYear(int year) {
-                this.year = year;
-            }
+        public void setId(String id) {
+            this.id = id;
         }
     }
 }

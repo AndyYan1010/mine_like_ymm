@@ -16,6 +16,7 @@ import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.activity.LoginActivity;
 import com.bt.smart.truck_broker.messageInfo.CommonInfo;
+import com.bt.smart.truck_broker.messageInfo.SMSInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.ToastUtils;
@@ -106,17 +107,25 @@ public class RegisterPhoneFragment extends Fragment implements View.OnClickListe
                 }
                 break;
             case R.id.tv_submit:
-                mPhone = String.valueOf(et_phone.getText()).trim();
+                String newPhone = String.valueOf(et_phone.getText()).trim();
+                if (null == mPhone) {
+                    ToastUtils.showToast(getContext(), "请获取验证码");
+                    return;
+                }
+                if (!newPhone.equals(mPhone)) {
+                    ToastUtils.showToast(getContext(), "您修改了手机号码，请重新获取验证码");
+                    return;
+                }
                 String wrtcode = String.valueOf(et_code.getText()).trim();
                 String wrtpsd = String.valueOf(et_psd.getText()).trim();
                 if ("".equals(wrtcode) || "请输入验证码".equals(wrtcode)) {
                     ToastUtils.showToast(getContext(), "请输入验证码");
                     return;
                 }
-                //                if (!wrtcode.equals(vCode)) {
-                //                    ToastUtils.showToast(getContext(), "验证码不正确");
-                //                    return;
-                //                }
+                if (!wrtcode.equals(vCode)) {
+                    ToastUtils.showToast(getContext(), "验证码不正确");
+                    return;
+                }
                 if ("".equals(wrtpsd) || "请设置密码".equals(wrtpsd)) {
                     ToastUtils.showToast(getContext(), "请设置密码");
                     return;
@@ -149,7 +158,7 @@ public class RegisterPhoneFragment extends Fragment implements View.OnClickListe
                 Gson gson = new Gson();
                 CommonInfo sendSMSInfo = gson.fromJson(resbody, CommonInfo.class);
                 if (1 == sendSMSInfo.getCode()) {
-                    isFinish=true;
+                    isFinish = true;
                     startActivity(new Intent(getContext(), LoginActivity.class));
                     getActivity().finish();
                 }
@@ -179,7 +188,7 @@ public class RegisterPhoneFragment extends Fragment implements View.OnClickListe
                 ToastUtils.showToast(getContext(), sendSMSInfo.getMessage());
                 if (1 == sendSMSInfo.getCode()) {
                     startActivity(new Intent(getContext(), LoginActivity.class));
-                    isFinish=true;
+                    isFinish = true;
                     getActivity().finish();
                 }
             }
@@ -202,10 +211,10 @@ public class RegisterPhoneFragment extends Fragment implements View.OnClickListe
                     return;
                 }
                 Gson gson = new Gson();
-                CommonInfo sendSMSInfo = gson.fromJson(resbody, CommonInfo.class);
-                if (1 == sendSMSInfo.getCode()) {
+                SMSInfo sendSMSInfo = gson.fromJson(resbody, SMSInfo.class);
+                if (1 == sendSMSInfo.getResult()) {
                     ToastUtils.showToast(getContext(), "验证码发送成功");
-                    vCode = sendSMSInfo.getValidateCode();
+                    vCode = sendSMSInfo.getCode();
                     handler.postDelayed(new Runnable() {
                         public void run() {
                             handler.postDelayed(this, 1000);//递归执行，一秒执行一次
