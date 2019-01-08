@@ -3,6 +3,8 @@
           package="com.bt.smart.truck_broker">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <!--android:roundIcon="@mipmap/ic_launcher_round"-->
     <application
@@ -22,6 +24,9 @@
         <activity android:name=".activity.LoginActivity"/>
         <activity android:name=".activity.RegisterActivity"/>
         <activity android:name=".MainActivity"/>
+        <activity android:name=".activity.userAct.AuthenticationActivity"/>
+        <activity android:name=".activity.userAct.GetFacePhotoActivity"/>
+        <activity android:name=".activity.userAct.GetDriveCardPhotoActivity"/>
     </application>
 
 </manifest>

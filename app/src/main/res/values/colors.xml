@@ -14,6 +14,7 @@
     <color name="vm_black_12">#1e212121</color>
     <color name="tr_black">#cc000000</color>
     <color name="lin_black">#1f1724</color>
+    <color name="trans_black">#99000000</color>
 
     <!--导航-->
     <color name="title_black">#2A2A2A</color>
@@ -61,7 +62,7 @@
     <color name="deepskyblue">#00BFFF</color>
     <color name="vm_blue_38">#612384fe</color>
     <color name="blue">#0000FF</color>
-    <color name="blue_10">#87CEFA</color>
+    <color name="blue_10">#6687CEFA</color>
     <!-- 橙色 -->
     <color name="orange">#FFA500</color>
     <color name="orange_10">#FF9933</color>

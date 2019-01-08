@@ -297,7 +297,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             if (!isFinish) {
                                 if (count > 0) {
                                     count--;
-                                    tv_gcode.setBackground(getResources().getDrawable(R.drawable.bg_round_gray));
+                                    tv_gcode.setBackground(getResources().getDrawable(R.drawable.bg_roundcorder_gray));
                                     tv_gcode.setText(count + "秒后可重新发送");
                                     tv_gcode.setClickable(false);
                                 } else {
