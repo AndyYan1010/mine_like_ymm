@@ -173,6 +173,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
+                android:minHeight="25dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -200,14 +201,15 @@
                 android:layout_marginTop="10dp"
                 android:background="@color/gray_10"/>
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:minHeight="25dp">
 
                 <TextView
+                    android:id="@+id/tv_carx"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -215,15 +217,24 @@
                     android:textColor="@color/word_black"
                     android:textSize="14sp"/>
 
-                <EditText
-                    android:id="@+id/et_code"
+                <TextView
+                    android:id="@+id/tv_carxing"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:background="@null"
+                    android:layout_marginRight="10dp"
+                    android:layout_toRightOf="@+id/tv_carx"
                     android:hint="请选择车型"
                     android:textSize="14sp"/>
-            </LinearLayout>
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:src="@drawable/me_next2"/>
+            </RelativeLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -232,30 +243,48 @@
                 android:layout_marginTop="10dp"
                 android:background="@color/gray_10"/>
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:minHeight="25dp">
 
                 <TextView
+                    android:id="@+id/tv_carl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
                     android:text="车长    "
                     android:textColor="@color/word_black"
                     android:textSize="14sp"/>
 
-                <EditText
+                <TextView
                     android:id="@+id/tv_length"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
-                    android:background="@null"
+                    android:layout_marginRight="10dp"
+                    android:layout_toRightOf="@+id/tv_carl"
                     android:hint="请选择车长"
                     android:textSize="14sp"/>
-            </LinearLayout>
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:src="@drawable/me_next2"/>
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/gray_10"/>
         </LinearLayout>
     </ScrollView>
 

@@ -62,6 +62,7 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
     }
 
     private void initData() {
+        img_back.setVisibility(View.VISIBLE);
         tv_title.setText("司机身份认证");
         img_back.setOnClickListener(this);
         img_up_head.setOnClickListener(this);

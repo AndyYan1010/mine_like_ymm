@@ -38,16 +38,6 @@ public class Home_F extends Fragment implements View.OnClickListener {
 
     private void initData() {
 
-//        //获取天气信息
-//        //申请定位权限
-//        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {//未开启定位权限
-//            Toast.makeText(getContext(), "未开启定位权限,不能获取到天气信息", Toast.LENGTH_LONG).show();
-//            //开启定位权限,200是标识码
-//            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_FINE_LOACTION);
-//        } else {
-//
-//        }
     }
 
     @Override
