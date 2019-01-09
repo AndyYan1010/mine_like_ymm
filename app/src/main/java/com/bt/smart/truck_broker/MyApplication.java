@@ -28,9 +28,10 @@ public class MyApplication extends Application {
     public static int                 flag         = -1;//判断是否被回收
     public static int                 isLogin      = 0;//判断是否登录
     public static String  userID;
+    public static String  userPhone;
+    public static String  userToken;
     public static String  userName;
     public static String  pasword;
-    public static String  userPhone;
     public static String  userHeadPic;
     public static String  slecHomeID;
     public static String  slecRoomID;

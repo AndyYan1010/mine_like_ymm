@@ -10,13 +10,18 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bt.smart.truck_broker.BaseActivity;
 import com.bt.smart.truck_broker.R;
+import com.bt.smart.truck_broker.utils.ToastUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,6 +46,7 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_face);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // 防止锁屏
         setView();
         setData();
     }
@@ -83,9 +89,12 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void getCameraPic() {
-        if (null!=bmp) {
+        if (null != bmp) {
             //将bitmap保存，记录照片本地地址，留待之后上传
-
+            boolean b = saveBitmap(bmp);
+            if (b) {
+                ToastUtils.showToast(this, "人脸保存成功");
+            }
         }
     }
 
@@ -171,5 +180,29 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         image.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, stream);
         bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+    }
+
+    /**
+     * 保存方法
+     */
+    public boolean saveBitmap(Bitmap bm) {
+        //        Log.e(TAG, "保存图片");
+        File f = new File("/sdcard/namecard/", "head001");
+        if (f.exists()) {
+            f.delete();
+        }
+        try {
+            FileOutputStream out = new FileOutputStream(f);
+            bm.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.flush();
+            out.close();
+            //            Log.i(TAG, "已经保存");
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

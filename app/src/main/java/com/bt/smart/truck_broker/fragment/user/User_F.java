@@ -96,7 +96,7 @@ public class User_F extends Fragment implements View.OnClickListener {
     }
 
     private void toSubmitPersonInfo() {
-        Intent intent = new Intent(getContext(), AuthenticationActivity.class);
+        Intent intent = new Intent(getActivity(), AuthenticationActivity.class);
         startActivity(intent);
     }
 

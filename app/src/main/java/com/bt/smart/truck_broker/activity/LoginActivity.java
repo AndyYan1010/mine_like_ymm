@@ -342,6 +342,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
                 MyApplication.userID = loginInfo.getRegisterDriver().getId();
                 MyApplication.userPhone = loginInfo.getRegisterDriver().getFmobile();
+                MyApplication.userToken = loginInfo.getToken();
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 finish();
             }

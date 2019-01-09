@@ -21,8 +21,7 @@ public class NetConfig {
     public static String GETNEWAPPVERSION = ROOT + "getNewAppVersion";
 
     //base64上传图片
-    public static String UPLOADBASE64ANDROID   = ROOT + "uploadBase64Android";
-    public static String UPLOADBASE64          = ROOT + "uploadBase64";
+    public static String PHOTO                 = ROOT + "registerDriverController/photo";
     //获取验证码
     public static String CHECKMESSAGE          = ROOT + "tokens/SMScode";
     //注册用户
@@ -37,6 +36,12 @@ public class NetConfig {
     public static String CodeLOGINURL          = ROOT + "tokens/registerdriver";
     //获取用户信息
     public static String REGISTERINFO          = ROOT + "registerInfo";
+
+    //提交司机认证信息
+    public static String REGISTERDRIVERCONTROLLER = ROOT + "registerDriverController/{id}";
+
+    //获取当天货源信息列表
+    public static String ALL_ORDER_LIST = ROOT + "orderController/list";
 
 
 }

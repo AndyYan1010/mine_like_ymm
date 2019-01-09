@@ -58,6 +58,18 @@ public class HttpOkhUtils {
         client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
     }
 
+    public void doGetWithOnlyHeader(String url, RequestParamsFM headbean, HttpCallBack httpCallBack) {
+        Request.Builder builder1 = new Request.Builder();
+        if (null != headbean) {
+            Set<String> set1 = headbean.keySet();
+            for (String key : set1) {
+                builder1.addHeader(key, headbean.get(key).toString());
+            }
+        }
+        Request request = builder1.url(url).build();
+        client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
+    }
+
     public void doGetWithParams(String url, RequestParamsFM bean, HttpCallBack httpCallBack) {
         url = url + "?";
         Iterator iter = bean.entrySet().iterator();
@@ -76,6 +88,34 @@ public class HttpOkhUtils {
             }
         }
         Request request = new Request.Builder().url(url).build();
+        client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
+    }
+
+    public void doGetWithHeadParams(String url, RequestParamsFM headbean, RequestParamsFM bean, HttpCallBack httpCallBack) {
+        Request.Builder builder1 = new Request.Builder();
+        if (null != headbean) {
+            Set<String> set1 = headbean.keySet();
+            for (String key : set1) {
+                builder1.addHeader(key, headbean.get(key).toString());
+            }
+        }
+        url = url + "?";
+        Iterator iter = bean.entrySet().iterator();
+        while (iter.hasNext()) {
+            Object next = iter.next();
+            if (null != next) {
+                RequestParamsFM.Entry entry = (RequestParamsFM.Entry) next;
+                Object key = entry.getKey();
+                Object value = entry.getValue();
+                url = url + key + "=" + value + "&";
+            } else {
+                RequestParamsFM.Entry entry = (RequestParamsFM.Entry) next;
+                Object key = entry.getKey();
+                Object value = entry.getValue();
+                url = url + key + "=" + value;
+            }
+        }
+        Request request = builder1.url(url).build();
         client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
     }
 
@@ -102,27 +142,27 @@ public class HttpOkhUtils {
         client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
     }
 
-//    public void doPostBeanToString(String url, RequestParamsFM bean, HttpCallBack httpCallBack) {
-//        RequestBody requestBody;
-//        boolean toJson = bean.getIsUseJsonStreamer();
-//        if (toJson) {
-//            //使用Gson将对象转换为json字符串
-//            String json = bean.toString();
-//            //MediaType  设置Content-Type 标头中包含的媒体类型值
-//            //            requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), json);
-//            requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
-//        } else {
-//            FormBody.Builder builder = new FormBody.Builder();
-//            Set<String> set = bean.keySet();
-//            for (String key : set) {
-//                String value = bean.get(key).toString();
-//                builder.add(key, value);
-//            }
-//            requestBody = builder.build();
-//        }
-//        Request request = new Request.Builder().url(url).post(requestBody).build();
-//        client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
-//    }
+    //    public void doPostBeanToString(String url, RequestParamsFM bean, HttpCallBack httpCallBack) {
+    //        RequestBody requestBody;
+    //        boolean toJson = bean.getIsUseJsonStreamer();
+    //        if (toJson) {
+    //            //使用Gson将对象转换为json字符串
+    //            String json = bean.toString();
+    //            //MediaType  设置Content-Type 标头中包含的媒体类型值
+    //            //            requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+    //            requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+    //        } else {
+    //            FormBody.Builder builder = new FormBody.Builder();
+    //            Set<String> set = bean.keySet();
+    //            for (String key : set) {
+    //                String value = bean.get(key).toString();
+    //                builder.add(key, value);
+    //            }
+    //            requestBody = builder.build();
+    //        }
+    //        Request request = new Request.Builder().url(url).post(requestBody).build();
+    //        client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
+    //    }
 
     public void doPostBean(String url, RequestParamsFM bean, HttpCallBack httpCallBack) {
         RequestBody requestBody;
@@ -208,6 +248,37 @@ public class HttpOkhUtils {
         client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
     }
 
+    public void doPutWithHeader(String url, RequestParamsFM headeBean, RequestParamsFM bean, HttpCallBack httpCallBack) {
+        Request.Builder builder1 = new Request.Builder();
+        if (null != headeBean) {
+            Set<String> set1 = headeBean.keySet();
+            for (String key : set1) {
+                builder1.addHeader(key, headeBean.get(key).toString());
+            }
+        }
+
+        RequestBody requestBody;
+        boolean toJson = bean.getIsUseJsonStreamer();
+        if (toJson) {
+            Gson gson = new Gson();
+            //使用Gson将对象转换为json字符串
+            String json = gson.toJson(bean);
+            //MediaType  设置Content-Type 标头中包含的媒体类型值
+            requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+        } else {
+            FormBody.Builder builder = new FormBody.Builder();
+            Set<String> set = bean.keySet();
+            for (String key : set) {
+                String value = bean.get(key).toString();
+                builder.add(key, value);
+            }
+            requestBody = builder.build();
+        }
+
+        Request request = builder1.url(url).put(requestBody).build();
+        client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
+    }
+
     public void doDelete(String url, RequestParamsFM bean, HttpCallBack httpCallBack) {
         url = url + "?";
         Iterator iter = bean.entrySet().iterator();
@@ -229,10 +300,16 @@ public class HttpOkhUtils {
         client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
     }
 
-    public void uploadFile(String url, RequestParamsFM bean, String fileKey, File file, HttpCallBack httpCallBack) {
+    public void upDateFile(String url, RequestParamsFM headbean, RequestParamsFM bean, String fileKey, File file, HttpCallBack httpCallBack) {
+        Request.Builder builder1 = new Request.Builder();
+        if (null != headbean) {
+            Set<String> set1 = headbean.keySet();
+            for (String key : set1) {
+                builder1.addHeader(key, headbean.get(key).toString());
+            }
+        }
         RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
         MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-        //        RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM).build();
         if (null != bean) {
             Set<String> set = bean.keySet();
             for (String key : set) {
@@ -242,11 +319,8 @@ public class HttpOkhUtils {
         }
         builder.addFormDataPart(fileKey, file.getName(), fileBody);
         RequestBody requestBody = builder.build();
-        //                .setType(MultipartBody.FORM)
-        //                .addFormDataPart("image", "test.jpg", fileBody)
-        //                .build();
 
-        Request request = new Request.Builder().url(url).post(requestBody).build();
+        Request request = builder1.url(url).post(requestBody).build();
         client.newCall(request).enqueue(new StringCallBack(request, httpCallBack));
     }
 

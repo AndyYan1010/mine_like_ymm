@@ -12,13 +12,24 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bt.smart.truck_broker.MyApplication;
+import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.adapter.RecyOrderAdapter;
+import com.bt.smart.truck_broker.messageInfo.AllOrderListInfo;
+import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.PopupOpenHelper;
+import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
+import com.bt.smart.truck_broker.utils.RequestParamsFM;
+import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Request;
 
 
 /**
@@ -31,17 +42,18 @@ import java.util.List;
  */
 
 public class SameDay_F extends Fragment implements View.OnClickListener {
-    private View             mRootView;
-    private TextView         tv_title;
-    private LinearLayout     liner_top;
-    private RelativeLayout   rlt_title;
-    private LinearLayout     liner_term;
-    private LinearLayout     line_start;
-    private LinearLayout     line_end;
-    private LinearLayout     line_screen;
-    private RecyclerView     rec_order;
-    private RecyOrderAdapter orderAdapter;
-    private List             mData;
+    private View                            mRootView;
+    private View                            view_b;//底部定位
+    private TextView                        tv_title;
+    private LinearLayout                    liner_top;
+    private RelativeLayout                  rlt_title;
+    private LinearLayout                    liner_term;
+    private LinearLayout                    line_start;
+    private LinearLayout                    line_end;
+    private LinearLayout                    line_screen;
+    private RecyclerView                    rec_order;
+    private RecyOrderAdapter                orderAdapter;
+    private List<AllOrderListInfo.DataBean> mData;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,6 +65,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
 
     private void initView() {
         tv_title = mRootView.findViewById(R.id.tv_title);
+        view_b = mRootView.findViewById(R.id.view_b);
         liner_top = mRootView.findViewById(R.id.liner_top);
         rlt_title = mRootView.findViewById(R.id.rlt_title);
         liner_term = mRootView.findViewById(R.id.liner_term);
@@ -68,17 +81,71 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         line_end.setOnClickListener(this);
         line_screen.setOnClickListener(this);
         mData = new ArrayList();
-        mData.add("");
         rec_order.setLayoutManager(new LinearLayoutManager(getContext()));
         orderAdapter = new RecyOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
         rec_order.setAdapter(orderAdapter);
         orderAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                switch (view.getId()){
+                switch (view.getId()) {
                     case R.id.list_item:
-                        //查看详情
+                        //TODO:查看详情
+                        //http://205.168.1.118/yingsu_war_exploded/rest/orderController/4d2881f668112c7b01681138da950001
+                        //X-AUTH-TOKEN  id
+                        /*{
+  "message": "成功",
+  "data": {
+    "id": "4d2881f668112c7b01681138da950001",
+    "carType": "大卡车",
+    "fcheck": "1",
+    "fhName": "张三",
+    "fmainId": "1",
+    "fh": "*",
+    "fstatus": "0",
+    "shAddress": "广州",
+    "shArea": "广州",
+    "shName": "李四",
+    "fsubId": "yingsu0001002",
+    "isFapiao": "1",
+    "goodsName": "床上用品",
+    "fhAddress": "海门",
+    "shTelephone": "13779806859",
+    "sh": "*",
+    "zhTime": "2019-01-03 19:03",
+    "fhTelephone": "13897604863",
+    "orderGoodsList": [
+      {
+        "id": "4d2881f668112c7b01681138da950002",
+        "goodsWeight": 20,
+        "goodsSpace": 100,
+        "goodsName": null,
+        "orderId": "4d2881f668112c7b01681138da950001"
+      }
+    ]
+  },
+  "ok": true,
+  "respCode": "0"
+}*/
 
+                        //司机接单 http://205.168.1.118/yingsu_war_exploded/rest/driverOrderController   post
+                        /*
+                        X-AUTH-TOKEN
+                        body {
+  "createDate": "2019-01-09T07:57:25.234Z",
+  "driverId": "string",
+  "id": "string",
+  "orderId": "string",
+  "orderStatus": "string"
+}*/
+
+                        /*响应
+                        * {
+  "data": {},
+  "message": "string",
+  "ok": true,
+  "respCode": "string"
+}
+                        * */
                         break;
                 }
             }
@@ -86,7 +153,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         //设置rec_order滑动事件
         setRecyclerviewMoveEvent();
         //获取订单列表信息
-        getOrderList();
+        getOrderList(1, 10);
     }
 
     @Override
@@ -107,14 +174,39 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void getOrderList() {
+    private void getOrderList(int no, int size) {
+        RequestParamsFM headParams = new RequestParamsFM();
+        headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
+        String finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size;
+        HttpOkhUtils.getInstance().doGetWithOnlyHeader(finalUrl, headParams, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ProgressDialogUtil.hideDialog();
+                ToastUtils.showToast(getContext(), "网络连接错误");
+            }
 
+            @Override
+            public void onSuccess(int code, String resbody) {
+                ProgressDialogUtil.hideDialog();
+                if (code != 200) {
+                    ToastUtils.showToast(getContext(), "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                AllOrderListInfo allOrderListInfo = gson.fromJson(resbody, AllOrderListInfo.class);
+                ToastUtils.showToast(getContext(), allOrderListInfo.getMessage());
+                if (allOrderListInfo.isOk()) {
+                    mData.addAll(allOrderListInfo.getData());
+                }
+            }
+        });
     }
 
     int scDownY;
     int scMoveY;
     int rltTop;
     int rltBot;
+    int rec_h;
 
     private void setRecyclerviewMoveEvent() {
         rec_order.setOnTouchListener(new View.OnTouchListener() {
@@ -123,6 +215,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         scDownY = (int) motionEvent.getRawY();
+                        rec_h = view_b.getTop();
                         break;
                     case MotionEvent.ACTION_MOVE:
                         scMoveY = (int) motionEvent.getRawY();
@@ -139,6 +232,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                         }
 
                         liner_top.layout(0, rltTop, liner_top.getWidth(), rltBot);
+                        rec_order.layout(0, rltTop + liner_top.getHeight(), rec_order.getWidth(), rec_h);
 
                         scDownY = (int) motionEvent.getRawY();
                         rltTop = liner_top.getTop();
