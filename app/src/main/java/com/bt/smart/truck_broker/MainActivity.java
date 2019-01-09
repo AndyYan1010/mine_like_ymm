@@ -1,5 +1,6 @@
 package com.bt.smart.truck_broker;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -158,6 +159,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 bt_menu[i].setImageResource(select_on[i]);
             }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        home_F.onActivityResult(requestCode, resultCode, data);
+        sameDay_F.onActivityResult(requestCode, resultCode, data);
     }
 
     private void changeTVColor(int item) {

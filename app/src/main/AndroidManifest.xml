@@ -29,6 +29,7 @@
         <activity android:name=".activity.userAct.AuthenticationActivity"/>
         <activity android:name=".activity.userAct.GetFacePhotoActivity"/>
         <activity android:name=".activity.userAct.GetDriveCardPhotoActivity"/>
+        <activity android:name=".activity.homeAct.SelectPlaceAndCarActivity"/>
     </application>
 
 </manifest>

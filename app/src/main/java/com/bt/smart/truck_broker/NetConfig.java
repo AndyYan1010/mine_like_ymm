@@ -41,7 +41,17 @@ public class NetConfig {
     public static String REGISTERDRIVERCONTROLLER = ROOT + "registerDriverController/{id}";
 
     //获取当天货源信息列表
-    public static String ALL_ORDER_LIST = ROOT + "orderController/list";
+    public static String ALL_ORDER_LIST        = ROOT + "orderController/list";
+    //获取当天货源条目详情
+    public static String ALL_ORDER_DETAIL      = ROOT + "orderController";
+    //司机接单
+    public static String DRIVERORDERCONTROLLER = ROOT + "driverOrderController";
+
+
+    //根据司机id获取个人线路
+    public static String DRIVERJOURNEYCONTROLLER = ROOT + "driverJourneyController";
+    //创建司机行驶路线
+//    public static String DRIVERJOURNEYCONTROLLER = ROOT + "driverJourneyController";
 
 
 }

@@ -1,5 +1,6 @@
 package com.bt.smart.truck_broker.fragment.sameDay;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,12 +16,14 @@ import android.widget.TextView;
 import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
+import com.bt.smart.truck_broker.activity.samedayAct.OrderDetailActivity;
 import com.bt.smart.truck_broker.adapter.RecyOrderAdapter;
 import com.bt.smart.truck_broker.messageInfo.AllOrderListInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.PopupOpenHelper;
 import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
+import com.bt.smart.truck_broker.utils.ShowCallUtil;
 import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
@@ -54,6 +57,8 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     private RecyclerView                    rec_order;
     private RecyOrderAdapter                orderAdapter;
     private List<AllOrderListInfo.DataBean> mData;
+    private int REQUEST_FOR_TAKE_ORDER = 12087;//接单返回
+    private int RESULT_TAKE_ORDER      = 12088;//接单成功响应值
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,64 +93,14 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 switch (view.getId()) {
-                    case R.id.list_item:
-                        //TODO:查看详情
-                        //http://205.168.1.118/yingsu_war_exploded/rest/orderController/4d2881f668112c7b01681138da950001
-                        //X-AUTH-TOKEN  id
-                        /*{
-  "message": "成功",
-  "data": {
-    "id": "4d2881f668112c7b01681138da950001",
-    "carType": "大卡车",
-    "fcheck": "1",
-    "fhName": "张三",
-    "fmainId": "1",
-    "fh": "*",
-    "fstatus": "0",
-    "shAddress": "广州",
-    "shArea": "广州",
-    "shName": "李四",
-    "fsubId": "yingsu0001002",
-    "isFapiao": "1",
-    "goodsName": "床上用品",
-    "fhAddress": "海门",
-    "shTelephone": "13779806859",
-    "sh": "*",
-    "zhTime": "2019-01-03 19:03",
-    "fhTelephone": "13897604863",
-    "orderGoodsList": [
-      {
-        "id": "4d2881f668112c7b01681138da950002",
-        "goodsWeight": 20,
-        "goodsSpace": 100,
-        "goodsName": null,
-        "orderId": "4d2881f668112c7b01681138da950001"
-      }
-    ]
-  },
-  "ok": true,
-  "respCode": "0"
-}*/
-
-                        //司机接单 http://205.168.1.118/yingsu_war_exploded/rest/driverOrderController   post
-                        /*
-                        X-AUTH-TOKEN
-                        body {
-  "createDate": "2019-01-09T07:57:25.234Z",
-  "driverId": "string",
-  "id": "string",
-  "orderId": "string",
-  "orderStatus": "string"
-}*/
-
-                        /*响应
-                        * {
-  "data": {},
-  "message": "string",
-  "ok": true,
-  "respCode": "string"
-}
-                        * */
+                    case R.id.linear_item:
+                        Intent intent = new Intent(getContext(), OrderDetailActivity.class);
+                        intent.putExtra("orderID", mData.get(position).getId());
+                        startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
+                        startActivity(intent);
+                        break;
+                    case R.id.img_call:
+                        ShowCallUtil.showCallDialog(getContext(),  mData.get(position).getFhTelephone());
                         break;
                 }
             }
@@ -171,6 +126,15 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                 //筛选运输条件
                 screenAllTerm();
                 break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (REQUEST_FOR_TAKE_ORDER == requestCode && RESULT_TAKE_ORDER == resultCode) {
+            //刷新界面
+            getOrderList(1, 10);
         }
     }
 

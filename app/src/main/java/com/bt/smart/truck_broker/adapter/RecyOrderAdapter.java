@@ -31,5 +31,7 @@ public class RecyOrderAdapter extends BaseQuickAdapter<AllOrderListInfo.DataBean
         //        (ImageView) helper.getView(R.id.img_kind)
         helper.setText(R.id.tv_place, item.getFhAddress() + "  →  " + item.getShAddress());
         helper.setText(R.id.tv_goodsname, item.getGoodsName());
+        helper.setText(R.id.tv_loadtime, "装货时间："+item.getZhTime());
+        helper.setText(R.id.tv_name, item.getFhName());
     }
 }
