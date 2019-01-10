@@ -1,9 +1,12 @@
 package com.bt.smart.truck_broker.adapter;
 
 import android.content.Context;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.messageInfo.AllOrderListInfo;
+import com.bt.smart.truck_broker.utils.ShowCallUtil;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 
@@ -27,11 +30,18 @@ public class RecyOrderAdapter extends BaseQuickAdapter<AllOrderListInfo.DataBean
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, AllOrderListInfo.DataBean item) {
-        //        (ImageView) helper.getView(R.id.img_kind)
+    protected void convert(BaseViewHolder helper, final AllOrderListInfo.DataBean item) {
+        //        (ImageView) helper.getView(R.id.img_call)
         helper.setText(R.id.tv_place, item.getFhAddress() + "  →  " + item.getShAddress());
         helper.setText(R.id.tv_goodsname, item.getGoodsName());
-        helper.setText(R.id.tv_loadtime, "装货时间："+item.getZhTime());
+        helper.setText(R.id.tv_loadtime, "装货时间：" + item.getZhTime());
         helper.setText(R.id.tv_name, item.getFhName());
+        ImageView img_call = (ImageView) helper.getView(R.id.img_call);
+        img_call.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ShowCallUtil.showCallDialog(mContext, item.getFhTelephone());
+            }
+        });
     }
 }

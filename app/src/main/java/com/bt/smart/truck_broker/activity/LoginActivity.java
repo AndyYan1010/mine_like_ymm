@@ -337,7 +337,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     return;
                 }
                 Gson gson = new Gson();
-                ToastUtils.showToast(LoginActivity.this, "登录成功" + resbody);
+                ToastUtils.showToast(LoginActivity.this, "登录成功");
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
                 MyApplication.userID = loginInfo.getRegisterDriver().getId();

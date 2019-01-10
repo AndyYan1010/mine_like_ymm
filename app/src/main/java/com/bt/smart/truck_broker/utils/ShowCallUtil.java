@@ -21,6 +21,10 @@ import com.bt.smart.truck_broker.R;
 public class ShowCallUtil {
 
     public static void showCallDialog(final Context context, final String ftel) {
+        if (null == ftel) {
+            ToastUtils.showToast(context, "未找到电话号码");
+            return;
+        }
         //弹出dialog
         AlertDialog dialog = new AlertDialog.Builder(context).create();
         dialog.setIcon(R.drawable.icon_phone);      //设置图标

@@ -85,26 +85,9 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         line_start.setOnClickListener(this);
         line_end.setOnClickListener(this);
         line_screen.setOnClickListener(this);
-        mData = new ArrayList();
-        rec_order.setLayoutManager(new LinearLayoutManager(getContext()));
-        orderAdapter = new RecyOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
-        rec_order.setAdapter(orderAdapter);
-        orderAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-            @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                switch (view.getId()) {
-                    case R.id.linear_item:
-                        Intent intent = new Intent(getContext(), OrderDetailActivity.class);
-                        intent.putExtra("orderID", mData.get(position).getId());
-                        startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
-                        startActivity(intent);
-                        break;
-                    case R.id.img_call:
-                        ShowCallUtil.showCallDialog(getContext(),  mData.get(position).getFhTelephone());
-                        break;
-                }
-            }
-        });
+        //初始化货源列表
+        initOrderList();
+
         //设置rec_order滑动事件
         setRecyclerviewMoveEvent();
         //获取订单列表信息
@@ -136,6 +119,29 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
             //刷新界面
             getOrderList(1, 10);
         }
+    }
+
+    private void initOrderList() {
+        mData = new ArrayList();
+        rec_order.setLayoutManager(new LinearLayoutManager(getContext()));
+        orderAdapter = new RecyOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
+        rec_order.setAdapter(orderAdapter);
+        orderAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                switch (view.getId()) {
+                    case R.id.linear_item:
+                        Intent intent = new Intent(getContext(), OrderDetailActivity.class);
+                        intent.putExtra("orderID", mData.get(position).getId());
+                        startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
+                        startActivity(intent);
+                        break;
+                    case R.id.img_call:
+                        ShowCallUtil.showCallDialog(getContext(), mData.get(position).getFhTelephone());
+                        break;
+                }
+            }
+        });
     }
 
     private void getOrderList(int no, int size) {

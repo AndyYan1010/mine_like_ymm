@@ -18,6 +18,11 @@ public class ChioceAdapterContentInfo {
 
     private String cont;
     private boolean chioce;
+    /**
+     * id : 10
+     */
+
+    private String id;
 
     public String getCont() {
         return cont;
@@ -33,5 +38,13 @@ public class ChioceAdapterContentInfo {
 
     public void setChioce(boolean chioce) {
         this.chioce = chioce;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

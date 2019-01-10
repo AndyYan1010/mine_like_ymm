@@ -164,8 +164,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        home_F.onActivityResult(requestCode, resultCode, data);
-        sameDay_F.onActivityResult(requestCode, resultCode, data);
+        if (null != home_F)
+            home_F.onActivityResult(requestCode, resultCode, data);
+        if (null != sameDay_F)
+            sameDay_F.onActivityResult(requestCode, resultCode, data);
     }
 
     private void changeTVColor(int item) {

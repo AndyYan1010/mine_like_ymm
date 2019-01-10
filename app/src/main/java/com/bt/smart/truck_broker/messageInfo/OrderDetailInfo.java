@@ -15,15 +15,15 @@ public class OrderDetailInfo {
 
     /**
      * message : 成功
-     * data : {"id":"4d2881f668112c7b01681138da950001","carType":"大卡车","fcheck":"1","fhName":"张三","fmainId":"1","fh":"*","fstatus":"0","shAddress":"广州","shArea":"广州","shName":"李四","fsubId":"yingsu0001002","isFapiao":"1","goodsName":"床上用品","fhAddress":"海门","shTelephone":"13779806859","sh":"*","zhTime":"2019-01-03 19:03","fhTelephone":"13897604863","orderGoodsList":[{"id":"4d2881f668112c7b01681138da950002","goodsWeight":20,"goodsSpace":100,"goodsName":null,"orderId":"4d2881f668112c7b01681138da950001"}]}
-     * ok : true
+     * data : {"id":"2c90b4e36835d2d501683643e62d0009","carType":"货车","zhTime":"2019-01-10","fmainId":"","fcheck":"0","goodsName":"货物类别服装","fhAddress":"发货人地址南通","shArea":"收货人地区上海","shTelephone":"18234567898","shAddress":"收货人地址上海","fstatus":"0","fsubId":"","fhName":"发货人张三","sh":"1235","fhTelephone":"18234567890","shName":"收货人李四","fh":"1236","isFapiao":"0","orderGoodsList":[{"id":"2c90b4e36835d2d501683643e62e000a","orderId":"2c90b4e36835d2d501683643e62d0009","goodsName":"上装","goodsWeight":12,"goodsSpace":11},{"id":"2c90b4e36835d2d501683643e62e000b","orderId":"2c90b4e36835d2d501683643e62d0009","goodsName":"下装","goodsWeight":22,"goodsSpace":21}]}
      * respCode : 0
+     * ok : true
      */
 
     private String message;
     private DataBean data;
-    private boolean  ok;
     private String   respCode;
+    private boolean  ok;
 
     public String getMessage() {
         return message;
@@ -41,14 +41,6 @@ public class OrderDetailInfo {
         this.data = data;
     }
 
-    public boolean isOk() {
-        return ok;
-    }
-
-    public void setOk(boolean ok) {
-        this.ok = ok;
-    }
-
     public String getRespCode() {
         return respCode;
     }
@@ -57,47 +49,55 @@ public class OrderDetailInfo {
         this.respCode = respCode;
     }
 
+    public boolean isOk() {
+        return ok;
+    }
+
+    public void setOk(boolean ok) {
+        this.ok = ok;
+    }
+
     public static class DataBean {
         /**
-         * id : 4d2881f668112c7b01681138da950001
-         * carType : 大卡车
-         * fcheck : 1
-         * fhName : 张三
-         * fmainId : 1
-         * fh : *
+         * id : 2c90b4e36835d2d501683643e62d0009
+         * carType : 货车
+         * zhTime : 2019-01-10
+         * fmainId :
+         * fcheck : 0
+         * goodsName : 货物类别服装
+         * fhAddress : 发货人地址南通
+         * shArea : 收货人地区上海
+         * shTelephone : 18234567898
+         * shAddress : 收货人地址上海
          * fstatus : 0
-         * shAddress : 广州
-         * shArea : 广州
-         * shName : 李四
-         * fsubId : yingsu0001002
-         * isFapiao : 1
-         * goodsName : 床上用品
-         * fhAddress : 海门
-         * shTelephone : 13779806859
-         * sh : *
-         * zhTime : 2019-01-03 19:03
-         * fhTelephone : 13897604863
-         * orderGoodsList : [{"id":"4d2881f668112c7b01681138da950002","goodsWeight":20,"goodsSpace":100,"goodsName":null,"orderId":"4d2881f668112c7b01681138da950001"}]
+         * fsubId :
+         * fhName : 发货人张三
+         * sh : 1235
+         * fhTelephone : 18234567890
+         * shName : 收货人李四
+         * fh : 1236
+         * isFapiao : 0
+         * orderGoodsList : [{"id":"2c90b4e36835d2d501683643e62e000a","orderId":"2c90b4e36835d2d501683643e62d0009","goodsName":"上装","goodsWeight":12,"goodsSpace":11},{"id":"2c90b4e36835d2d501683643e62e000b","orderId":"2c90b4e36835d2d501683643e62d0009","goodsName":"下装","goodsWeight":22,"goodsSpace":21}]
          */
 
         private String id;
         private String                   carType;
-        private String                   fcheck;
-        private String                   fhName;
+        private String                   zhTime;
         private String                   fmainId;
-        private String                   fh;
-        private String                   fstatus;
-        private String                   shAddress;
-        private String                   shArea;
-        private String                   shName;
-        private String                   fsubId;
-        private String                   isFapiao;
+        private String                   fcheck;
         private String                   goodsName;
         private String                   fhAddress;
+        private String                   shArea;
         private String                   shTelephone;
+        private String                   shAddress;
+        private String                   fstatus;
+        private String                   fsubId;
+        private String                   fhName;
         private String                   sh;
-        private String                   zhTime;
         private String                   fhTelephone;
+        private String                   shName;
+        private String                   fh;
+        private String                   isFapiao;
         private List<OrderGoodsListBean> orderGoodsList;
 
         public String getId() {
@@ -116,20 +116,12 @@ public class OrderDetailInfo {
             this.carType = carType;
         }
 
-        public String getFcheck() {
-            return fcheck;
+        public String getZhTime() {
+            return zhTime;
         }
 
-        public void setFcheck(String fcheck) {
-            this.fcheck = fcheck;
-        }
-
-        public String getFhName() {
-            return fhName;
-        }
-
-        public void setFhName(String fhName) {
-            this.fhName = fhName;
+        public void setZhTime(String zhTime) {
+            this.zhTime = zhTime;
         }
 
         public String getFmainId() {
@@ -140,60 +132,12 @@ public class OrderDetailInfo {
             this.fmainId = fmainId;
         }
 
-        public String getFh() {
-            return fh;
+        public String getFcheck() {
+            return fcheck;
         }
 
-        public void setFh(String fh) {
-            this.fh = fh;
-        }
-
-        public String getFstatus() {
-            return fstatus;
-        }
-
-        public void setFstatus(String fstatus) {
-            this.fstatus = fstatus;
-        }
-
-        public String getShAddress() {
-            return shAddress;
-        }
-
-        public void setShAddress(String shAddress) {
-            this.shAddress = shAddress;
-        }
-
-        public String getShArea() {
-            return shArea;
-        }
-
-        public void setShArea(String shArea) {
-            this.shArea = shArea;
-        }
-
-        public String getShName() {
-            return shName;
-        }
-
-        public void setShName(String shName) {
-            this.shName = shName;
-        }
-
-        public String getFsubId() {
-            return fsubId;
-        }
-
-        public void setFsubId(String fsubId) {
-            this.fsubId = fsubId;
-        }
-
-        public String getIsFapiao() {
-            return isFapiao;
-        }
-
-        public void setIsFapiao(String isFapiao) {
-            this.isFapiao = isFapiao;
+        public void setFcheck(String fcheck) {
+            this.fcheck = fcheck;
         }
 
         public String getGoodsName() {
@@ -212,12 +156,52 @@ public class OrderDetailInfo {
             this.fhAddress = fhAddress;
         }
 
+        public String getShArea() {
+            return shArea;
+        }
+
+        public void setShArea(String shArea) {
+            this.shArea = shArea;
+        }
+
         public String getShTelephone() {
             return shTelephone;
         }
 
         public void setShTelephone(String shTelephone) {
             this.shTelephone = shTelephone;
+        }
+
+        public String getShAddress() {
+            return shAddress;
+        }
+
+        public void setShAddress(String shAddress) {
+            this.shAddress = shAddress;
+        }
+
+        public String getFstatus() {
+            return fstatus;
+        }
+
+        public void setFstatus(String fstatus) {
+            this.fstatus = fstatus;
+        }
+
+        public String getFsubId() {
+            return fsubId;
+        }
+
+        public void setFsubId(String fsubId) {
+            this.fsubId = fsubId;
+        }
+
+        public String getFhName() {
+            return fhName;
+        }
+
+        public void setFhName(String fhName) {
+            this.fhName = fhName;
         }
 
         public String getSh() {
@@ -228,20 +212,36 @@ public class OrderDetailInfo {
             this.sh = sh;
         }
 
-        public String getZhTime() {
-            return zhTime;
-        }
-
-        public void setZhTime(String zhTime) {
-            this.zhTime = zhTime;
-        }
-
         public String getFhTelephone() {
             return fhTelephone;
         }
 
         public void setFhTelephone(String fhTelephone) {
             this.fhTelephone = fhTelephone;
+        }
+
+        public String getShName() {
+            return shName;
+        }
+
+        public void setShName(String shName) {
+            this.shName = shName;
+        }
+
+        public String getFh() {
+            return fh;
+        }
+
+        public void setFh(String fh) {
+            this.fh = fh;
+        }
+
+        public String getIsFapiao() {
+            return isFapiao;
+        }
+
+        public void setIsFapiao(String isFapiao) {
+            this.isFapiao = isFapiao;
         }
 
         public List<OrderGoodsListBean> getOrderGoodsList() {
@@ -254,18 +254,18 @@ public class OrderDetailInfo {
 
         public static class OrderGoodsListBean {
             /**
-             * id : 4d2881f668112c7b01681138da950002
-             * goodsWeight : 20
-             * goodsSpace : 100
-             * goodsName : null
-             * orderId : 4d2881f668112c7b01681138da950001
+             * id : 2c90b4e36835d2d501683643e62e000a
+             * orderId : 2c90b4e36835d2d501683643e62d0009
+             * goodsName : 上装
+             * goodsWeight : 12
+             * goodsSpace : 11
              */
 
             private String id;
+            private String orderId;
+            private String goodsName;
             private int    goodsWeight;
             private int    goodsSpace;
-            private Object goodsName;
-            private String orderId;
 
             public String getId() {
                 return id;
@@ -273,6 +273,22 @@ public class OrderDetailInfo {
 
             public void setId(String id) {
                 this.id = id;
+            }
+
+            public String getOrderId() {
+                return orderId;
+            }
+
+            public void setOrderId(String orderId) {
+                this.orderId = orderId;
+            }
+
+            public String getGoodsName() {
+                return goodsName;
+            }
+
+            public void setGoodsName(String goodsName) {
+                this.goodsName = goodsName;
             }
 
             public int getGoodsWeight() {
@@ -289,22 +305,6 @@ public class OrderDetailInfo {
 
             public void setGoodsSpace(int goodsSpace) {
                 this.goodsSpace = goodsSpace;
-            }
-
-            public Object getGoodsName() {
-                return goodsName;
-            }
-
-            public void setGoodsName(Object goodsName) {
-                this.goodsName = goodsName;
-            }
-
-            public String getOrderId() {
-                return orderId;
-            }
-
-            public void setOrderId(String orderId) {
-                this.orderId = orderId;
             }
         }
     }

@@ -6,9 +6,22 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.bt.smart.truck_broker.MyApplication;
+import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
+import com.bt.smart.truck_broker.fragment.home.Home_F;
+import com.bt.smart.truck_broker.messageInfo.CommenInfo;
+import com.bt.smart.truck_broker.messageInfo.SearchDriverLinesInfo;
+import com.bt.smart.truck_broker.utils.HttpOkhUtils;
+import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
+import com.bt.smart.truck_broker.utils.RequestParamsFM;
+import com.bt.smart.truck_broker.utils.ToastUtils;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.List;
+
+import okhttp3.Request;
 
 /**
  * @创建者 AndyYan
@@ -20,12 +33,14 @@ import java.util.List;
  */
 
 public class LvLinesAdapter extends BaseAdapter {
-    private Context mContext;
-    private List    mList;
+    private Context                              mContext;
+    private List<SearchDriverLinesInfo.DataBean> mList;
+    private Home_F                               homeF;
 
-    public LvLinesAdapter(Context context, List list) {
+    public LvLinesAdapter(Context context, List<SearchDriverLinesInfo.DataBean> list, Home_F home_f) {
         this.mContext = context;
         this.mList = list;
+        this.homeF = home_f;
     }
 
     @Override
@@ -44,7 +59,7 @@ public class LvLinesAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View view, ViewGroup viewGroup) {
         final MyViewHolder viewholder;
         if (null == view) {
             viewholder = new MyViewHolder();
@@ -56,8 +71,53 @@ public class LvLinesAdapter extends BaseAdapter {
         } else {
             viewholder = (MyViewHolder) view.getTag();
         }
+        viewholder.tv_place.setText(mList.get(i).getOrigin() + "  →  " + mList.get(i).getDestination());
+        viewholder.tv_explain.setText(mList.get(i).getCarLong() + "  /  " + mList.get(i).getCarType());
+        if (mList.get(i).isCanDel()) {
+            viewholder.tv_del.setVisibility(View.VISIBLE);
+        } else {
+            viewholder.tv_del.setVisibility(View.GONE);
+        }
+        viewholder.tv_del.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //从服务器删除线路
+                deletLines(i);
+            }
+        });
 
         return view;
+    }
+
+    private void deletLines(final int i) {
+        RequestParamsFM headParam = new RequestParamsFM();
+        headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
+        HttpOkhUtils.getInstance().doDeleteOnlyWithHead(NetConfig.DRIVERJOURNEYCONTROLLER+"/"+mList.get(i).getId(), headParam, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ProgressDialogUtil.hideDialog();
+                ToastUtils.showToast(mContext, "网络连接错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                ProgressDialogUtil.hideDialog();
+                if (code != 200) {
+                    ToastUtils.showToast(mContext, "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                CommenInfo commenInfo = gson.fromJson(resbody, CommenInfo.class);
+                ToastUtils.showToast(mContext, commenInfo.getMessage());
+                if (commenInfo.isOk()) {
+                    mList.remove(i);
+                    if (mList.size() == 0) {
+                        homeF.setUIChange();
+                    }
+                    notifyDataSetChanged();
+                }
+            }
+        });
     }
 
     private class MyViewHolder {

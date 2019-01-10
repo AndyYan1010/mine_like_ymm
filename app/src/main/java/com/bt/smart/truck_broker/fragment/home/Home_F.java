@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -13,8 +14,10 @@ import android.widget.TextView;
 import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
+import com.bt.smart.truck_broker.activity.homeAct.FindByLinesActivity;
 import com.bt.smart.truck_broker.activity.homeAct.SelectPlaceAndCarActivity;
 import com.bt.smart.truck_broker.adapter.LvLinesAdapter;
+import com.bt.smart.truck_broker.messageInfo.SearchDriverLinesInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
@@ -44,13 +47,13 @@ public class Home_F extends Fragment implements View.OnClickListener {
     private LinearLayout linear_lines;//有线路时需展示的view
     private TextView     tv_linesnum;//线路数
     private TextView     tv_edit;//编辑线路
+    private boolean      canEdit;//是否编辑路线
     private ListView     lv_line;//线路列表
     private TextView     tv_addline;
-    private int REQUEST_FINE_LOACTION    = 2001;//申请定位权限的识别码
     private int REQUEST_FOR_SELECT_LINES = 10066;//设置线路响应码
-    private int result_FOR_SELECT_LINES  = 10067;//设置线路响应值
-    private List           mData;
-    private LvLinesAdapter linesAdapter;
+    private int Result_FOR_SELECT_LINES  = 10067;//设置线路响应值
+    private List<SearchDriverLinesInfo.DataBean> mData;
+    private LvLinesAdapter                       linesAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -71,12 +74,11 @@ public class Home_F extends Fragment implements View.OnClickListener {
     }
 
     private void initData() {
-        mData = new ArrayList();
-        linesAdapter = new LvLinesAdapter(getContext(), mData);
-        lv_line.setAdapter(linesAdapter);
-        linear_lines.setVisibility(View.GONE);
-        //获取个人线路
-        getPersonalLines();
+        //初始化路线
+        initLinesData();
+
+        tv_addline.setOnClickListener(this);
+        tv_edit.setOnClickListener(this);
     }
 
     @Override
@@ -87,59 +89,68 @@ public class Home_F extends Fragment implements View.OnClickListener {
                 //创建司机行程
                 createDriverLine();
                 break;
+            case R.id.tv_edit:
+                //编辑路线
+                editLines();
+                break;
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_FOR_SELECT_LINES && resultCode == result_FOR_SELECT_LINES) {
+        if (requestCode == REQUEST_FOR_SELECT_LINES && resultCode == Result_FOR_SELECT_LINES) {
             //搜索最新线路列表
-
+            //获取个人线路
+            getPersonalLines();
         }
+    }
+
+    private void editLines() {
+        if (!canEdit) {
+            canEdit = true;
+            tv_edit.setText("取消编辑");
+            for (SearchDriverLinesInfo.DataBean bean : mData) {
+                bean.setCanDel(true);
+            }
+        } else {
+            canEdit = false;
+            tv_edit.setText("编辑");
+            for (SearchDriverLinesInfo.DataBean bean : mData) {
+                bean.setCanDel(false);
+            }
+        }
+        linesAdapter.notifyDataSetChanged();
+    }
+
+    private void initLinesData() {
+        mData = new ArrayList();
+        linesAdapter = new LvLinesAdapter(getContext(), mData, this);
+        lv_line.setAdapter(linesAdapter);
+        lv_line.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //跳转线路查找货源列表
+                Intent intent = new Intent(getContext(),FindByLinesActivity.class);
+                intent.putExtra("lineID",mData.get(i).getId());
+                startActivity(intent);
+            }
+        });
+        linear_lines.setVisibility(View.GONE);
+        //获取个人线路
+        getPersonalLines();
     }
 
     private void createDriverLine() {
         //跳转添加路线界面
         Intent intent = new Intent(getContext(), SelectPlaceAndCarActivity.class);
         startActivityForResult(intent, REQUEST_FOR_SELECT_LINES);
-
-
-        RequestParamsFM headParams = new RequestParamsFM();
-        headParams.put("", MyApplication.userToken);
-        RequestParamsFM params = new RequestParamsFM();
-        params.put("carType", "");
-        params.put("carLong", "");
-        params.put("destination", "");
-        params.put("driverId", "");
-        params.put("id", MyApplication.userID);
-        params.put("origin", "");
-        HttpOkhUtils.getInstance().doPostWithHeader(NetConfig.DRIVERJOURNEYCONTROLLER, headParams, params, new HttpOkhUtils.HttpCallBack() {
-            @Override
-            public void onError(Request request, IOException e) {
-                ProgressDialogUtil.hideDialog();
-                ToastUtils.showToast(getContext(), "网络连接错误");
-            }
-
-            @Override
-            public void onSuccess(int code, String resbody) {
-                ProgressDialogUtil.hideDialog();
-                if (code != 200) {
-                    ToastUtils.showToast(getContext(), "网络错误" + code);
-                    return;
-                }
-                Gson gson = new Gson();
-
-            }
-        });
     }
 
     private void getPersonalLines() {
         RequestParamsFM headParams = new RequestParamsFM();
-        headParams.put("", MyApplication.userToken);
-        RequestParamsFM params = new RequestParamsFM();
-        params.put("driverId", MyApplication.userID);
-        HttpOkhUtils.getInstance().doGetWithHeadParams(NetConfig.DRIVERJOURNEYCONTROLLER, headParams, params, new HttpOkhUtils.HttpCallBack() {
+        headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
+        HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.DRIVERJOURNEYCONTROLLER + "/getRoute/" + MyApplication.userID, headParams, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
                 ProgressDialogUtil.hideDialog();
@@ -154,11 +165,26 @@ public class Home_F extends Fragment implements View.OnClickListener {
                     return;
                 }
                 Gson gson = new Gson();
-                //                linear_tips.setVisibility(View.GONE);
-                //                linear_lines.setVisibility(View.VISIBLE);
-                //                mData.add("");
-                //                linesAdapter.notifyDataSetChanged();
+                SearchDriverLinesInfo searchDriverLinesInfo = gson.fromJson(resbody, SearchDriverLinesInfo.class);
+                ToastUtils.showToast(getContext(), searchDriverLinesInfo.getMessage());
+                if (searchDriverLinesInfo.isOk()) {
+                    if (searchDriverLinesInfo.getData().size() > 0) {
+                        linear_lines.setVisibility(View.VISIBLE);
+                        linear_tips.setVisibility(View.GONE);
+                        tv_linesnum.setText("我的路线(" + searchDriverLinesInfo.getData().size() + "/10)");
+                        mData.addAll(searchDriverLinesInfo.getData());
+                        linesAdapter.notifyDataSetChanged();
+                    } else {
+                        linear_lines.setVisibility(View.GONE);
+                        linear_tips.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         });
+    }
+
+    public void setUIChange() {
+        linear_lines.setVisibility(View.GONE);
+        linear_tips.setVisibility(View.VISIBLE);
     }
 }

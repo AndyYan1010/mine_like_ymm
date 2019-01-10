@@ -46,6 +46,7 @@
     <color name="gray_11">#bbbbbb</color>
     <color name="gray_12">#cccccc</color>
     <color name="gray_ec">#ECECEC</color>
+    <color name="gray_ea">#EAEAEA</color>
     <color name="gray_aa">#AAAAAA</color>
     <color name="gray_cc">#CCCCCC</color>
     <color name="gray_e">#EEEEEE</color>
@@ -93,4 +94,7 @@
 
     <color name="text_blue">#0076FF</color>
     <color name="text_black">#333333</color>
+
+    <color name="transplant">#00ffffff</color>
+
 </resources>

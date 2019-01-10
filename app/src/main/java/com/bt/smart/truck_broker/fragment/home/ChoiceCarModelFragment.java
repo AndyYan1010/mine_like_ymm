@@ -16,6 +16,7 @@ import com.bt.smart.truck_broker.adapter.RecyPlaceAdapter;
 import com.bt.smart.truck_broker.messageInfo.ChioceAdapterContentInfo;
 import com.bt.smart.truck_broker.utils.EditTextUtils;
 import com.bt.smart.truck_broker.utils.MyFragmentManagerUtil;
+import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import java.util.ArrayList;
@@ -74,7 +75,6 @@ public class ChoiceCarModelFragment extends Fragment implements View.OnClickList
         //设置车型数据
         setModelData();
 
-
         img_back.setOnClickListener(this);
         tv_sureLength.setOnClickListener(this);
         tv_clear.setOnClickListener(this);
@@ -108,16 +108,16 @@ public class ChoiceCarModelFragment extends Fragment implements View.OnClickList
         contentInfo.setChioce(false);
         mLengthData.add(contentInfo);
         ChioceAdapterContentInfo contentInfo1 = new ChioceAdapterContentInfo();
-        contentInfo.setCont("1.8米");
-        contentInfo.setChioce(false);
+        contentInfo1.setCont("1.8米");
+        contentInfo1.setChioce(false);
         mLengthData.add(contentInfo1);
         ChioceAdapterContentInfo contentInfo2 = new ChioceAdapterContentInfo();
-        contentInfo.setCont("2.7米");
-        contentInfo.setChioce(false);
+        contentInfo2.setCont("2.7米");
+        contentInfo2.setChioce(false);
         mLengthData.add(contentInfo2);
         ChioceAdapterContentInfo contentInfo3 = new ChioceAdapterContentInfo();
-        contentInfo.setCont("3.8米");
-        contentInfo.setChioce(false);
+        contentInfo3.setCont("3.8米");
+        contentInfo3.setChioce(false);
         mLengthData.add(contentInfo3);
         recy_length.setLayoutManager(new GridLayoutManager(getContext(), 4));
         placeAdapter = new RecyPlaceAdapter(R.layout.adpter_pop_city_place, getContext(), mLengthData);
@@ -131,6 +131,8 @@ public class ChoiceCarModelFragment extends Fragment implements View.OnClickList
                         bean.setChioce(false);
                     }
                     mLengthData.get(0).setChioce(true);
+                } else {
+                    mLengthData.get(0).setChioce(false);
                 }
                 placeAdapter.notifyDataSetChanged();
             }
@@ -144,16 +146,16 @@ public class ChoiceCarModelFragment extends Fragment implements View.OnClickList
         contentInfo.setChioce(false);
         mModelData.add(contentInfo);
         ChioceAdapterContentInfo contentInfo1 = new ChioceAdapterContentInfo();
-        contentInfo.setCont("平板");
-        contentInfo.setChioce(false);
+        contentInfo1.setCont("平板");
+        contentInfo1.setChioce(false);
         mModelData.add(contentInfo1);
         ChioceAdapterContentInfo contentInfo2 = new ChioceAdapterContentInfo();
-        contentInfo.setCont("高栏");
-        contentInfo.setChioce(false);
+        contentInfo2.setCont("高栏");
+        contentInfo2.setChioce(false);
         mModelData.add(contentInfo2);
         ChioceAdapterContentInfo contentInfo3 = new ChioceAdapterContentInfo();
-        contentInfo.setCont("厢式");
-        contentInfo.setChioce(false);
+        contentInfo3.setCont("厢式");
+        contentInfo3.setChioce(false);
         mModelData.add(contentInfo3);
         recy_model.setLayoutManager(new GridLayoutManager(getContext(), 4));
         modelAdapter = new RecyPlaceAdapter(R.layout.adpter_pop_city_place, getContext(), mModelData);
@@ -167,6 +169,8 @@ public class ChoiceCarModelFragment extends Fragment implements View.OnClickList
                         bean.setChioce(false);
                     }
                     mModelData.get(0).setChioce(true);
+                } else {
+                    mModelData.get(0).setChioce(false);
                 }
                 modelAdapter.notifyDataSetChanged();
             }
@@ -195,8 +199,30 @@ public class ChoiceCarModelFragment extends Fragment implements View.OnClickList
         }
     }
 
+    private boolean isChoiceLength;
+    private boolean isChoiceModel;
+
     private void makeSureTerm() {
-        mTopFragment.setChioceTerm();
+        for (ChioceAdapterContentInfo bean : mLengthData) {
+            if (bean.isChioce()) {
+                isChoiceLength = true;
+            }
+        }
+        for (ChioceAdapterContentInfo bean : mModelData) {
+            if (bean.isChioce()) {
+                isChoiceModel = true;
+            }
+        }
+        if (!isChoiceLength) {
+            ToastUtils.showToast(getContext(), "请选择车长");
+            return;
+        }
+        if (!isChoiceModel) {
+            ToastUtils.showToast(getContext(), "请选择车型");
+            return;
+        }
+        mTopFragment.setChioceTerm(mLengthData, mModelData);
+        MyFragmentManagerUtil.closeTopFragment(this);
     }
 
     public void setTopFragment(SetLinesAddressFragment fragment) {

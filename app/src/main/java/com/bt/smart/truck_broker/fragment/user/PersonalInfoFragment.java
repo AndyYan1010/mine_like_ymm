@@ -21,6 +21,7 @@ import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.activity.userAct.GetFacePhotoActivity;
+import com.bt.smart.truck_broker.utils.GlideLoaderUtil;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
@@ -109,6 +110,7 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
         super.onActivityResult(requestCode, resultCode, data);
         if (REQUEST_FOR_FACE == requestCode && resultCode == RESULT_FOR_FACE) {
             mImageFileUrl = data.getStringExtra("face_pic_url");
+            GlideLoaderUtil.showImageView(getContext(), mImageFileUrl, img_up_head);
         }
         //相册返回，获取图片路径
         if (requestCode == IMAGE && data != null) {
@@ -167,6 +169,7 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
                 Gson gson = new Gson();
                 System.out.println(resbody);
                 System.out.println(resbody);
+/*{"message":"成功","data":"upload/files/1547108710666.png","ok":true,"respCode":"0"}*/
                 //                gson.fromJson();
             }
         });

@@ -1,12 +1,16 @@
 package com.bt.smart.truck_broker.activity.userAct;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -40,7 +44,9 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     private TextView    tv_sure;
     private Camera      mCamera;
     private boolean     bfrontSwitch;
-    private Bitmap      bmp;
+    private Bitmap      mBmp;
+    private int RESULT_FOR_FACE = 10088;//获取头像响应值
+    private String fileUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,13 +95,54 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void getCameraPic() {
-        if (null != bmp) {
+        mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+            @Override
+            public void onPreviewFrame(byte[] bytes, Camera camera) {
+                Camera.Size size = camera.getParameters().getPreviewSize();
+                try {
+                    YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
+                    if (image != null) {
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
+
+                        Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+
+                        //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
+                        //                        mBmp = bmp;
+                        rotateMyBitmap(bmp);
+                        stream.close();
+                    }
+                } catch (Exception ex) {
+                    Log.e("Sys", "Error:" + ex.getMessage());
+                }
+            }
+        });
+
+        if (null != mBmp) {
             //将bitmap保存，记录照片本地地址，留待之后上传
-            boolean b = saveBitmap(bmp);
+            boolean b = saveBitmap(mBmp);
             if (b) {
                 ToastUtils.showToast(this, "人脸保存成功");
+                Intent intent = getIntent().putExtra("face_pic_url", fileUrl);
+                setResult(RESULT_FOR_FACE, intent);
+                finish();
+            } else {
+                ToastUtils.showToast(this, "人脸获取失败");
             }
         }
+    }
+
+    public void rotateMyBitmap(Bitmap bmp) {
+        //*****旋转一下
+        Matrix matrix = new Matrix();
+        matrix.postRotate(-90);
+
+        //Bitmap bitmap = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.ARGB_8888);
+
+        Bitmap nbmp2 = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+
+        //*******显示一下
+        mBmp = nbmp2;
     }
 
     private void setSurFaceView() {
@@ -179,24 +226,30 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
         YuvImage image = new YuvImage(bytes, ImageFormat.NV21, previewSize.width, previewSize.height, null);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         image.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, stream);
-        bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+        //        mBmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
     }
 
     /**
      * 保存方法
      */
     public boolean saveBitmap(Bitmap bm) {
+        long longTime = System.currentTimeMillis();
+        fileUrl = "/sdcard/DCIM/Camera/" + longTime + "head001.png";
         //        Log.e(TAG, "保存图片");
-        File f = new File("/sdcard/namecard/", "head001");
-        if (f.exists()) {
-            f.delete();
+        File file = new File("/sdcard/DCIM/Camera/", longTime + "head001.png");
+        if (file.exists()) {
+            file.delete();
         }
         try {
-            FileOutputStream out = new FileOutputStream(f);
+            FileOutputStream out = new FileOutputStream(file);
             bm.compress(Bitmap.CompressFormat.PNG, 90, out);
             out.flush();
             out.close();
-            //            Log.i(TAG, "已经保存");
+            //保存图片后发送广播通知更新数据库
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            Uri uri = Uri.fromFile(file);
+            intent.setData(uri);
+            this.sendBroadcast(intent);
             return true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
