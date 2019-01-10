@@ -146,12 +146,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 switch (view.getId()) {
-//                    case R.id.linear_item:
-//
-//                        break;
-//                    case R.id.img_call:
-//                        ShowCallUtil.showCallDialog(getContext(), mData.get(position).getFhTelephone());
-//                        break;
+
                 }
             }
         });

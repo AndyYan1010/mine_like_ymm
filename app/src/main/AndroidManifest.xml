@@ -32,6 +32,7 @@
         <activity android:name=".activity.homeAct.SelectPlaceAndCarActivity"/>
         <activity android:name=".activity.samedayAct.OrderDetailActivity"/>
         <activity android:name=".activity.homeAct.FindByLinesActivity"/>
+        <activity android:name=".activity.userAct.GetDrivingCardPhotoActivity"/>
     </application>
 
 </manifest>

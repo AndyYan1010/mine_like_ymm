@@ -189,6 +189,7 @@
                     android:id="@+id/et_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:background="@null"
@@ -204,6 +205,7 @@
                 android:background="@color/gray_10"/>
 
             <RelativeLayout
+                android:id="@+id/rlt_carModel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -223,8 +225,9 @@
                     android:id="@+id/tv_carmodel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginRight="30dp"
                     android:layout_toRightOf="@+id/tv_carx"
                     android:hint="请选择车型"
                     android:textSize="14sp"/>
@@ -246,6 +249,7 @@
                 android:background="@color/gray_10"/>
 
             <RelativeLayout
+                android:id="@+id/rlt_carLength"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"

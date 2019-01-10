@@ -136,9 +136,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     private void getOrderDetail() {
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
-        RequestParamsFM params = new RequestParamsFM();
-        params.put("id", orderID);
-        HttpOkhUtils.getInstance().doGetWithHeadParams(NetConfig.ALL_ORDER_DETAIL, headParams, params, new HttpOkhUtils.HttpCallBack() {
+        HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.ALL_ORDER_DETAIL + "/" + orderID, headParams, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
                 ProgressDialogUtil.hideDialog();

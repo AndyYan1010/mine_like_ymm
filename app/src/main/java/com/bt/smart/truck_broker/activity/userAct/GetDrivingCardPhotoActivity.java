@@ -16,10 +16,10 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bt.smart.truck_broker.BaseActivity;
 import com.bt.smart.truck_broker.R;
+import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.ToastUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -31,27 +31,26 @@ import java.util.List;
 
 /**
  * @创建者 AndyYan
- * @创建时间 2019/1/8 15:00
+ * @创建时间 2019/1/8 16:44
  * @描述 ${TODO}
  * @更新者 $Author$
  * @更新时间 $Date$
  * @更新描述 ${TODO}
  */
 
-public class GetFacePhotoActivity extends BaseActivity implements View.OnClickListener, Camera.PreviewCallback {
+public class GetDrivingCardPhotoActivity extends BaseActivity implements View.OnClickListener, Camera.PreviewCallback {
     private SurfaceView sfview;
     private ImageView   img_back;
-    private TextView    tv_sure;
+    private ImageView   img_sure;
     private Camera      mCamera;
-    private boolean     bfrontSwitch;
     private Bitmap      mBmp;
-    private int RESULT_FOR_FACE = 10088;//获取头像响应值
+    private int RESULT_FOR_FACE = 10098;//获取头像响应值
     private String fileUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_get_face);
+        setContentView(R.layout.activity_get_driving_card);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // 防止锁屏
         setView();
         setData();
@@ -60,12 +59,12 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     private void setView() {
         sfview = (SurfaceView) findViewById(R.id.sfview);
         img_back = (ImageView) findViewById(R.id.img_back);
-        tv_sure = (TextView) findViewById(R.id.tv_sure);
+        img_sure = (ImageView) findViewById(R.id.img_sure);
     }
 
     private void setData() {
         img_back.setOnClickListener(this);
-        tv_sure.setOnClickListener(this);
+        img_sure.setOnClickListener(this);
         //获取前置摄像头，显示在SurfaceView上
         setSurFaceView();
     }
@@ -76,7 +75,7 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
             case R.id.img_back:
                 finish();
                 break;
-            case R.id.tv_sure:
+            case R.id.img_sure:
                 //拍摄,获取相机图片
                 getCameraPic();
                 break;
@@ -95,6 +94,7 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void getCameraPic() {
+        ProgressDialogUtil.startShow(this, "正在取样中，请稍等...");
         mCamera.setPreviewCallback(new Camera.PreviewCallback() {
             @Override
             public void onPreviewFrame(byte[] bytes, Camera camera) {
@@ -103,12 +103,10 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
                     YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
                     if (image != null) {
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        image.compressToJpeg(new Rect(0, 0, size.width, size.height), 100, stream);
-
+                        image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
                         Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
 
                         //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
-                        //mBmp = bmp;
                         rotateMyBitmap(bmp);
                         stream.close();
                     }
@@ -117,17 +115,19 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
                 }
             }
         });
+
         if (null != mBmp) {
             //将bitmap保存，记录照片本地地址，留待之后上传
             boolean b = saveBitmap(mBmp);
             if (b) {
-                ToastUtils.showToast(this, "人脸保存成功");
-                Intent intent = getIntent().putExtra("face_pic_url", fileUrl);
+                ToastUtils.showToast(this, "驾驶证保存成功");
+                Intent intent = getIntent().putExtra("card_pic_url", fileUrl);
                 setResult(RESULT_FOR_FACE, intent);
                 finish();
             } else {
-                ToastUtils.showToast(this, "人脸获取失败");
+                ToastUtils.showToast(this, "驾驶证获取失败");
             }
+            ProgressDialogUtil.hideDialog();
         }
     }
 
@@ -135,26 +135,14 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
         //*****旋转一下
         Matrix matrix = new Matrix();
         matrix.postRotate(-90);
-
-        //Bitmap bitmap = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.ARGB_8888);
-
         Bitmap nbmp2 = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
-
         //*******显示一下
         mBmp = nbmp2;
     }
 
     private void setSurFaceView() {
-        //判断是否有前置摄像头
-        bfrontSwitch = isHasFrontCamera();
         if (mCamera == null) {
-            if (bfrontSwitch) {
-                mCamera = Camera.open(1);//前置
-                //                rotation = 270;
-            } else {
-                mCamera = Camera.open(0);//后置
-                //                rotation = 90;
-            }
+            mCamera = Camera.open(0);//后置
         }
         mCamera.setDisplayOrientation(90);
         Camera.Parameters parameters = mCamera.getParameters();
@@ -162,9 +150,8 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
         List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
         parameters.setPreviewSize(supportedPreviewSizes.get(0).width, supportedPreviewSizes.get(0).height);//设置预览分辨率
         parameters.setPreviewFrameRate(25);
+        //后置需要自动对焦，否则人脸采集照片模糊
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        //        if (!bfrontSwitch) {//后置需要自动对焦，否则人脸采集照片模糊
-        //        }
         mCamera.setParameters(parameters);
         mCamera.setPreviewCallback(this);//开启Camera预览回调，重写onPreviewFrame获取相机回调
         mCamera.startPreview();//开启预览
@@ -206,19 +193,6 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
         }
     }
 
-    private boolean isHasFrontCamera() {
-        boolean hasFrontCarmera = false;
-        int numberOfCameras = Camera.getNumberOfCameras();
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                hasFrontCarmera = true;
-            }
-        }
-        return hasFrontCarmera;
-    }
-
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         Camera.Size size = camera.getParameters().getPreviewSize();
@@ -226,12 +200,10 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
             YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
             if (image != null) {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                image.compressToJpeg(new Rect(0, 0, size.width, size.height), 100, stream);
-
+                image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
                 Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
 
                 //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
-                //mBmp = bmp;
                 rotateMyBitmap(bmp);
                 stream.close();
             }
@@ -242,7 +214,7 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
         //        YuvImage image = new YuvImage(bytes, ImageFormat.NV21, previewSize.width, previewSize.height, null);
         //        ByteArrayOutputStream stream = new ByteArrayOutputStream();
         //        image.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, stream);
-        //        mBmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+        //        //        mBmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
     }
 
     /**
@@ -250,9 +222,9 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
      */
     public boolean saveBitmap(Bitmap bm) {
         long longTime = System.currentTimeMillis();
-        fileUrl = "/sdcard/DCIM/Camera/" + longTime + "head001.png";
+        fileUrl = "/sdcard/DCIM/Camera/" + longTime + "card002.png";
         //        Log.e(TAG, "保存图片");
-        File file = new File("/sdcard/DCIM/Camera/", longTime + "head001.png");
+        File file = new File("/sdcard/DCIM/Camera/", longTime + "card002.png");
         if (file.exists()) {
             file.delete();
         }

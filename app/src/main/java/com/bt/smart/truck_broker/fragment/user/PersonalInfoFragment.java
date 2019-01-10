@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,21 +18,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bt.smart.truck_broker.MyApplication;
-import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
+import com.bt.smart.truck_broker.activity.userAct.GetDriveCardPhotoActivity;
 import com.bt.smart.truck_broker.activity.userAct.GetFacePhotoActivity;
+import com.bt.smart.truck_broker.utils.EditTextUtils;
 import com.bt.smart.truck_broker.utils.GlideLoaderUtil;
-import com.bt.smart.truck_broker.utils.HttpOkhUtils;
-import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
-import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.ToastUtils;
-import com.google.gson.Gson;
-
-import java.io.File;
-import java.io.IOException;
-
-import okhttp3.Request;
 
 /**
  * @创建者 AndyYan
@@ -54,7 +46,10 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
     private int MY_PERMISSIONS_REQUEST_CALL_PHONE2 = 10087;//照相权限申请码
     private int REQUEST_FOR_FACE                   = 10086;
     private int RESULT_FOR_FACE                    = 10088;
-    private String mImageFileUrl;
+    private int REQUEST_FOR_CARD                   = 10096;
+    private int RESULT_FOR_CARD                    = 10098;
+    private String mImageFaceFileUrl;
+    private String mImageCardFileUrl;
     private String testFileUrl;
 
     @Override
@@ -109,8 +104,12 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (REQUEST_FOR_FACE == requestCode && resultCode == RESULT_FOR_FACE) {
-            mImageFileUrl = data.getStringExtra("face_pic_url");
-            GlideLoaderUtil.showImageView(getContext(), mImageFileUrl, img_up_head);
+            mImageFaceFileUrl = data.getStringExtra("face_pic_url");
+            GlideLoaderUtil.showImageView(getContext(), mImageFaceFileUrl, img_up_head);
+        }
+        if (REQUEST_FOR_CARD == requestCode && resultCode == RESULT_FOR_CARD) {
+            mImageCardFileUrl = data.getStringExtra("card_pic_url");
+            GlideLoaderUtil.showImageView(getContext(), mImageCardFileUrl, img_up_card);
         }
         //相册返回，获取图片路径
         if (requestCode == IMAGE && data != null) {
@@ -127,54 +126,34 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
     }
 
     private void toWriteCarInfo() {
-        //测试提交图片
-        testUpPic();
+        //        //测试提交图片
+        //        testUpPic();
+        if (null == mImageFaceFileUrl || "".equals(mImageFaceFileUrl)) {
+            ToastUtils.showToast(getContext(), "未拍摄人脸");
+            return;
+        }
+        if (null == mImageCardFileUrl || "".equals(mImageCardFileUrl)) {
+            ToastUtils.showToast(getContext(), "未拍摄驾驶证");
+            return;
+        }
+        if (EditTextUtils.isEmpty(et_name, "姓名必须和身份证上相同")) {
+            ToastUtils.showToast(getContext(), "姓名不能为空");
+            return;
+        }
 
-        //        if (EditTextUtils.isEmpty(et_name, "姓名必须和身份证上相同")) {
-        //            ToastUtils.showToast(getContext(), "姓名不能为空");
-        //            return;
-        //        }
-        //
-        //        if (EditTextUtils.isEmpty(et_code, "请输入身份证号")) {
-        //            ToastUtils.showToast(getContext(), "身份证号不能为空");
-        //            return;
-        //        }
-        //        PersonalCarInfoFragment personalCarFt = new PersonalCarInfoFragment();
-        //        personalCarFt.setSomeInfo("", "", EditTextUtils.getContent(et_name), EditTextUtils.getContent(et_code));
-        //        FragmentTransaction ftt = getFragmentManager().beginTransaction();
-        //        ftt.add(R.id.frame, personalCarFt, "personalCarFt");
-        //        ftt.addToBackStack("personalCarFt");
-        //        ftt.commit();
+        if (EditTextUtils.isEmpty(et_code, "请输入身份证号")) {
+            ToastUtils.showToast(getContext(), "身份证号不能为空");
+            return;
+        }
+        PersonalCarInfoFragment personalCarFt = new PersonalCarInfoFragment();
+        personalCarFt.setSomeInfo(mImageFaceFileUrl, mImageCardFileUrl, EditTextUtils.getContent(et_name), EditTextUtils.getContent(et_code));
+        FragmentTransaction ftt = getFragmentManager().beginTransaction();
+        ftt.add(R.id.frame, personalCarFt, "personalCarFt");
+        ftt.addToBackStack("personalCarFt");
+        ftt.commit();
     }
 
-    private void testUpPic() {
-        File file = new File(testFileUrl);
-        RequestParamsFM headParam = new RequestParamsFM();
-        headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
-        RequestParamsFM params = new RequestParamsFM();
-        HttpOkhUtils.getInstance().upDateFile(NetConfig.PHOTO, headParam, params, "file", file, new HttpOkhUtils.HttpCallBack() {
-            @Override
-            public void onError(Request request, IOException e) {
-                ProgressDialogUtil.hideDialog();
-                ToastUtils.showToast(getContext(), "网络连接错误");
-            }
 
-            @Override
-            public void onSuccess(int code, String resbody) {
-                ProgressDialogUtil.hideDialog();
-                if (code != 200) {
-                    ToastUtils.showToast(getContext(), "网络错误" + code);
-                    return;
-                }
-                Gson gson = new Gson();
-                System.out.println(resbody);
-                System.out.println(resbody);
-/*{"message":"成功","data":"upload/files/1547108710666.png","ok":true,"respCode":"0"}*/
-                //                gson.fromJson();
-            }
-        });
-        return;
-    }
 
     private void toGetFacePic() {
         //第二个参数是需要申请的权限
@@ -202,33 +181,30 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
 
     private void toPhotoDriveCard() {
         //测试调用相册上传图片
-        //第二个参数是需要申请的权限
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            //权限还没有授予，需要在这里写申请权限的代码
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_CALL_PHONE2);
-        } else {
-            //权限已经被授予，在这里直接写要执行的相应方法即可
-            //调用相册
-            Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            getActivity().startActivityForResult(intent, IMAGE);
-        }
-
-
         //        //第二个参数是需要申请的权限
-        //        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+        //        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
         //                != PackageManager.PERMISSION_GRANTED) {
         //            //权限还没有授予，需要在这里写申请权限的代码
-        //            ToastUtils.showToast(getContext(), "面部认证功能，需要拍摄照片，请开启手机相机权限!");
-        //            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
+        //            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
         //                    MY_PERMISSIONS_REQUEST_CALL_PHONE2);
         //        } else {
-        //
-        //
-        //
-        //            //            Intent intent = new Intent(getContext(), GetDriveCardPhotoActivity.class);
-        //            //            startActivityForResult(intent, REQUEST_FOR_FACE);
+        //            //权限已经被授予，在这里直接写要执行的相应方法即可
+        //            //调用相册
+        //            Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        //            getActivity().startActivityForResult(intent, IMAGE);
         //        }
+
+
+        //第二个参数是需要申请的权限
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            //权限还没有授予，需要在这里写申请权限的代码
+            ToastUtils.showToast(getContext(), "面部认证功能，需要拍摄照片，请开启手机相机权限!");
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
+                    MY_PERMISSIONS_REQUEST_CALL_PHONE2);
+        } else {
+            Intent intent = new Intent(getContext(), GetDriveCardPhotoActivity.class);
+            startActivityForResult(intent, REQUEST_FOR_CARD);
+        }
     }
 }

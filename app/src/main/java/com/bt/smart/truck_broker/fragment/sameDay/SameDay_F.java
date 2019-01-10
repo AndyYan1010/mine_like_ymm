@@ -23,7 +23,6 @@ import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.PopupOpenHelper;
 import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
-import com.bt.smart.truck_broker.utils.ShowCallUtil;
 import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
@@ -130,16 +129,17 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 switch (view.getId()) {
-                    case R.id.linear_item:
-                        Intent intent = new Intent(getContext(), OrderDetailActivity.class);
-                        intent.putExtra("orderID", mData.get(position).getId());
-                        startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
-                        startActivity(intent);
-                        break;
-                    case R.id.img_call:
-                        ShowCallUtil.showCallDialog(getContext(), mData.get(position).getFhTelephone());
-                        break;
+
                 }
+            }
+        });
+        orderAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Intent intent = new Intent(getContext(), OrderDetailActivity.class);
+                intent.putExtra("orderID", mData.get(position).getId());
+                startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
+                startActivity(intent);
             }
         });
     }
@@ -166,7 +166,9 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                 AllOrderListInfo allOrderListInfo = gson.fromJson(resbody, AllOrderListInfo.class);
                 ToastUtils.showToast(getContext(), allOrderListInfo.getMessage());
                 if (allOrderListInfo.isOk()) {
+                    mData.clear();
                     mData.addAll(allOrderListInfo.getData());
+                    orderAdapter.notifyDataSetChanged();
                 }
             }
         });
