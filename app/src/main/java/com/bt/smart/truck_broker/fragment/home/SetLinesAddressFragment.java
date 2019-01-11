@@ -203,26 +203,26 @@ public class SetLinesAddressFragment extends Fragment implements View.OnClickLis
     private String destination = "";
 
     private void sendDriverLine() {
-        if (mDataSt.size()==0){
-            ToastUtils.showToast(getContext(),"出发地不能为空");
+        if (mDataSt.size() == 0) {
+            ToastUtils.showToast(getContext(), "出发地不能为空");
             return;
         }
-        if (mDataEd.size()==0){
-            ToastUtils.showToast(getContext(),"目的地不能为空");
+        if (mDataEd.size() == 0) {
+            ToastUtils.showToast(getContext(), "目的地不能为空");
             return;
         }
         for (int i = 0; i < mDataSt.size(); i++) {
             if (i == 0) {
-                origin = mDataSt.get(i).getCont();
+                origin = mDataSt.get(i).getId();
             } else {
-                origin = origin + "," + mDataSt.get(i).getCont();
+                origin = origin + "," + mDataSt.get(i).getId();
             }
         }
         for (int i = 0; i < mDataEd.size(); i++) {
             if (i == 0) {
-                destination = mDataEd.get(i).getCont();
+                destination = mDataEd.get(i).getId();
             } else {
-                destination = destination + "," + mDataEd.get(i).getCont();
+                destination = destination + "," + mDataEd.get(i).getId();
             }
         }
         RequestParamsFM headParams = new RequestParamsFM();
@@ -234,6 +234,7 @@ public class SetLinesAddressFragment extends Fragment implements View.OnClickLis
         params.put("id", MyApplication.userID);
         params.put("origin", origin);
         params.put("destination", destination);
+        params.setUseJsonStreamer(true);
         HttpOkhUtils.getInstance().doPostWithHeader(NetConfig.DRIVERJOURNEYCONTROLLER, headParams, params, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
@@ -307,6 +308,7 @@ public class SetLinesAddressFragment extends Fragment implements View.OnClickLis
                                 //将选择的起点填写
                                 ChioceAdapterContentInfo contentInfo = new ChioceAdapterContentInfo();
                                 contentInfo.setCont(mDataPopEd.get(position).getCont());
+                                contentInfo.setId(mDataPopEd.get(position).getId());
                                 mDataSt.add(contentInfo);
                                 placeAdapter.notifyDataSetChanged();
                                 if (mDataSt.size() >= 3) {
@@ -318,6 +320,7 @@ public class SetLinesAddressFragment extends Fragment implements View.OnClickLis
                                 //将选择的目的地填写
                                 ChioceAdapterContentInfo contentInfo = new ChioceAdapterContentInfo();
                                 contentInfo.setCont(mDataPopEd.get(position).getCont());
+                                contentInfo.setId(mDataPopEd.get(position).getId());
                                 mDataEd.add(contentInfo);
                                 placeEdAdapter.notifyDataSetChanged();
                                 if (mDataEd.size() >= 3) {

@@ -3,6 +3,7 @@ package com.bt.smart.truck_broker.fragment.sameDay;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,7 +20,10 @@ import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.activity.samedayAct.OrderDetailActivity;
 import com.bt.smart.truck_broker.adapter.RecyOrderAdapter;
+import com.bt.smart.truck_broker.adapter.RecyPlaceAdapter;
 import com.bt.smart.truck_broker.messageInfo.AllOrderListInfo;
+import com.bt.smart.truck_broker.messageInfo.ChioceAdapterContentInfo;
+import com.bt.smart.truck_broker.messageInfo.ShengDataInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.PopupOpenHelper;
 import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
@@ -47,6 +52,8 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     private View                            mRootView;
     private View                            view_b;//底部定位
     private TextView                        tv_title;
+    private TextView                        tv_start;//起点
+    private TextView                        tv_end;//终点
     private LinearLayout                    liner_top;
     private RelativeLayout                  rlt_title;
     private LinearLayout                    liner_term;
@@ -77,6 +84,8 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         line_end = mRootView.findViewById(R.id.line_end);
         line_screen = mRootView.findViewById(R.id.line_screen);
         rec_order = mRootView.findViewById(R.id.rec_order);
+        tv_start = mRootView.findViewById(R.id.tv_start);
+        tv_end = mRootView.findViewById(R.id.tv_end);
     }
 
     private void initData() {
@@ -88,9 +97,12 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         initOrderList();
 
         //设置rec_order滑动事件
-        setRecyclerviewMoveEvent();
+        //        setRecyclerviewMoveEvent();
         //获取订单列表信息
         getOrderList(1, 10);
+
+        //初始化起点线路
+        initStartPlace();
     }
 
     @Override
@@ -98,11 +110,11 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.line_start:
                 //选择运输起点
-                choiceStartPlace(line_start);
+                choiceStartPlace(0);
                 break;
             case R.id.line_end:
                 //选择运输终点
-                choiceEndPlace();
+                choiceStartPlace(1);
                 break;
             case R.id.line_screen:
                 //筛选运输条件
@@ -120,26 +132,68 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void initStartPlace() {
+        //获取省的数据
+        mSHEData = new ArrayList();
+        mSHIData = new ArrayList();
+        mQUData = new ArrayList();
+        //选择窗数据
+        mDataPopEd = new ArrayList<>();
+        getShengFen();
+    }
+
+    private void getShengFen() {
+        RequestParamsFM headParam = new RequestParamsFM();
+        headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
+        RequestParamsFM params = new RequestParamsFM();
+        params.put("pid", "1");
+        HttpOkhUtils.getInstance().doGetWithHeadParams(NetConfig.REGIONSELECT, headParam, params, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ProgressDialogUtil.hideDialog();
+                ToastUtils.showToast(getContext(), "网络连接错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                ProgressDialogUtil.hideDialog();
+                if (code != 200) {
+                    ToastUtils.showToast(getContext(), "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                ShengDataInfo shengDataInfo = gson.fromJson(resbody, ShengDataInfo.class);
+                ToastUtils.showToast(getContext(), shengDataInfo.getMessage());
+                if (shengDataInfo.isOk()) {
+                    mSHEData.clear();
+                    mSHEData.addAll(shengDataInfo.getData());
+                    if (null == mDataPopEd) {
+                        mDataPopEd = new ArrayList<>();
+                    } else {
+                        mDataPopEd.clear();
+                    }
+                    for (ShengDataInfo.DataBean bean : mSHEData) {
+                        ChioceAdapterContentInfo contentInfo = new ChioceAdapterContentInfo();
+                        contentInfo.setCont(bean.getName());
+                        contentInfo.setId(bean.getId());
+                        mDataPopEd.add(contentInfo);
+                    }
+                }
+            }
+        });
+    }
+
     private void initOrderList() {
         mData = new ArrayList();
         rec_order.setLayoutManager(new LinearLayoutManager(getContext()));
         orderAdapter = new RecyOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
         rec_order.setAdapter(orderAdapter);
-        orderAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-            @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                switch (view.getId()) {
-
-                }
-            }
-        });
         orderAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent(getContext(), OrderDetailActivity.class);
                 intent.putExtra("orderID", mData.get(position).getId());
                 startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
-                startActivity(intent);
             }
         });
     }
@@ -179,6 +233,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     int rltTop;
     int rltBot;
     int rec_h;
+    int rec_weight;
 
     private void setRecyclerviewMoveEvent() {
         rec_order.setOnTouchListener(new View.OnTouchListener() {
@@ -188,6 +243,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                     case MotionEvent.ACTION_DOWN:
                         scDownY = (int) motionEvent.getRawY();
                         rec_h = view_b.getTop();
+                        rec_weight = rec_order.getWidth();
                         break;
                     case MotionEvent.ACTION_MOVE:
                         scMoveY = (int) motionEvent.getRawY();
@@ -204,7 +260,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                         }
 
                         liner_top.layout(0, rltTop, liner_top.getWidth(), rltBot);
-                        rec_order.layout(0, rltTop + liner_top.getHeight(), rec_order.getWidth(), rec_h);
+                        rec_order.layout(0, rltTop + liner_top.getHeight(), rec_weight, rec_h);
 
                         scDownY = (int) motionEvent.getRawY();
                         rltTop = liner_top.getTop();
@@ -217,14 +273,178 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void choiceStartPlace(LinearLayout line_start) {
-        PopupOpenHelper openHelper = new PopupOpenHelper(getContext(), line_start, R.layout.popup_choice_start);
-        openHelper.openPopupWindowWithView(true, 0, (int) line_start.getY() + line_start.getHeight());
 
+    private List<ChioceAdapterContentInfo> mDataPopEd;
+    private List<ShengDataInfo.DataBean>   mSHEData;
+    private List<ShengDataInfo.DataBean>   mSHIData;
+    private List<ShengDataInfo.DataBean>   mQUData;
+    private int                            stCityLevel;
+    private PopupOpenHelper                openHelper;
+
+    private void choiceStartPlace(final int kind) {
+        openHelper = new PopupOpenHelper(getContext(), line_start, R.layout.popup_choice_start);
+        openHelper.openPopupWindowWithView(true, 0, (int) line_start.getY() + line_start.getHeight());
+        openHelper.setOnPopupViewClick(new PopupOpenHelper.ViewClickListener() {
+            @Override
+            public void onViewClickListener(PopupWindow popupWindow, View inflateView) {
+                RecyclerView recy_city = inflateView.findViewById(R.id.recy_city);
+                final TextView tv_back = inflateView.findViewById(R.id.tv_back);
+                final TextView tv_cancel = inflateView.findViewById(R.id.tv_cancel);
+                if (stCityLevel != 0) {
+                    tv_back.setVisibility(View.VISIBLE);
+                }
+                recy_city.setLayoutManager(new GridLayoutManager(getContext(), 4));
+                final RecyPlaceAdapter recyPlaceAdapter = new RecyPlaceAdapter(R.layout.adpter_pop_city_place, getContext(), mDataPopEd);
+                recy_city.setAdapter(recyPlaceAdapter);
+                recyPlaceAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                        String id = mDataPopEd.get(position).getId();
+                        if (stCityLevel == 0) {
+                            //获取省份对应城市
+                            getCityBySheng(id, tv_back, recyPlaceAdapter);
+                            stCityLevel++;
+                        } else if (stCityLevel == 1) {
+                            //获取城市对应的区
+                            getTownByCity(id, tv_back, recyPlaceAdapter);
+                            stCityLevel++;
+                        } else {
+                            if (kind == 0) {
+                                //将选择的起点填写
+                                tv_start.setText(mDataPopEd.get(position).getCont());
+                                openHelper.dismiss();
+                            } else {
+                                //将选择的目的地填写
+                                tv_end.setText(mDataPopEd.get(position).getCont());
+                                openHelper.dismiss();
+                            }
+                        }
+                    }
+                });
+                //设置返回上一级事件
+                tv_back.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        stCityLevel--;
+                        if (stCityLevel == 0) {
+                            tv_back.setVisibility(View.GONE);
+                            mDataPopEd.clear();
+                            //添加上一级省数据
+                            for (ShengDataInfo.DataBean bean : mSHEData) {
+                                ChioceAdapterContentInfo contentInfo = new ChioceAdapterContentInfo();
+                                contentInfo.setCont(bean.getName());
+                                contentInfo.setId(bean.getId());
+                                mDataPopEd.add(contentInfo);
+                            }
+                            recyPlaceAdapter.notifyDataSetChanged();
+                        } else if (stCityLevel == 1) {
+                            mDataPopEd.clear();
+                            //添加上一级城市数据
+                            for (ShengDataInfo.DataBean bean : mSHIData) {
+                                ChioceAdapterContentInfo contentInfo = new ChioceAdapterContentInfo();
+                                contentInfo.setCont(bean.getName());
+                                contentInfo.setId(bean.getId());
+                                mDataPopEd.add(contentInfo);
+                            }
+                            recyPlaceAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+                tv_cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //                        stCityLevel = 0;
+                        openHelper.dismiss();
+                    }
+                });
+            }
+        });
     }
 
-    private void choiceEndPlace() {
+    private void getCityBySheng(String id, final TextView tv_back, final RecyPlaceAdapter recyPlaceAdapter) {
+        RequestParamsFM headParam = new RequestParamsFM();
+        headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
+        RequestParamsFM params = new RequestParamsFM();
+        params.put("pid", id);
+        HttpOkhUtils.getInstance().doGetWithHeadParams(NetConfig.REGIONSELECT, headParam, params, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ProgressDialogUtil.hideDialog();
+                ToastUtils.showToast(getContext(), "网络连接错误");
+            }
 
+            @Override
+            public void onSuccess(int code, String resbody) {
+                ProgressDialogUtil.hideDialog();
+                if (code != 200) {
+                    ToastUtils.showToast(getContext(), "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                ShengDataInfo shengDataInfo = gson.fromJson(resbody, ShengDataInfo.class);
+                ToastUtils.showToast(getContext(), shengDataInfo.getMessage());
+                if (shengDataInfo.isOk()) {
+                    tv_back.setVisibility(View.VISIBLE);
+                    mSHIData.clear();
+                    mSHIData.addAll(shengDataInfo.getData());
+                    if (null == mDataPopEd) {
+                        mDataPopEd = new ArrayList<>();
+                    } else {
+                        mDataPopEd.clear();
+                    }
+                    for (ShengDataInfo.DataBean bean : mSHIData) {
+                        ChioceAdapterContentInfo contentInfo = new ChioceAdapterContentInfo();
+                        contentInfo.setCont(bean.getName());
+                        contentInfo.setId(bean.getId());
+                        mDataPopEd.add(contentInfo);
+                    }
+                    recyPlaceAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
+    private void getTownByCity(String id, final TextView tv_back, final RecyPlaceAdapter recyPlaceAdapter) {
+        RequestParamsFM headParam = new RequestParamsFM();
+        headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
+        RequestParamsFM params = new RequestParamsFM();
+        params.put("pid", id);
+        HttpOkhUtils.getInstance().doGetWithHeadParams(NetConfig.REGIONSELECT, headParam, params, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ProgressDialogUtil.hideDialog();
+                ToastUtils.showToast(getContext(), "网络连接错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                ProgressDialogUtil.hideDialog();
+                if (code != 200) {
+                    ToastUtils.showToast(getContext(), "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                ShengDataInfo shengDataInfo = gson.fromJson(resbody, ShengDataInfo.class);
+                ToastUtils.showToast(getContext(), shengDataInfo.getMessage());
+                if (shengDataInfo.isOk()) {
+                    tv_back.setVisibility(View.VISIBLE);
+                    mQUData.clear();
+                    mQUData.addAll(shengDataInfo.getData());
+                    if (null == mDataPopEd) {
+                        mDataPopEd = new ArrayList<>();
+                    } else {
+                        mDataPopEd.clear();
+                    }
+                    for (ShengDataInfo.DataBean bean : mQUData) {
+                        ChioceAdapterContentInfo contentInfo = new ChioceAdapterContentInfo();
+                        contentInfo.setCont(bean.getName());
+                        contentInfo.setId(bean.getId());
+                        mDataPopEd.add(contentInfo);
+                    }
+                    recyPlaceAdapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
 
     private void screenAllTerm() {

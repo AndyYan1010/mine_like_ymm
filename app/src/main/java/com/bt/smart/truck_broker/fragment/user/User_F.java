@@ -1,5 +1,8 @@
 package com.bt.smart.truck_broker.fragment.user;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,8 +13,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.R;
+import com.bt.smart.truck_broker.activity.LoginActivity;
 import com.bt.smart.truck_broker.activity.userAct.AuthenticationActivity;
+import com.bt.smart.truck_broker.utils.SpUtils;
 
 
 /**
@@ -35,6 +41,7 @@ public class User_F extends Fragment implements View.OnClickListener {
     private RelativeLayout rtv_phone;
     private RelativeLayout rtv_serv;
     private RelativeLayout rtv_about;
+    private RelativeLayout rtv_exit;
 
 
     @Override
@@ -56,6 +63,7 @@ public class User_F extends Fragment implements View.OnClickListener {
         rtv_phone = mRootView.findViewById(R.id.rtv_phone);
         rtv_serv = mRootView.findViewById(R.id.rtv_serv);
         rtv_about = mRootView.findViewById(R.id.rtv_about);
+        rtv_exit = mRootView.findViewById(R.id.rtv_exit);
 
     }
 
@@ -66,6 +74,7 @@ public class User_F extends Fragment implements View.OnClickListener {
         rtv_phone.setOnClickListener(this);
         rtv_serv.setOnClickListener(this);
         rtv_about.setOnClickListener(this);
+        rtv_exit.setOnClickListener(this);
     }
 
 
@@ -92,7 +101,33 @@ public class User_F extends Fragment implements View.OnClickListener {
                 //关于我们
                 aboutUs();
                 break;
+            case R.id.rtv_exit:
+                //退出登录
+                exitLogin();
+                break;
         }
+    }
+
+    private void exitLogin() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), AlertDialog.THEME_HOLO_LIGHT);
+        builder.setTitle("温馨提示");
+        builder.setMessage("您确定要退出当前登录帐号吗？");
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SpUtils.putBoolean(getContext(), "isRem", false);
+                MyApplication.isLogin = 0;
+                Intent intent = new Intent();
+                intent.setClass(getContext(), LoginActivity.class);
+                startActivity(intent);
+                ((Activity) getContext()).finish();
+            }
+        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        }).create().show();
     }
 
     private void toSubmitPersonInfo() {

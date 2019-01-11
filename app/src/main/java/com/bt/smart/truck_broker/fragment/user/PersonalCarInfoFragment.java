@@ -185,6 +185,10 @@ public class PersonalCarInfoFragment extends Fragment implements View.OnClickLis
 
     private void UpDataPic(String fileUrl, final int kind) {
         File file = new File(fileUrl);
+        if (null == file || !file.exists()) {
+            ToastUtils.showToast(getContext(), "照片获取失败,请返回重新拍摄");
+            return;
+        }
         RequestParamsFM headParam = new RequestParamsFM();
         headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
         RequestParamsFM params = new RequestParamsFM();

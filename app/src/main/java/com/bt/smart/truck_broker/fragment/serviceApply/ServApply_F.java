@@ -35,7 +35,7 @@ public class ServApply_F extends Fragment {
     }
 
     private void initData() {
-        tv_title.setText("适玩");
+        tv_title.setText("定制服务");
 
     }
 }

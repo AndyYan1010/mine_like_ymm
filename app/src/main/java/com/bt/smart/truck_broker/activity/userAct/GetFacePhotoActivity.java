@@ -16,7 +16,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bt.smart.truck_broker.BaseActivity;
 import com.bt.smart.truck_broker.R;
@@ -41,7 +40,8 @@ import java.util.List;
 public class GetFacePhotoActivity extends BaseActivity implements View.OnClickListener, Camera.PreviewCallback {
     private SurfaceView sfview;
     private ImageView   img_back;
-    private TextView    tv_sure;
+    private ImageView   img_sure;
+    //    private TextView    tv_sure;
     private Camera      mCamera;
     private boolean     bfrontSwitch;
     private Bitmap      mBmp;
@@ -60,12 +60,12 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     private void setView() {
         sfview = (SurfaceView) findViewById(R.id.sfview);
         img_back = (ImageView) findViewById(R.id.img_back);
-        tv_sure = (TextView) findViewById(R.id.tv_sure);
+        img_sure = (ImageView) findViewById(R.id.img_sure);
     }
 
     private void setData() {
         img_back.setOnClickListener(this);
-        tv_sure.setOnClickListener(this);
+        img_sure.setOnClickListener(this);
         //获取前置摄像头，显示在SurfaceView上
         setSurFaceView();
     }
@@ -76,7 +76,7 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
             case R.id.img_back:
                 finish();
                 break;
-            case R.id.tv_sure:
+            case R.id.img_sure:
                 //拍摄,获取相机图片
                 getCameraPic();
                 break;
