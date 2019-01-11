@@ -123,11 +123,21 @@ public class HttpOkhUtils {
         RequestBody requestBody;
         boolean toJson = bean.getIsUseJsonStreamer();
         if (toJson) {
-            Gson gson = new Gson();
-            //使用Gson将对象转换为json字符串
-            String json = gson.toJson(bean);
+            String json;
+            JSONObject jsonObject = new JSONObject();
+            Set<String> set1 = bean.keySet();
+            for (Iterator<String> it = set1.iterator(); it.hasNext(); ) {
+                String key = it.next();
+                try {
+                    jsonObject.put(key, bean.get(key));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            json = jsonObject.toString();
             //MediaType  设置Content-Type 标头中包含的媒体类型值
-            requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+            //requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+            requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
         } else {
             FormBody.Builder builder = new FormBody.Builder();
             Set<String> set = bean.keySet();
@@ -186,10 +196,21 @@ public class HttpOkhUtils {
         RequestBody requestBody;
         boolean toJson = bean.getIsUseJsonStreamer();
         if (toJson) {
-            //使用Gson将对象转换为json字符串
-            String json = bean.toString();
+            String json;
+            JSONObject jsonObject = new JSONObject();
+            Set<String> set1 = bean.keySet();
+            for (Iterator<String> it = set1.iterator(); it.hasNext(); ) {
+                String key = it.next();
+                try {
+                    jsonObject.put(key, bean.get(key));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            json = jsonObject.toString();
             //MediaType  设置Content-Type 标头中包含的媒体类型值
-            requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+            //requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+            requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
         } else {
             FormBody.Builder builder = new FormBody.Builder();
             Set<String> set2 = bean.keySet();
@@ -238,11 +259,21 @@ public class HttpOkhUtils {
         RequestBody requestBody;
         boolean toJson = bean.getIsUseJsonStreamer();
         if (toJson) {
-            Gson gson = new Gson();
-            //使用Gson将对象转换为json字符串
-            String json = gson.toJson(bean);
+            String json;
+            JSONObject jsonObject = new JSONObject();
+            Set<String> set1 = bean.keySet();
+            for (Iterator<String> it = set1.iterator(); it.hasNext(); ) {
+                String key = it.next();
+                try {
+                    jsonObject.put(key, bean.get(key));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            json = jsonObject.toString();
             //MediaType  设置Content-Type 标头中包含的媒体类型值
-            requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+            //requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), json);
+            requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
         } else {
             FormBody.Builder builder = new FormBody.Builder();
             Set<String> set = bean.keySet();

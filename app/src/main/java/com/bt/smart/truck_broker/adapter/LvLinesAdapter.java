@@ -72,7 +72,7 @@ public class LvLinesAdapter extends BaseAdapter {
             viewholder = (MyViewHolder) view.getTag();
         }
         viewholder.tv_place.setText(mList.get(i).getOrigin() + "  →  " + mList.get(i).getDestination());
-        viewholder.tv_explain.setText(mList.get(i).getCarLong() + "  /  " + mList.get(i).getCarType());
+        viewholder.tv_explain.setText(mList.get(i).getCar_long() + "  /  " + mList.get(i).getCar_type());
         if (mList.get(i).isCanDel()) {
             viewholder.tv_del.setVisibility(View.VISIBLE);
         } else {
@@ -92,7 +92,7 @@ public class LvLinesAdapter extends BaseAdapter {
     private void deletLines(final int i) {
         RequestParamsFM headParam = new RequestParamsFM();
         headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
-        HttpOkhUtils.getInstance().doDeleteOnlyWithHead(NetConfig.DRIVERJOURNEYCONTROLLER+"/"+mList.get(i).getId(), headParam, new HttpOkhUtils.HttpCallBack() {
+        HttpOkhUtils.getInstance().doDeleteOnlyWithHead(NetConfig.DRIVERJOURNEYCONTROLLER + "/" + mList.get(i).getId(), headParam, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
                 ProgressDialogUtil.hideDialog();
@@ -102,6 +102,15 @@ public class LvLinesAdapter extends BaseAdapter {
             @Override
             public void onSuccess(int code, String resbody) {
                 ProgressDialogUtil.hideDialog();
+                if (code == 403) {
+                    ToastUtils.showToast(mContext, "删除成功");
+                    mList.remove(i);
+                    if (mList.size() == 0) {
+                        homeF.setUIChange();
+                    }
+                    notifyDataSetChanged();
+                    return;
+                }
                 if (code != 200) {
                     ToastUtils.showToast(mContext, "网络错误" + code);
                     return;

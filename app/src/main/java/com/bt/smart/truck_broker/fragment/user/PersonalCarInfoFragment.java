@@ -208,8 +208,6 @@ public class PersonalCarInfoFragment extends Fragment implements View.OnClickLis
                 }
                 if (times == 3) {
                     ProgressDialogUtil.hideDialog();
-                    //提交信息
-                    sendDriverInfo();
                 }
             }
 
@@ -239,6 +237,8 @@ public class PersonalCarInfoFragment extends Fragment implements View.OnClickLis
                     }
                     if (times == 3) {
                         ProgressDialogUtil.hideDialog();
+                        //提交信息
+                        sendDriverInfo();
                     }
                 }
             }
@@ -247,19 +247,20 @@ public class PersonalCarInfoFragment extends Fragment implements View.OnClickLis
     }
 
     private void sendDriverInfo() {
+        RequestParamsFM headParams = new RequestParamsFM();
+        headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         RequestParamsFM params = new RequestParamsFM();
         params.put("checkStatus", "0");
+        params.put("id", MyApplication.userID);
         params.put("fphoto", getHeadUrl);//头像
-        params.put("driver_license", getDriverUrl);//驾驶证
-        params.put("driving_license", getDrivingUrl);//行驶证
+        params.put("driverLicense", getDriverUrl);//驾驶证
+        params.put("drivingLicense", getDrivingUrl);//行驶证
         params.put("fcarno", carno);//车牌号
         params.put("fname", userName);//姓名
-        params.put("id_number", personalNo);//身份证号
+        params.put("idNumber", personalNo);//身份证号
         params.put("fcartype", carModel);//车型
         params.put("fcarlength", carLeng);//车长
         params.setUseJsonStreamer(true);
-        RequestParamsFM headParams = new RequestParamsFM();
-        headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         HttpOkhUtils.getInstance().doPutWithHeader(NetConfig.REGISTERDRIVERCONTROLLER, headParams, params, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {

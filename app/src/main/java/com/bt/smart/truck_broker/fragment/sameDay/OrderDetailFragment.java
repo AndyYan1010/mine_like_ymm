@@ -37,6 +37,7 @@ import okhttp3.Request;
 public class OrderDetailFragment extends Fragment implements View.OnClickListener {
     private View            mRootView;
     private ImageView       img_back;
+    private ImageView       img_empty;
     private TextView        tv_title;
     private String          orderID;
     private TextView        tv_place;
@@ -60,6 +61,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
 
     private void initView() {
         img_back = mRootView.findViewById(R.id.img_back);
+        img_empty = mRootView.findViewById(R.id.img_empty);
         tv_title = mRootView.findViewById(R.id.tv_title);
         tv_place = mRootView.findViewById(R.id.tv_place);
         tv_goodsname = mRootView.findViewById(R.id.tv_goodsname);
@@ -88,8 +90,8 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
             case R.id.img_back:
                 MyFragmentManagerUtil.closeFragmentOnAct(this);
                 break;
-            case R.id.tv_cont:
-                ShowCallUtil.showCallDialog(getContext(), orderDetailInfo.getData().getFhTelephone());
+            case R.id.tv_cont://联系货主
+                ShowCallUtil.showCallDialog(getContext(), orderDetailInfo.getData().getFh_telephone());
                 break;
             case R.id.tv_take:
                 //接单
@@ -102,11 +104,10 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         RequestParamsFM params = new RequestParamsFM();
-        params.put("createDate", orderDetailInfo.getData().getZhTime());
         params.put("driverId", MyApplication.userID);
-        params.put("id", orderDetailInfo.getData().getFmainId());
+        params.put("id", MyApplication.userID);
         params.put("orderId", orderDetailInfo.getData().getId());
-        params.put("orderStatus", orderDetailInfo.getData().getFstatus());
+        params.put("orderStatus", "0");
         params.setUseJsonStreamer(true);
         HttpOkhUtils.getInstance().doPostWithHeader(NetConfig.DRIVERORDERCONTROLLER, headParams, params, new HttpOkhUtils.HttpCallBack() {
             @Override
@@ -146,6 +147,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
             @Override
             public void onSuccess(int code, String resbody) {
                 ProgressDialogUtil.hideDialog();
+                img_empty.setVisibility(View.VISIBLE);
                 if (code != 200) {
                     ToastUtils.showToast(getContext(), "网络错误" + code);
                     return;
@@ -154,12 +156,13 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                 orderDetailInfo = gson.fromJson(resbody, OrderDetailInfo.class);
                 ToastUtils.showToast(getContext(), orderDetailInfo.getMessage());
                 if (orderDetailInfo.isOk()) {
-                    tv_place.setText(orderDetailInfo.getData().getFhAddress() + "  →  " + orderDetailInfo.getData().getShAddress());
-                    tv_goodsname.setText(orderDetailInfo.getData().getGoodsName());
-                    tv_carType.setText(orderDetailInfo.getData().getCarType());
-                    tv_name.setText(orderDetailInfo.getData().getFhName());
-                    tv_fhPlace.setText(orderDetailInfo.getData().getFhAddress());
-                    tv_phone.setText(orderDetailInfo.getData().getFhTelephone());
+                    img_empty.setVisibility(View.GONE);
+                    tv_place.setText(orderDetailInfo.getData().getOrigin() + "  →  " + orderDetailInfo.getData().getDestination());
+                    tv_goodsname.setText(orderDetailInfo.getData().getGoods_name());
+                    tv_carType.setText(orderDetailInfo.getData().getCar_type());
+                    tv_name.setText(orderDetailInfo.getData().getFh_name());
+                    tv_fhPlace.setText(orderDetailInfo.getData().getFh_address());
+                    tv_phone.setText(orderDetailInfo.getData().getFh_telephone());
                 }
             }
         });

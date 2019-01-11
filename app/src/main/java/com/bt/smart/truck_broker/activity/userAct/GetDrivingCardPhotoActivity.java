@@ -121,8 +121,8 @@ public class GetDrivingCardPhotoActivity extends BaseActivity implements View.On
             boolean b = saveBitmap(mBmp);
             if (b) {
                 ToastUtils.showToast(this, "驾驶证保存成功");
-                Intent intent = getIntent().putExtra("card_pic_url", fileUrl);
-                setResult(RESULT_FOR_FACE, intent);
+                Intent intent = getIntent().putExtra("driving_pic_url", fileUrl);
+                setResult(RESULT_FOR_DRIVING_CARD, intent);
                 finish();
             } else {
                 ToastUtils.showToast(this, "驾驶证获取失败");
@@ -130,6 +130,8 @@ public class GetDrivingCardPhotoActivity extends BaseActivity implements View.On
             ProgressDialogUtil.hideDialog();
         }
     }
+
+    private int RESULT_FOR_DRIVING_CARD = 10108;
 
     public void rotateMyBitmap(Bitmap bmp) {
         //*****旋转一下

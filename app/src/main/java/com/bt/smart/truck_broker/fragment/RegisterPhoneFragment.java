@@ -16,6 +16,7 @@ import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.activity.LoginActivity;
 import com.bt.smart.truck_broker.messageInfo.CommonInfo;
+import com.bt.smart.truck_broker.messageInfo.RegisterInfo;
 import com.bt.smart.truck_broker.messageInfo.SMSInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
@@ -141,9 +142,9 @@ public class RegisterPhoneFragment extends Fragment implements View.OnClickListe
 
     private void registMember(String phone, String wrtpsd) {
         RequestParamsFM params = new RequestParamsFM();
-        params.put("mobile", phone);
+        params.put("fmobile", phone);
         params.put("fpassword", wrtpsd);
-        HttpOkhUtils.getInstance().doPost(NetConfig.USERINSERTPC, params, new HttpOkhUtils.HttpCallBack() {
+        HttpOkhUtils.getInstance().doPost(NetConfig.REGISTERDRIVER, params, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
                 ToastUtils.showToast(getContext(), "网络错误");
@@ -156,13 +157,13 @@ public class RegisterPhoneFragment extends Fragment implements View.OnClickListe
                     return;
                 }
                 Gson gson = new Gson();
-                CommonInfo sendSMSInfo = gson.fromJson(resbody, CommonInfo.class);
-                if (1 == sendSMSInfo.getCode()) {
+                RegisterInfo sendSMSInfo = gson.fromJson(resbody, RegisterInfo.class);
+                ToastUtils.showToast(getContext(), sendSMSInfo.getMessage());
+                if (sendSMSInfo.isOk()) {
                     isFinish = true;
                     startActivity(new Intent(getContext(), LoginActivity.class));
                     getActivity().finish();
                 }
-                ToastUtils.showToast(getContext(), sendSMSInfo.getMessage());
             }
         });
     }
@@ -197,8 +198,8 @@ public class RegisterPhoneFragment extends Fragment implements View.OnClickListe
 
     private void sendMsgFromIntnet() {
         RequestParamsFM params = new RequestParamsFM();
-        params.put("mobile", mPhone);
-        HttpOkhUtils.getInstance().doGetWithParams(NetConfig.CHECKMESSAGE, params, new HttpOkhUtils.HttpCallBack() {
+        params.put("fmobile", mPhone);
+        HttpOkhUtils.getInstance().doPost(NetConfig.CHECKMESSAGE, params, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
                 ToastUtils.showToast(getContext(), "网络错误");

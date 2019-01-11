@@ -15,14 +15,14 @@ public class LinesOrderInfo {
 
     /**
      * message : 成功
-     * data : [{"id":"2c90b4e36835d2d501683643e62d0009","fstatus":"0","fh_name":"发货人张三","fh_telephone":"18234567890","fh_address":"发货人地址南通","sh_name":"收货人李四","sh_telephone":"18234567898","sh_address":"收货人地址上海","sh_area":"收货人地区上海","car_type":"货车","zh_time":"2019-01-10","goods_name":"货物类别服装","fh":"1236","sh":"1235","fcheck":"0","fmain_id":"","fsub_id":"","is_fapiao":"0"},{"id":"2c90b4e3683644c0016836458c1a0000","fstatus":"0","fh_name":"张三","fh_telephone":"18234567890","fh_address":"南通","sh_name":"李四","sh_telephone":"18234567898","sh_address":"上海","sh_area":"上海","car_type":"货车","zh_time":"2019-01-10 08:00","goods_name":"服装","fh":"1236","sh":"1235","fcheck":"0","fmain_id":"yingsu0028","fsub_id":"","is_fapiao":"0"},{"id":"2c90b4e368368c940168369130130000","fstatus":"0","fh_name":"赵六","fh_telephone":"18234567890","fh_address":"南通","sh_name":"李四","sh_telephone":"18234567898","sh_address":"云南","sh_area":"云南","car_type":"货车","zh_time":"2019-01-11","goods_name":"货物类别服装","fh":"1236","sh":"1235","fcheck":"0","fmain_id":"yingsu0028","fsub_id":"","is_fapiao":"1"},{"id":"2c90b4e368368c94016836a7ef26000a","fstatus":"0","fh_name":"发货人张三","fh_telephone":"18234567890","fh_address":"发货人地址南通","sh_name":"收货人李四","sh_telephone":"18234567898","sh_address":"收货人地址上海","sh_area":"收货人地区上海","car_type":"货车","zh_time":"2019-01-12","goods_name":"货物类别服装","fh":"1236","sh":"1235","fcheck":"0","fmain_id":"yingsu0028","fsub_id":"","is_fapiao":"0"},{"id":"2c90b4e36836b0ef016836b544040004","fstatus":"0","fh_name":"发货人张三","fh_telephone":"18234567890","fh_address":"发货人地址南通","sh_name":"收货人李四","sh_telephone":"18234567898","sh_address":"收货人地址上海","sh_area":"收货人地区上海","car_type":"货车","zh_time":"2019-01-11","goods_name":"货物类别服装","fh":"1236","sh":"1235","fcheck":"0","fmain_id":"","fsub_id":"yingsu0028001","is_fapiao":"1"}]
-     * ok : true
+     * data : [{"id":"2c90b4e368368c94016836a7ef26000a","fstatus":"0","fh_name":"发货人张三","fh_telephone":"18234567890","fh_address":"发货人地址南通","sh_name":"收货人李四","sh_telephone":"18234567898","sh_address":"收货人地址上海","sh_area":"收货人地区上海","car_type":"货车","zh_time":"2019-01-12","goods_name":"货物类别服装","fh":"1236","sh":"1235","fcheck":"0","fmain_id":"yingsu0028","fsub_id":"","is_fapiao":"0","origin":"江苏省南通市港闸区","destination":"江苏省南通市崇川区"},{"id":"2c90b4e36836b0ef016836b544040004","fstatus":"0","fh_name":"发货人张三","fh_telephone":"18234567890","fh_address":"发货人地址南通","sh_name":"收货人李四","sh_telephone":"18234567898","sh_address":"收货人地址上海","sh_area":"收货人地区上海","car_type":"货车","zh_time":"2019-01-11","goods_name":"货物类别服装","fh":"1236","sh":"1235","fcheck":"0","fmain_id":"","fsub_id":"yingsu0028001","is_fapiao":"1","origin":"江苏省南通市港闸区","destination":"江苏省南通市崇川区"}]
      * respCode : 0
+     * ok : true
      */
 
     private String message;
-    private boolean        ok;
     private String         respCode;
+    private boolean        ok;
     private List<DataBean> data;
 
     public String getMessage() {
@@ -33,20 +33,20 @@ public class LinesOrderInfo {
         this.message = message;
     }
 
-    public boolean isOk() {
-        return ok;
-    }
-
-    public void setOk(boolean ok) {
-        this.ok = ok;
-    }
-
     public String getRespCode() {
         return respCode;
     }
 
     public void setRespCode(String respCode) {
         this.respCode = respCode;
+    }
+
+    public boolean isOk() {
+        return ok;
+    }
+
+    public void setOk(boolean ok) {
+        this.ok = ok;
     }
 
     public List<DataBean> getData() {
@@ -59,7 +59,7 @@ public class LinesOrderInfo {
 
     public static class DataBean {
         /**
-         * id : 2c90b4e36835d2d501683643e62d0009
+         * id : 2c90b4e368368c94016836a7ef26000a
          * fstatus : 0
          * fh_name : 发货人张三
          * fh_telephone : 18234567890
@@ -69,14 +69,16 @@ public class LinesOrderInfo {
          * sh_address : 收货人地址上海
          * sh_area : 收货人地区上海
          * car_type : 货车
-         * zh_time : 2019-01-10
+         * zh_time : 2019-01-12
          * goods_name : 货物类别服装
          * fh : 1236
          * sh : 1235
          * fcheck : 0
-         * fmain_id :
+         * fmain_id : yingsu0028
          * fsub_id :
          * is_fapiao : 0
+         * origin : 江苏省南通市港闸区
+         * destination : 江苏省南通市崇川区
          */
 
         private String id;
@@ -97,6 +99,8 @@ public class LinesOrderInfo {
         private String fmain_id;
         private String fsub_id;
         private String is_fapiao;
+        private String origin;
+        private String destination;
 
         public String getId() {
             return id;
@@ -240,6 +244,22 @@ public class LinesOrderInfo {
 
         public void setIs_fapiao(String is_fapiao) {
             this.is_fapiao = is_fapiao;
+        }
+
+        public String getOrigin() {
+            return origin;
+        }
+
+        public void setOrigin(String origin) {
+            this.origin = origin;
+        }
+
+        public String getDestination() {
+            return destination;
+        }
+
+        public void setDestination(String destination) {
+            this.destination = destination;
         }
     }
 }

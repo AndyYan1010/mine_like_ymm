@@ -51,6 +51,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
     private int REQUEST_FOR_TAKE_ORDER = 12087;//接单返回
     private int RESULT_TAKE_ORDER      = 12088;//接单成功响应值
     private String lineID;
+    private String line_name;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -71,6 +72,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
         img_back.setVisibility(View.VISIBLE);
         tv_title.setText("货源列表");
         lineID = getActivity().getIntent().getStringExtra("lineID");
+        line_name=getActivity().getIntent().getStringExtra("lineName");
         //初始化货源列表数据
         initOrderList();
         //获取线路货源
@@ -156,7 +158,6 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
                 Intent intent = new Intent(getContext(), OrderDetailActivity.class);
                 intent.putExtra("orderID", mData.get(position).getId());
                 startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
-                startActivity(intent);
             }
         });
     }

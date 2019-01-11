@@ -131,8 +131,9 @@ public class Home_F extends Fragment implements View.OnClickListener {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //跳转线路查找货源列表
-                Intent intent = new Intent(getContext(),FindByLinesActivity.class);
-                intent.putExtra("lineID",mData.get(i).getId());
+                Intent intent = new Intent(getContext(), FindByLinesActivity.class);
+                intent.putExtra("lineID", mData.get(i).getId());
+                intent.putExtra("lineName", mData.get(i).getOrigin() + "  →  " + mData.get(i).getDestination());
                 startActivity(intent);
             }
         });
