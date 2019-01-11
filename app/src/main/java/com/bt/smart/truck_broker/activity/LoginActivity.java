@@ -128,6 +128,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         tv_gcode.setOnClickListener(this);
         tv_gcode.setVisibility(View.GONE);
         et_code.setVisibility(View.GONE);
+        handler = new Handler();
     }
 
     @Override

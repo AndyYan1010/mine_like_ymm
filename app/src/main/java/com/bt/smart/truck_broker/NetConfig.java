@@ -33,7 +33,7 @@ public class NetConfig {
     //用户登录
     public static String LOGINURL              = ROOT + "tokens/registerdriver";
     //验证码登录
-    public static String CodeLOGINURL          = ROOT + "tokens/registerdriver";
+    public static String CodeLOGINURL          = ROOT + "tokens/registerdriver/code";
     //获取用户信息
     public static String REGISTERINFO          = ROOT + "registerInfo";
 
