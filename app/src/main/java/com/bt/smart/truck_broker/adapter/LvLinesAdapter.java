@@ -102,15 +102,6 @@ public class LvLinesAdapter extends BaseAdapter {
             @Override
             public void onSuccess(int code, String resbody) {
                 ProgressDialogUtil.hideDialog();
-                if (code == 403) {
-                    ToastUtils.showToast(mContext, "删除成功");
-                    mList.remove(i);
-                    if (mList.size() == 0) {
-                        homeF.setUIChange();
-                    }
-                    notifyDataSetChanged();
-                    return;
-                }
                 if (code != 200) {
                     ToastUtils.showToast(mContext, "网络错误" + code);
                     return;
@@ -122,6 +113,8 @@ public class LvLinesAdapter extends BaseAdapter {
                     mList.remove(i);
                     if (mList.size() == 0) {
                         homeF.setUIChange();
+                    }else {
+                        homeF.changeTitle();
                     }
                     notifyDataSetChanged();
                 }

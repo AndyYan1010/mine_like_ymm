@@ -252,6 +252,8 @@ public class PersonalCarInfoFragment extends Fragment implements View.OnClickLis
         RequestParamsFM params = new RequestParamsFM();
         params.put("checkStatus", "0");
         params.put("id", MyApplication.userID);
+        params.put("fmobile",MyApplication.userPhone);
+        params.put("fpassword",MyApplication.pasword);
         params.put("fphoto", getHeadUrl);//头像
         params.put("driverLicense", getDriverUrl);//驾驶证
         params.put("drivingLicense", getDrivingUrl);//行驶证

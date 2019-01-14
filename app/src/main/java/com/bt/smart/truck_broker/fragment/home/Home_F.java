@@ -3,6 +3,7 @@ package com.bt.smart.truck_broker.fragment.home;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,6 @@ import com.bt.smart.truck_broker.activity.homeAct.SelectPlaceAndCarActivity;
 import com.bt.smart.truck_broker.adapter.LvLinesAdapter;
 import com.bt.smart.truck_broker.messageInfo.SearchDriverLinesInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
-import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.SoundPoolUtil;
 import com.bt.smart.truck_broker.utils.ToastUtils;
@@ -41,15 +41,16 @@ import okhttp3.Request;
  */
 
 public class Home_F extends Fragment implements View.OnClickListener {
-    private View         mRootView;
-    private TextView     tv_mine;
-    private LinearLayout linear_tips;//没有线路时的提醒
-    private LinearLayout linear_lines;//有线路时需展示的view
-    private TextView     tv_linesnum;//线路数
-    private TextView     tv_edit;//编辑线路
-    private boolean      canEdit;//是否编辑路线
-    private ListView     lv_line;//线路列表
-    private TextView     tv_addline;
+    private View               mRootView;
+    private TextView           tv_mine;
+    private SwipeRefreshLayout swiperefresh;
+    private LinearLayout       linear_tips;//没有线路时的提醒
+    private LinearLayout       linear_lines;//有线路时需展示的view
+    private TextView           tv_linesnum;//线路数
+    private TextView           tv_edit;//编辑线路
+    private boolean            canEdit;//是否编辑路线
+    private ListView           lv_line;//线路列表
+    private TextView           tv_addline;
     private int REQUEST_FOR_SELECT_LINES = 10066;//设置线路响应码
     private int Result_FOR_SELECT_LINES  = 10067;//设置线路响应值
     private List<SearchDriverLinesInfo.DataBean> mData;
@@ -65,6 +66,7 @@ public class Home_F extends Fragment implements View.OnClickListener {
 
     private void initView() {
         tv_mine = mRootView.findViewById(R.id.tv_mine);
+        swiperefresh = mRootView.findViewById(R.id.swiperefresh);
         linear_tips = mRootView.findViewById(R.id.linear_tips);
         linear_lines = mRootView.findViewById(R.id.linear_lines);
         tv_linesnum = mRootView.findViewById(R.id.tv_linesnum);
@@ -76,7 +78,13 @@ public class Home_F extends Fragment implements View.OnClickListener {
     private void initData() {
         //初始化路线
         initLinesData();
-
+        swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //获取个人线路
+                getPersonalLines();
+            }
+        });
         tv_addline.setOnClickListener(this);
         tv_edit.setOnClickListener(this);
     }
@@ -149,18 +157,19 @@ public class Home_F extends Fragment implements View.OnClickListener {
     }
 
     private void getPersonalLines() {
+        swiperefresh.setRefreshing(true);
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.DRIVERJOURNEYCONTROLLER + "/getRoute/" + MyApplication.userID, headParams, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
-                ProgressDialogUtil.hideDialog();
+                swiperefresh.setRefreshing(false);
                 ToastUtils.showToast(getContext(), "网络连接错误");
             }
 
             @Override
             public void onSuccess(int code, String resbody) {
-                ProgressDialogUtil.hideDialog();
+                swiperefresh.setRefreshing(false);
                 if (code != 200) {
                     ToastUtils.showToast(getContext(), "网络错误" + code);
                     return;
@@ -170,6 +179,7 @@ public class Home_F extends Fragment implements View.OnClickListener {
                 ToastUtils.showToast(getContext(), searchDriverLinesInfo.getMessage());
                 if (searchDriverLinesInfo.isOk()) {
                     if (searchDriverLinesInfo.getData().size() > 0) {
+                        mData.clear();
                         linear_lines.setVisibility(View.VISIBLE);
                         linear_tips.setVisibility(View.GONE);
                         tv_linesnum.setText("我的路线(" + searchDriverLinesInfo.getData().size() + "/10)");
@@ -187,5 +197,9 @@ public class Home_F extends Fragment implements View.OnClickListener {
     public void setUIChange() {
         linear_lines.setVisibility(View.GONE);
         linear_tips.setVisibility(View.VISIBLE);
+    }
+
+    public void changeTitle() {
+        tv_linesnum.setText("我的路线(" + mData.size() + "/10)");
     }
 }

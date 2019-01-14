@@ -1,6 +1,8 @@
 package com.bt.smart.truck_broker.activity.userAct;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -9,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -117,6 +120,7 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
         });
 
         if (null != mBmp) {
+            mCamera.stopPreview();
             //将bitmap保存，记录照片本地地址，留待之后上传
             boolean b = saveBitmap(mBmp);
             if (b) {
@@ -141,6 +145,11 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
     }
 
     private void setSurFaceView() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
+            }
+        }
         if (mCamera == null) {
             mCamera = Camera.open(0);//后置
         }

@@ -12,24 +12,16 @@ package com.bt.smart.truck_broker.messageInfo;
 public class CommenInfo {
 
     /**
-     * data : {}
-     * message : string
+     * message : 成功
+     * data : null
      * ok : true
-     * respCode : string
+     * respCode : 0
      */
 
-    private DataBean data;
-    private String  message;
+    private String message;
+    private Object  data;
     private boolean ok;
     private String  respCode;
-
-    public DataBean getData() {
-        return data;
-    }
-
-    public void setData(DataBean data) {
-        this.data = data;
-    }
 
     public String getMessage() {
         return message;
@@ -37,6 +29,14 @@ public class CommenInfo {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 
     public boolean isOk() {
@@ -53,8 +53,5 @@ public class CommenInfo {
 
     public void setRespCode(String respCode) {
         this.respCode = respCode;
-    }
-
-    public static class DataBean {
     }
 }

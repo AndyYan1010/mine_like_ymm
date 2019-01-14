@@ -3,6 +3,7 @@ package com.bt.smart.truck_broker.fragment.sameDay;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,6 +51,7 @@ import okhttp3.Request;
 
 public class SameDay_F extends Fragment implements View.OnClickListener {
     private View                            mRootView;
+    private SwipeRefreshLayout              swiperefresh;
     private View                            view_b;//底部定位
     private TextView                        tv_title;
     private TextView                        tv_start;//起点
@@ -77,6 +79,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     private void initView() {
         tv_title = mRootView.findViewById(R.id.tv_title);
         view_b = mRootView.findViewById(R.id.view_b);
+        swiperefresh = mRootView.findViewById(R.id.swiperefresh);
         liner_top = mRootView.findViewById(R.id.liner_top);
         rlt_title = mRootView.findViewById(R.id.rlt_title);
         liner_term = mRootView.findViewById(R.id.liner_term);
@@ -93,14 +96,21 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         line_start.setOnClickListener(this);
         line_end.setOnClickListener(this);
         line_screen.setOnClickListener(this);
+        swiperefresh.setRefreshing(true);
         //初始化货源列表
         initOrderList();
 
         //设置rec_order滑动事件
-        //        setRecyclerviewMoveEvent();
+        setRecyclerviewMoveEvent();
+        swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //获取订单列表信息
+                getOrderList(1, 10);
+            }
+        });
         //获取订单列表信息
         getOrderList(1, 10);
-
         //初始化起点线路
         initStartPlace();
     }
@@ -205,13 +215,13 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         HttpOkhUtils.getInstance().doGetWithOnlyHeader(finalUrl, headParams, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
-                ProgressDialogUtil.hideDialog();
+                swiperefresh.setRefreshing(false);
                 ToastUtils.showToast(getContext(), "网络连接错误");
             }
 
             @Override
             public void onSuccess(int code, String resbody) {
-                ProgressDialogUtil.hideDialog();
+                swiperefresh.setRefreshing(false);
                 if (code != 200) {
                     ToastUtils.showToast(getContext(), "网络错误" + code);
                     return;
@@ -228,12 +238,10 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         });
     }
 
-    int scDownY;
-    int scMoveY;
-    int rltTop;
-    int rltBot;
-    int rec_h;
-    int rec_weight;
+    private int scDownY;
+    private int scMoveY;
+    private int rltTop;
+    private int rltBot;
 
     private void setRecyclerviewMoveEvent() {
         rec_order.setOnTouchListener(new View.OnTouchListener() {
@@ -242,30 +250,31 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         scDownY = (int) motionEvent.getRawY();
-                        rec_h = view_b.getTop();
-                        rec_weight = rec_order.getWidth();
                         break;
                     case MotionEvent.ACTION_MOVE:
+                        if (scDownY == 0) {
+                            scDownY = (int) motionEvent.getRawY();
+                        }
                         scMoveY = (int) motionEvent.getRawY();
                         rltTop = rltTop + (scMoveY - scDownY);
                         rltBot = rltTop + liner_top.getHeight();
-
-                        if (rltTop >= 0) {
+                        if (rltTop > 0) {
                             rltTop = 0;
-                            rltBot = rltTop + liner_top.getHeight();
+                            rltBot = liner_top.getHeight();
                         }
-                        if (rltBot <= 0) {
+                        if (rltBot < 0) {
                             rltBot = 0;
                             rltTop = rltBot - liner_top.getHeight();
                         }
-
                         liner_top.layout(0, rltTop, liner_top.getWidth(), rltBot);
-                        rec_order.layout(0, rltTop + liner_top.getHeight(), rec_weight, rec_h);
-
+                        rec_order.layout(0, rltTop + liner_top.getHeight(), liner_top.getWidth(), view_b.getTop());
+                        //平和滑动
                         scDownY = (int) motionEvent.getRawY();
-                        rltTop = liner_top.getTop();
                         break;
                     case MotionEvent.ACTION_UP:
+                        //抬起时要从新
+                        scDownY = 0;
+                        scMoveY = 0;
                         break;
                 }
                 return false;

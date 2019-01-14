@@ -218,6 +218,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         ToastUtils.showToast(LoginActivity.this, "验证码不正确");
                         return;
                     }
+                    //验证码登录
                     loginWithYZCode(mPhone);
                 } else {
                     String psd = String.valueOf(edit_psd.getText()).trim();
@@ -225,7 +226,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         ToastUtils.showToast(LoginActivity.this, "请输入密码");
                         return;
                     }
-
                     //是否记住账号密码
                     isNeedRem(phone, psd);
                     //登录
@@ -261,13 +261,15 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     return;
                 }
                 Gson gson = new Gson();
-                ToastUtils.showToast(LoginActivity.this, "登录成功" + resbody);
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
-                MyApplication.userID = loginInfo.getRegisterDriver().getId();
-                MyApplication.userPhone = loginInfo.getRegisterDriver().getFmobile();
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                finish();
+                ToastUtils.showToast(LoginActivity.this, loginInfo.getMessage());
+                if (loginInfo.isOk()){
+                    MyApplication.userToken = loginInfo.getData().getToken();
+                    MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();
+                    MyApplication.userPhone = loginInfo.getData().getRegisterDriver().getFmobile();
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+                }
             }
         });
     }
@@ -338,14 +340,15 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     return;
                 }
                 Gson gson = new Gson();
-                ToastUtils.showToast(LoginActivity.this, "登录成功");
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
-                MyApplication.userID = loginInfo.getRegisterDriver().getId();
-                MyApplication.userPhone = loginInfo.getRegisterDriver().getFmobile();
-                MyApplication.userToken = loginInfo.getToken();
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                finish();
+                ToastUtils.showToast(LoginActivity.this, loginInfo.getMessage());
+                if (loginInfo.isOk()){
+                    MyApplication.userToken = loginInfo.getData().getToken();
+                    MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();
+                    MyApplication.userPhone = loginInfo.getData().getRegisterDriver().getFmobile();
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+                }
             }
         });
     }

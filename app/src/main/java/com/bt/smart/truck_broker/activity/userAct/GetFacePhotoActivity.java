@@ -84,6 +84,17 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (mCamera != null) {
+            mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mCamera != null) {
@@ -95,9 +106,9 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     }
 
     private void getCameraPic() {
-        mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+        mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
-            public void onPreviewFrame(byte[] bytes, Camera camera) {
+            public void onPictureTaken(byte[] bytes, Camera camera) {
                 Camera.Size size = camera.getParameters().getPreviewSize();
                 try {
                     YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
@@ -118,12 +129,14 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
             }
         });
         if (null != mBmp) {
+            mCamera.stopPreview();
             //将bitmap保存，记录照片本地地址，留待之后上传
             boolean b = saveBitmap(mBmp);
             if (b) {
                 ToastUtils.showToast(this, "人脸保存成功");
                 Intent intent = getIntent().putExtra("face_pic_url", fileUrl);
                 setResult(RESULT_FOR_FACE, intent);
+
                 finish();
             } else {
                 ToastUtils.showToast(this, "人脸获取失败");
@@ -191,6 +204,28 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
 
     }
 
+    @Override
+    public void onPreviewFrame(byte[] bytes, Camera camera) {
+        Log.e("Sys", "success:");
+        Camera.Size size = camera.getParameters().getPreviewSize();
+        try {
+            YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
+            if (image != null) {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                image.compressToJpeg(new Rect(0, 0, size.width, size.height), 100, stream);
+
+                Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+
+                //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
+                //mBmp = bmp;
+                rotateMyBitmap(bmp);
+                stream.close();
+            }
+        } catch (Exception ex) {
+            Log.e("Sys", "Error:" + ex.getMessage());
+        }
+    }
+
     private void startPreview(SurfaceHolder mSurfaceHolder) {
         try {
             mCamera.setPreviewDisplay(mSurfaceHolder);
@@ -217,32 +252,6 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
             }
         }
         return hasFrontCarmera;
-    }
-
-    @Override
-    public void onPreviewFrame(byte[] bytes, Camera camera) {
-        Camera.Size size = camera.getParameters().getPreviewSize();
-        try {
-            YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
-            if (image != null) {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                image.compressToJpeg(new Rect(0, 0, size.width, size.height), 100, stream);
-
-                Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-
-                //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
-                //mBmp = bmp;
-                rotateMyBitmap(bmp);
-                stream.close();
-            }
-        } catch (Exception ex) {
-            Log.e("Sys", "Error:" + ex.getMessage());
-        }
-        //        Camera.Size previewSize = camera.getParameters().getPreviewSize();
-        //        YuvImage image = new YuvImage(bytes, ImageFormat.NV21, previewSize.width, previewSize.height, null);
-        //        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        //        image.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, stream);
-        //        mBmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
     }
 
     /**
