@@ -8,7 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -278,9 +277,10 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                         imgTop = imgTop + (scDownY - scMoveY);
                         rltBot = rltTop + liner_top.getHeight();
                         //标题的位置
-                        if (rltTop > 0) {
+                        if (rltTop >= 0) {
                             rltTop = 0;
                             rltBot = liner_top.getHeight();
+                            swiperefresh.layout(0, 0, liner_top.getWidth(), liner_top.getHeight());
                         }
                         if (rltBot < 0) {
                             rltBot = 0;
@@ -293,7 +293,6 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                         if (imgTop < view_a.getTop()) {
                             imgTop = view_a.getTop();
                         }
-                        Log.i("img高度", "imgHight" + imgTop);
                         //设置位置
                         liner_top.layout(0, rltTop, liner_top.getWidth(), rltBot);
                         rec_order.layout(0, rltTop + liner_top.getHeight(), liner_top.getWidth(), view_b.getTop());
