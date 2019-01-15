@@ -153,8 +153,6 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
         ftt.commit();
     }
 
-
-
     private void toGetFacePic() {
         //第二个参数是需要申请的权限
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)

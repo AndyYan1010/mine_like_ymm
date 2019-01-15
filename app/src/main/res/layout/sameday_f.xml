@@ -141,13 +141,29 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="80dp"
         android:layout_below="@+id/liner_top">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"/>
     </android.support.v4.widget.SwipeRefreshLayout>
+
+    <View
+        android:id="@+id/view_a"
+        android:layout_width="1px"
+        android:layout_height="1px"
+        android:layout_above="@+id/img_refresh"/>
+
+    <ImageView
+        android:id="@+id/img_refresh"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="70dp"
+        android:layout_marginRight="20dp"
+        android:src="@drawable/icon_refresh"/>
 
     <View
         android:id="@+id/view_b"

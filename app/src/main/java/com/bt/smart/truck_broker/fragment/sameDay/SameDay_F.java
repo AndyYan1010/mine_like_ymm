@@ -1,5 +1,6 @@
 package com.bt.smart.truck_broker.fragment.sameDay;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,10 +8,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -52,6 +55,8 @@ import okhttp3.Request;
 public class SameDay_F extends Fragment implements View.OnClickListener {
     private View                            mRootView;
     private SwipeRefreshLayout              swiperefresh;
+    private ImageView                       img_refresh;//顶部刷新按钮
+    private View                            view_a;//刷新按钮定位
     private View                            view_b;//底部定位
     private TextView                        tv_title;
     private TextView                        tv_start;//起点
@@ -67,6 +72,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     private List<AllOrderListInfo.DataBean> mData;
     private int REQUEST_FOR_TAKE_ORDER = 12087;//接单返回
     private int RESULT_TAKE_ORDER      = 12088;//接单成功响应值
+    private ObjectAnimator animatorXz;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,8 +84,10 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
 
     private void initView() {
         tv_title = mRootView.findViewById(R.id.tv_title);
+        view_a = mRootView.findViewById(R.id.view_a);
         view_b = mRootView.findViewById(R.id.view_b);
         swiperefresh = mRootView.findViewById(R.id.swiperefresh);
+        img_refresh = mRootView.findViewById(R.id.img_refresh);
         liner_top = mRootView.findViewById(R.id.liner_top);
         rlt_title = mRootView.findViewById(R.id.rlt_title);
         liner_term = mRootView.findViewById(R.id.liner_term);
@@ -93,15 +101,14 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
 
     private void initData() {
         tv_title.setText("最新货源");
-        line_start.setOnClickListener(this);
-        line_end.setOnClickListener(this);
-        line_screen.setOnClickListener(this);
-        swiperefresh.setRefreshing(true);
         //初始化货源列表
         initOrderList();
+        //初始化起点线路
+        initStartPlace();
+        //获取订单列表信息
+        getOrderList(1, 10);
 
-        //设置rec_order滑动事件
-        setRecyclerviewMoveEvent();
+        swiperefresh.setColorSchemeColors(getResources().getColor(R.color.blue_icon), getResources().getColor(R.color.yellow_40), getResources().getColor(R.color.red_160));
         swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -109,15 +116,24 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                 getOrderList(1, 10);
             }
         });
-        //获取订单列表信息
-        getOrderList(1, 10);
-        //初始化起点线路
-        initStartPlace();
+        //设置rec_order滑动事件
+        setRecyclerviewMoveEvent();
+        line_start.setOnClickListener(this);
+        line_end.setOnClickListener(this);
+        line_screen.setOnClickListener(this);
+        img_refresh.setOnClickListener(this);
+        animatorXz = ObjectAnimator.ofFloat(img_refresh, "rotation", 0f, 90f, 180f, 360f);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.img_refresh://按钮刷新列表
+                animatorXz.setDuration(2000);
+                animatorXz.start();
+                //获取订单列表信息
+                getOrderList(1, 10);
+                break;
             case R.id.line_start:
                 //选择运输起点
                 choiceStartPlace(0);
@@ -209,6 +225,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     }
 
     private void getOrderList(int no, int size) {
+        swiperefresh.setRefreshing(true);
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         String finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size;
@@ -231,6 +248,9 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                 ToastUtils.showToast(getContext(), allOrderListInfo.getMessage());
                 if (allOrderListInfo.isOk()) {
                     mData.clear();
+                    //                    for (int i = 0; i < 3; i++) {
+                    //                        mData.add(allOrderListInfo.getData().get(i));
+                    //                    }
                     mData.addAll(allOrderListInfo.getData());
                     orderAdapter.notifyDataSetChanged();
                 }
@@ -242,6 +262,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     private int scMoveY;
     private int rltTop;
     private int rltBot;
+    private int imgTop;
 
     private void setRecyclerviewMoveEvent() {
         rec_order.setOnTouchListener(new View.OnTouchListener() {
@@ -257,7 +278,9 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                         }
                         scMoveY = (int) motionEvent.getRawY();
                         rltTop = rltTop + (scMoveY - scDownY);
+                        imgTop = imgTop + (scDownY - scMoveY);
                         rltBot = rltTop + liner_top.getHeight();
+                        //标题的位置
                         if (rltTop > 0) {
                             rltTop = 0;
                             rltBot = liner_top.getHeight();
@@ -266,8 +289,18 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                             rltBot = 0;
                             rltTop = rltBot - liner_top.getHeight();
                         }
+                        //刷新按钮的位置
+                        if (imgTop > view_b.getTop()) {
+                            imgTop = view_b.getTop();
+                        }
+                        if (imgTop < view_a.getTop()) {
+                            imgTop = view_a.getTop();
+                        }
+                        Log.i("img高度", "imgHight" + imgTop);
+                        //设置位置
                         liner_top.layout(0, rltTop, liner_top.getWidth(), rltBot);
                         rec_order.layout(0, rltTop + liner_top.getHeight(), liner_top.getWidth(), view_b.getTop());
+                        img_refresh.layout(img_refresh.getLeft(), imgTop, img_refresh.getLeft() + img_refresh.getWidth(), imgTop + img_refresh.getHeight());
                         //平和滑动
                         scDownY = (int) motionEvent.getRawY();
                         break;

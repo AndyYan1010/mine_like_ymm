@@ -78,6 +78,8 @@ public class Home_F extends Fragment implements View.OnClickListener {
     private void initData() {
         //初始化路线
         initLinesData();
+        swiperefresh.setColorSchemeColors(getResources().getColor(R.color.blue_icon),getResources().getColor(R.color.yellow_40),getResources().getColor(R.color.red_160));
+
         swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

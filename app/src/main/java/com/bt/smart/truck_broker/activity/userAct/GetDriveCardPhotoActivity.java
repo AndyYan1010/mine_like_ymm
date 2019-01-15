@@ -22,7 +22,6 @@ import android.widget.ImageView;
 
 import com.bt.smart.truck_broker.BaseActivity;
 import com.bt.smart.truck_broker.R;
-import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.ToastUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -46,9 +45,10 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
     private ImageView   img_back;
     private ImageView   img_sure;
     private Camera      mCamera;
+    private byte[]      mPicByte;//临时记录预览下的图片数据
     private Bitmap      mBmp;
+    private String      fileUrl;
     private int RESULT_FOR_FACE = 10098;//获取头像响应值
-    private String fileUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +86,17 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (mCamera != null) {
+            mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mCamera != null) {
@@ -97,30 +108,26 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
     }
 
     private void getCameraPic() {
-        ProgressDialogUtil.startShow(this, "正在取样中，请稍等...");
-        mCamera.setPreviewCallback(new Camera.PreviewCallback() {
-            @Override
-            public void onPreviewFrame(byte[] bytes, Camera camera) {
-                Camera.Size size = camera.getParameters().getPreviewSize();
-                try {
-                    YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
-                    if (image != null) {
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
-                        Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+        mCamera.stopPreview();
+        //保存图片
+        Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
+        try {
+            YuvImage image = new YuvImage(mPicByte, ImageFormat.NV21, previewSize.width, previewSize.height, null);
+            if (image != null) {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                image.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 100, stream);
 
-                        //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
-                        rotateMyBitmap(bmp);
-                        stream.close();
-                    }
-                } catch (Exception ex) {
-                    Log.e("Sys", "Error:" + ex.getMessage());
-                }
+                Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+
+                //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
+                //mBmp = bmp;
+                rotateMyBitmap(bmp);
+                stream.close();
             }
-        });
-
+        } catch (Exception ex) {
+            Log.e("Sys", "Error:" + ex.getMessage());
+        }
         if (null != mBmp) {
-            mCamera.stopPreview();
             //将bitmap保存，记录照片本地地址，留待之后上传
             boolean b = saveBitmap(mBmp);
             if (b) {
@@ -131,7 +138,6 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
             } else {
                 ToastUtils.showToast(this, "驾驶证获取失败");
             }
-            ProgressDialogUtil.hideDialog();
         }
     }
 
@@ -139,9 +145,7 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
         //*****旋转一下
         Matrix matrix = new Matrix();
         matrix.postRotate(-90);
-        Bitmap nbmp2 = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
-        //*******显示一下
-        mBmp = nbmp2;
+        mBmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
     }
 
     private void setSurFaceView() {
@@ -158,12 +162,13 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
         parameters.setPreviewFormat(ImageFormat.NV21);//default默认为21，所有手机均支持NV21
         List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
         parameters.setPreviewSize(supportedPreviewSizes.get(0).width, supportedPreviewSizes.get(0).height);//设置预览分辨率
+        parameters.setPictureSize(supportedPreviewSizes.get(0).width, supportedPreviewSizes.get(0).height);
         parameters.setPreviewFrameRate(25);
         //后置需要自动对焦，否则人脸采集照片模糊
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         mCamera.setParameters(parameters);
-        mCamera.setPreviewCallback(this);//开启Camera预览回调，重写onPreviewFrame获取相机回调
         mCamera.startPreview();//开启预览
+        mCamera.setPreviewCallback(this);//开启Camera预览回调，重写onPreviewFrame获取相机回调
         mCamera.cancelAutoFocus();//聚焦
         //已打开相机
 
@@ -204,26 +209,7 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
 
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
-        Camera.Size size = camera.getParameters().getPreviewSize();
-        try {
-            YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
-            if (image != null) {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                image.compressToJpeg(new Rect(0, 0, size.width, size.height), 80, stream);
-                Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-
-                //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
-                rotateMyBitmap(bmp);
-                stream.close();
-            }
-        } catch (Exception ex) {
-            Log.e("Sys", "Error:" + ex.getMessage());
-        }
-        //        Camera.Size previewSize = camera.getParameters().getPreviewSize();
-        //        YuvImage image = new YuvImage(bytes, ImageFormat.NV21, previewSize.width, previewSize.height, null);
-        //        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        //        image.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, stream);
-        //        //        mBmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+        mPicByte = bytes;
     }
 
     /**

@@ -41,12 +41,13 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
     private SurfaceView sfview;
     private ImageView   img_back;
     private ImageView   img_sure;
-    //    private TextView    tv_sure;
     private Camera      mCamera;
     private boolean     bfrontSwitch;
+    private byte[]      mPicByte;//临时记录预览下的图片数据
     private Bitmap      mBmp;
+    private String      fileUrl;
     private int RESULT_FOR_FACE = 10088;//获取头像响应值
-    private String fileUrl;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,58 +106,6 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
         }
     }
 
-    private void getCameraPic() {
-        mCamera.takePicture(null, null, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-                Camera.Size size = camera.getParameters().getPreviewSize();
-                try {
-                    YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
-                    if (image != null) {
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        image.compressToJpeg(new Rect(0, 0, size.width, size.height), 100, stream);
-
-                        Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-
-                        //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
-                        //mBmp = bmp;
-                        rotateMyBitmap(bmp);
-                        stream.close();
-                    }
-                } catch (Exception ex) {
-                    Log.e("Sys", "Error:" + ex.getMessage());
-                }
-            }
-        });
-        if (null != mBmp) {
-            mCamera.stopPreview();
-            //将bitmap保存，记录照片本地地址，留待之后上传
-            boolean b = saveBitmap(mBmp);
-            if (b) {
-                ToastUtils.showToast(this, "人脸保存成功");
-                Intent intent = getIntent().putExtra("face_pic_url", fileUrl);
-                setResult(RESULT_FOR_FACE, intent);
-
-                finish();
-            } else {
-                ToastUtils.showToast(this, "人脸获取失败");
-            }
-        }
-    }
-
-    public void rotateMyBitmap(Bitmap bmp) {
-        //*****旋转一下
-        Matrix matrix = new Matrix();
-        matrix.postRotate(-90);
-
-        //Bitmap bitmap = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.ARGB_8888);
-
-        Bitmap nbmp2 = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
-
-        //*******显示一下
-        mBmp = nbmp2;
-    }
-
     private void setSurFaceView() {
         //判断是否有前置摄像头
         bfrontSwitch = isHasFrontCamera();
@@ -174,13 +123,14 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
         parameters.setPreviewFormat(ImageFormat.NV21);//default默认为21，所有手机均支持NV21
         List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
         parameters.setPreviewSize(supportedPreviewSizes.get(0).width, supportedPreviewSizes.get(0).height);//设置预览分辨率
+        //        List<Camera.Size> supportedPictureSizes = parameters.getSupportedPictureSizes();
+        parameters.setPictureSize(supportedPreviewSizes.get(0).width, supportedPreviewSizes.get(0).height);//设置图片分辨率
         parameters.setPreviewFrameRate(25);
+        //后置需要自动对焦，否则人脸采集照片模糊
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        //        if (!bfrontSwitch) {//后置需要自动对焦，否则人脸采集照片模糊
-        //        }
         mCamera.setParameters(parameters);
-        mCamera.setPreviewCallback(this);//开启Camera预览回调，重写onPreviewFrame获取相机回调
         mCamera.startPreview();//开启预览
+        mCamera.setPreviewCallback(this);//开启Camera预览回调，重写onPreviewFrame获取相机回调
         mCamera.cancelAutoFocus();//聚焦
         //已打开相机
 
@@ -206,24 +156,49 @@ public class GetFacePhotoActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
-        Log.e("Sys", "success:");
-        Camera.Size size = camera.getParameters().getPreviewSize();
+        mPicByte = bytes;
+    }
+
+    private void getCameraPic() {
+        mCamera.stopPreview();
+        //保存图片
+        Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
         try {
-            YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
+            YuvImage image = new YuvImage(mPicByte, ImageFormat.NV21, previewSize.width, previewSize.height, null);
             if (image != null) {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                image.compressToJpeg(new Rect(0, 0, size.width, size.height), 100, stream);
-
+                image.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 100, stream);
                 Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-
                 //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
-                //mBmp = bmp;
                 rotateMyBitmap(bmp);
                 stream.close();
             }
         } catch (Exception ex) {
             Log.e("Sys", "Error:" + ex.getMessage());
         }
+
+        if (null != mBmp) {
+            //将bitmap保存，记录照片本地地址，留待之后上传
+            boolean b = saveBitmap(mBmp);
+            if (b) {
+                ToastUtils.showToast(this, "人脸保存成功");
+                Intent intent = getIntent().putExtra("face_pic_url", fileUrl);
+                setResult(RESULT_FOR_FACE, intent);
+                finish();
+            } else {
+                ToastUtils.showToast(this, "人脸获取失败，请退出重新打开摄像机");
+            }
+        }
+    }
+
+    public void rotateMyBitmap(Bitmap bmp) {
+        //*****旋转一下
+        Matrix matrix = new Matrix();
+        matrix.postRotate(-90);
+
+        //Bitmap bitmap = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.ARGB_8888);
+
+        mBmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
     }
 
     private void startPreview(SurfaceHolder mSurfaceHolder) {
