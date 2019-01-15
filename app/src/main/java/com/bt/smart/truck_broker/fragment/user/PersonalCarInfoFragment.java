@@ -195,19 +195,16 @@ public class PersonalCarInfoFragment extends Fragment implements View.OnClickLis
         HttpOkhUtils.getInstance().upDateFile(NetConfig.PHOTO, headParam, params, "file", file, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
-                ToastUtils.showToast(getContext(), "网络连接错误");
+                ProgressDialogUtil.hideDialog();
                 if (1 == kind) {
                     times++;
                     ToastUtils.showToast(getContext(), "头像上传失败");
                 } else if (2 == kind) {
                     times++;
-                    ToastUtils.showToast(getContext(), "头像上传失败");
+                    ToastUtils.showToast(getContext(), "驾驶证上传失败");
                 } else if (3 == kind) {
                     times++;
-                    ToastUtils.showToast(getContext(), "头像上传失败");
-                }
-                if (times == 3) {
-                    ProgressDialogUtil.hideDialog();
+                    ToastUtils.showToast(getContext(), "行驶证上传失败");
                 }
             }
 
@@ -236,7 +233,6 @@ public class PersonalCarInfoFragment extends Fragment implements View.OnClickLis
                         ToastUtils.showToast(getContext(), "行驶证上传成功");
                     }
                     if (times == 3) {
-                        ProgressDialogUtil.hideDialog();
                         //提交信息
                         sendDriverInfo();
                     }
@@ -246,24 +242,22 @@ public class PersonalCarInfoFragment extends Fragment implements View.OnClickLis
         return;
     }
 
+    //提交认证信息
     private void sendDriverInfo() {
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         RequestParamsFM params = new RequestParamsFM();
-        params.put("checkStatus", "0");
-        params.put("id", MyApplication.userID);
-        params.put("fmobile",MyApplication.userPhone);
-        params.put("fpassword",MyApplication.pasword);
-        params.put("fphoto", getHeadUrl);//头像
-        params.put("driverLicense", getDriverUrl);//驾驶证
-        params.put("drivingLicense", getDrivingUrl);//行驶证
-        params.put("fcarno", carno);//车牌号
-        params.put("fname", userName);//姓名
-        params.put("idNumber", personalNo);//身份证号
+        params.put("submitMobile", MyApplication.userPhone);
+        params.put("name", userName);//姓名
+        params.put("idnumber", personalNo);//身份证号
+        params.put("headpic", getHeadUrl);//头像
+        params.put("drivingLicence", getDriverUrl);//驾驶证
+        params.put("vehicleLicence", getDrivingUrl);//行驶证
         params.put("fcartype", carModel);//车型
         params.put("fcarlength", carLeng);//车长
+        params.put("fcarno", carno);//车牌号
         params.setUseJsonStreamer(true);
-        HttpOkhUtils.getInstance().doPutWithHeader(NetConfig.REGISTERDRIVERCONTROLLER, headParams, params, new HttpOkhUtils.HttpCallBack() {
+        HttpOkhUtils.getInstance().doPostWithHeader(NetConfig.DRIVERGDCONTROLLER, headParams, params, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
                 ProgressDialogUtil.hideDialog();
@@ -281,6 +275,7 @@ public class PersonalCarInfoFragment extends Fragment implements View.OnClickLis
                 UpDataDriverInfo upDataDriverInfo = gson.fromJson(resbody, UpDataDriverInfo.class);
                 ToastUtils.showToast(getContext(), upDataDriverInfo.getMessage());
                 if (upDataDriverInfo.isOk()) {
+                    MyApplication.checkStatus = "1";
                     getActivity().finish();
                 }
             }

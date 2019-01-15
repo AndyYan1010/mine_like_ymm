@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +15,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bt.smart.truck_broker.MyApplication;
+import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.activity.LoginActivity;
 import com.bt.smart.truck_broker.activity.userAct.AuthenticationActivity;
+import com.bt.smart.truck_broker.messageInfo.LoginInfo;
+import com.bt.smart.truck_broker.utils.GlideLoaderUtil;
+import com.bt.smart.truck_broker.utils.HttpOkhUtils;
+import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.SpUtils;
+import com.bt.smart.truck_broker.utils.ToastUtils;
+import com.google.gson.Gson;
+
+import java.io.IOException;
+
+import okhttp3.Request;
 
 
 /**
@@ -30,18 +42,20 @@ import com.bt.smart.truck_broker.utils.SpUtils;
  */
 
 public class User_F extends Fragment implements View.OnClickListener {
-    private View           mRootView;
-    private TextView       tv_title;
-    private ImageView      img_head;
-    private TextView       tv_phone;
-    private TextView       tv_isCheck;
-    private TextView       tv_warn;
-    private TextView       tv_submit;
-    private RelativeLayout rtv_address;
-    private RelativeLayout rtv_phone;
-    private RelativeLayout rtv_serv;
-    private RelativeLayout rtv_about;
-    private RelativeLayout rtv_exit;
+    private View               mRootView;
+    private TextView           tv_title;
+    private SwipeRefreshLayout swiperefresh;
+    private ImageView          img_head;
+    private TextView           tv_phone;
+    private TextView           tv_isCheck;
+    private TextView           tv_checked;
+    private TextView           tv_warn;
+    private TextView           tv_submit;
+    private RelativeLayout     rtv_address;
+    private RelativeLayout     rtv_phone;
+    private RelativeLayout     rtv_serv;
+    private RelativeLayout     rtv_about;
+    private RelativeLayout     rtv_exit;
 
 
     @Override
@@ -54,9 +68,11 @@ public class User_F extends Fragment implements View.OnClickListener {
 
     private void initView() {
         tv_title = mRootView.findViewById(R.id.tv_title);
+        swiperefresh = mRootView.findViewById(R.id.swiperefresh);
         img_head = mRootView.findViewById(R.id.img_head);
         tv_phone = mRootView.findViewById(R.id.tv_phone);
         tv_isCheck = mRootView.findViewById(R.id.tv_isCheck);
+        tv_checked = mRootView.findViewById(R.id.tv_checked);
         tv_warn = mRootView.findViewById(R.id.tv_warn);
         tv_submit = mRootView.findViewById(R.id.tv_submit);
         rtv_address = mRootView.findViewById(R.id.rtv_address);
@@ -69,14 +85,26 @@ public class User_F extends Fragment implements View.OnClickListener {
 
     private void initData() {
         tv_title.setText("我的");
+        if ("".equals(MyApplication.userName)){
+            tv_phone.setText(MyApplication.userPhone);
+        }else {
+            tv_phone.setText(MyApplication.userName);
+        }
         tv_submit.setOnClickListener(this);
         rtv_address.setOnClickListener(this);
         rtv_phone.setOnClickListener(this);
         rtv_serv.setOnClickListener(this);
         rtv_about.setOnClickListener(this);
         rtv_exit.setOnClickListener(this);
+        GlideLoaderUtil.showImgWithIcon(getContext(), NetConfig.IMG_HEAD + MyApplication.userHeadPic, R.drawable.iman, R.drawable.iman, img_head);
+        swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //重新登录下获取最新的认证状态
+                getNewCheckStatue();
+            }
+        });
     }
-
 
     @Override
     public void onClick(View view) {
@@ -106,6 +134,82 @@ public class User_F extends Fragment implements View.OnClickListener {
                 exitLogin();
                 break;
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //根据认证状态判断
+        checkCheckStatues();
+    }
+
+    private void checkCheckStatues() {
+        if ("1".equals(MyApplication.checkStatus)) {
+            tv_isCheck.setText("待审核");
+            tv_isCheck.setTextColor(getResources().getColor(R.color.yellow));
+            tv_warn.setText("您的认证信息已提交，请等待客服审核。");
+            tv_submit.setVisibility(View.GONE);
+        } else if ("2".equals(MyApplication.checkStatus)) {
+            tv_isCheck.setText("退回");
+            tv_isCheck.setTextColor(getResources().getColor(R.color.red_30));
+            tv_warn.setText("您提交的认证信息被驳回，具体失败原因，我们会通过短信通知您。");
+            tv_submit.setVisibility(View.VISIBLE);
+        } else if ("3".equals(MyApplication.checkStatus)) {//审核通过
+            tv_checked.setVisibility(View.VISIBLE);
+            tv_isCheck.setVisibility(View.GONE);
+            tv_warn.setVisibility(View.GONE);
+            tv_submit.setVisibility(View.GONE);
+        } else {
+            tv_isCheck.setText("未认证");
+            tv_isCheck.setTextColor(getResources().getColor(R.color.red_30));
+            tv_submit.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void getNewCheckStatue() {
+        swiperefresh.setRefreshing(true);
+        RequestParamsFM params = new RequestParamsFM();
+        params.put("fmobile", MyApplication.userPhone);
+        HttpOkhUtils.getInstance().doPostBean(NetConfig.CodeLOGINURL, params, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                swiperefresh.setRefreshing(false);
+                ToastUtils.showToast(getContext(), "网络连接错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                swiperefresh.setRefreshing(false);
+                if (code != 200) {
+                    ToastUtils.showToast(getContext(), "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
+                ToastUtils.showToast(getContext(), loginInfo.getMessage());
+                if (loginInfo.isOk()) {
+                    MyApplication.userToken = loginInfo.getData().getToken();
+                    MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();
+                    MyApplication.userName = loginInfo.getData().getRegisterDriver().getFname();
+                    MyApplication.userPhone = loginInfo.getData().getRegisterDriver().getFmobile();
+                    MyApplication.checkStatus = loginInfo.getData().getRegisterDriver().getCheckStatus();
+                    MyApplication.userHeadPic = loginInfo.getData().getRegisterDriver().getFphoto();
+                    //更改界面UI
+                    changeUFUI();
+                }
+            }
+        });
+    }
+
+    private void changeUFUI() {
+        //根据认证状态判断
+        checkCheckStatues();
+        if ("".equals(MyApplication.userName)){
+            tv_phone.setText(MyApplication.userPhone);
+        }else {
+            tv_phone.setText(MyApplication.userName);
+        }
+        GlideLoaderUtil.showImgWithIcon(getContext(), NetConfig.IMG_HEAD + MyApplication.userHeadPic, R.drawable.iman, R.drawable.iman, img_head);
     }
 
     private void exitLogin() {

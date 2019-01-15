@@ -27,18 +27,13 @@ public class MyApplication extends Application {
     public static ArrayList<Activity> listActivity = new ArrayList<Activity>();//用来装载activity
     public static int                 flag         = -1;//判断是否被回收
     public static int                 isLogin      = 0;//判断是否登录
-    public static String  userID;
-    public static String  userPhone;
-    public static String  userToken;
-    public static String  userName;
-    public static String  pasword;
-    public static String  userHeadPic;
-    public static String  slecHomeID;
-    public static String  slecRoomID;
-    public static boolean isLoading;//房间设备是否刷新
-    public static String  loadUrl;
-    public static boolean sceneRefresh;
-    public static int     devNum;
+    public static String userID;
+    public static String userPhone;
+    public static String userToken;
+    public static String checkStatus;
+    public static String userHeadPic;
+    public static String userName;
+    public static String pasword;
 
     @Override
     public void onCreate() {

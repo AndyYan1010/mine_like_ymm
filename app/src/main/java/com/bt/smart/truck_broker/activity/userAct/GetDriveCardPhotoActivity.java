@@ -120,7 +120,6 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
                 Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
 
                 //因为图片会放生旋转，因此要对图片进行旋转到和手机在一个方向上
-                //mBmp = bmp;
                 rotateMyBitmap(bmp);
                 stream.close();
             }
@@ -144,7 +143,7 @@ public class GetDriveCardPhotoActivity extends BaseActivity implements View.OnCl
     public void rotateMyBitmap(Bitmap bmp) {
         //*****旋转一下
         Matrix matrix = new Matrix();
-        matrix.postRotate(-90);
+        matrix.postRotate(90);
         mBmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
     }
 

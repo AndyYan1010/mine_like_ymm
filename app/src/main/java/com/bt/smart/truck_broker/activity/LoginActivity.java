@@ -266,7 +266,46 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 if (loginInfo.isOk()){
                     MyApplication.userToken = loginInfo.getData().getToken();
                     MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();
+                    MyApplication.userName = loginInfo.getData().getRegisterDriver().getFname();
                     MyApplication.userPhone = loginInfo.getData().getRegisterDriver().getFmobile();
+                    MyApplication.checkStatus = loginInfo.getData().getRegisterDriver().getCheckStatus();
+                    MyApplication.userHeadPic = loginInfo.getData().getRegisterDriver().getFphoto();
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+                }
+            }
+        });
+    }
+
+    private void loginToService(String phone, final String psd) {
+        ProgressDialogUtil.startShow(LoginActivity.this, "正在登录请稍后");
+        RequestParamsFM params = new RequestParamsFM();
+        params.put("fmobile", phone);
+        params.put("password", psd);
+        HttpOkhUtils.getInstance().doPost(NetConfig.LOGINURL, params, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ProgressDialogUtil.hideDialog();
+                ToastUtils.showToast(LoginActivity.this, "网络连接错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                ProgressDialogUtil.hideDialog();
+                if (code != 200) {
+                    ToastUtils.showToast(LoginActivity.this, "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
+                ToastUtils.showToast(LoginActivity.this, loginInfo.getMessage());
+                if (loginInfo.isOk()){
+                    MyApplication.userToken = loginInfo.getData().getToken();
+                    MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();
+                    MyApplication.userName = loginInfo.getData().getRegisterDriver().getFname();
+                    MyApplication.userPhone = loginInfo.getData().getRegisterDriver().getFmobile();
+                    MyApplication.checkStatus = loginInfo.getData().getRegisterDriver().getCheckStatus();
+                    MyApplication.userHeadPic = loginInfo.getData().getRegisterDriver().getFphoto();
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
                 }
@@ -315,39 +354,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     }, 1000);    //第一次执行，一秒之后。第一次执行完就没关系了
                 } else {
                     ToastUtils.showToast(LoginActivity.this, "验证码获取失败");
-                }
-            }
-        });
-    }
-
-    private void loginToService(String phone, final String psd) {
-        ProgressDialogUtil.startShow(LoginActivity.this, "正在登录请稍后");
-        RequestParamsFM params = new RequestParamsFM();
-        params.put("fmobile", phone);
-        params.put("password", psd);
-        HttpOkhUtils.getInstance().doPost(NetConfig.LOGINURL, params, new HttpOkhUtils.HttpCallBack() {
-            @Override
-            public void onError(Request request, IOException e) {
-                ProgressDialogUtil.hideDialog();
-                ToastUtils.showToast(LoginActivity.this, "网络连接错误");
-            }
-
-            @Override
-            public void onSuccess(int code, String resbody) {
-                ProgressDialogUtil.hideDialog();
-                if (code != 200) {
-                    ToastUtils.showToast(LoginActivity.this, "网络错误" + code);
-                    return;
-                }
-                Gson gson = new Gson();
-                LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
-                ToastUtils.showToast(LoginActivity.this, loginInfo.getMessage());
-                if (loginInfo.isOk()){
-                    MyApplication.userToken = loginInfo.getData().getToken();
-                    MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();
-                    MyApplication.userPhone = loginInfo.getData().getRegisterDriver().getFmobile();
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    finish();
                 }
             }
         });

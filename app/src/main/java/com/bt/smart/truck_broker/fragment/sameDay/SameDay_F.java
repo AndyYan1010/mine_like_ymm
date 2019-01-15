@@ -248,9 +248,6 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                 ToastUtils.showToast(getContext(), allOrderListInfo.getMessage());
                 if (allOrderListInfo.isOk()) {
                     mData.clear();
-                    //                    for (int i = 0; i < 3; i++) {
-                    //                        mData.add(allOrderListInfo.getData().get(i));
-                    //                    }
                     mData.addAll(allOrderListInfo.getData());
                     orderAdapter.notifyDataSetChanged();
                 }
