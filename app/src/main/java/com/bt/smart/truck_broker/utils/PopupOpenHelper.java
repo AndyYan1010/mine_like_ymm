@@ -103,7 +103,7 @@ public class PopupOpenHelper {
     }
 
     public void setOnPopupViewClick(ViewClickListener viewClickListener) {
-        viewClickListener.onViewClickListener(popupWindow, inflateView);
+        viewClickListener.onViewListener(popupWindow, inflateView);
     }
 
     public void dismiss() {
@@ -111,6 +111,6 @@ public class PopupOpenHelper {
     }
 
     public interface ViewClickListener {
-        void onViewClickListener(PopupWindow popupWindow, View inflateView);
+        void onViewListener(PopupWindow popupWindow, View inflateView);
     }
 }

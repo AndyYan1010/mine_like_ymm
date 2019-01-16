@@ -281,7 +281,7 @@ public class SetLinesAddressFragment extends Fragment implements View.OnClickLis
         openHelper.openPopupWindowWithView(true, 0, (int) linear_cf00.getY() + linear_cf00.getHeight());
         openHelper.setOnPopupViewClick(new PopupOpenHelper.ViewClickListener() {
             @Override
-            public void onViewClickListener(PopupWindow popupWindow, View inflateView) {
+            public void onViewListener(PopupWindow popupWindow, View inflateView) {
                 RecyclerView recy_city = inflateView.findViewById(R.id.recy_city);
                 final TextView tv_back = inflateView.findViewById(R.id.tv_back);
                 final TextView tv_cancel = inflateView.findViewById(R.id.tv_cancel);

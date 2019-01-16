@@ -3,10 +3,14 @@ package com.bt.smart.truck_broker.adapter;
 import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.messageInfo.AllOrderListInfo;
+import com.bt.smart.truck_broker.utils.MyAlertDialogHelper;
 import com.bt.smart.truck_broker.utils.ShowCallUtil;
+import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 
@@ -40,7 +44,34 @@ public class RecyOrderAdapter extends BaseQuickAdapter<AllOrderListInfo.DataBean
         img_call.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!"3".equals(MyApplication.checkStatus)) {
+                    ToastUtils.showToast(mContext, "请先提交资料，认证通过才能联系货主哦！");
+                    //弹出dialog提示
+                    showCheckWarning();
+                    return;
+                }
                 ShowCallUtil.showCallDialog(mContext, item.getFhTelephone());
+            }
+        });
+    }
+
+    private void showCheckWarning() {
+        final MyAlertDialogHelper dialogHelper = new MyAlertDialogHelper();
+        View view = View.inflate(mContext, R.layout.dialog_check_warning, null);
+        dialogHelper.setDIYView(mContext, view);
+        dialogHelper.show();
+        TextView tv_cancel = view.findViewById(R.id.tv_cancel);
+        TextView tv_sure = view.findViewById(R.id.tv_sure);
+        tv_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogHelper.disMiss();
+            }
+        });
+        tv_sure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogHelper.disMiss();
             }
         });
     }

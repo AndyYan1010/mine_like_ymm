@@ -1,9 +1,9 @@
 package com.bt.smart.truck_broker.fragment.sameDay;
 
-import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,10 +12,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bt.smart.truck_broker.MyApplication;
@@ -28,6 +28,8 @@ import com.bt.smart.truck_broker.messageInfo.AllOrderListInfo;
 import com.bt.smart.truck_broker.messageInfo.ChioceAdapterContentInfo;
 import com.bt.smart.truck_broker.messageInfo.ShengDataInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
+import com.bt.smart.truck_broker.utils.MyAlertDialogHelper;
+import com.bt.smart.truck_broker.utils.MyAnimationUtils;
 import com.bt.smart.truck_broker.utils.PopupOpenHelper;
 import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
@@ -52,26 +54,22 @@ import okhttp3.Request;
  */
 
 public class SameDay_F extends Fragment implements View.OnClickListener {
-    private View                            mRootView;
-    private SwipeRefreshLayout              swiperefresh;
-    private ImageView                       img_refresh;//顶部刷新按钮
-    private View                            view_a;//刷新按钮定位
-    private View                            view_b;//底部定位
-    private TextView                        tv_title;
-    private TextView                        tv_start;//起点
-    private TextView                        tv_end;//终点
-    private LinearLayout                    liner_top;
-    private RelativeLayout                  rlt_title;
-    private LinearLayout                    liner_term;
-    private LinearLayout                    line_start;
-    private LinearLayout                    line_end;
-    private LinearLayout                    line_screen;
+    private View               mRootView;
+    private TextView           tv_title;
+    private SwipeRefreshLayout swiperefresh;
+    private NestedScrollView   nestscroll;
+    private ImageView          img_refresh,img_totop;
+    private TextView           tv_start;//起点
+    private TextView           tv_end;//终点
+    private LinearLayout       line_start;
+    private LinearLayout       line_end;
+    private LinearLayout       line_screen;
+    private ImageView          img_start, img_end;//起点终点的箭头
     private RecyclerView                    rec_order;
     private RecyOrderAdapter                orderAdapter;
     private List<AllOrderListInfo.DataBean> mData;
     private int REQUEST_FOR_TAKE_ORDER = 12087;//接单返回
     private int RESULT_TAKE_ORDER      = 12088;//接单成功响应值
-    private ObjectAnimator animatorXz;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -83,15 +81,14 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
 
     private void initView() {
         tv_title = mRootView.findViewById(R.id.tv_title);
-        view_a = mRootView.findViewById(R.id.view_a);
-        view_b = mRootView.findViewById(R.id.view_b);
         swiperefresh = mRootView.findViewById(R.id.swiperefresh);
+        nestscroll = mRootView.findViewById(R.id.nestscroll);
         img_refresh = mRootView.findViewById(R.id.img_refresh);
-        liner_top = mRootView.findViewById(R.id.liner_top);
-        rlt_title = mRootView.findViewById(R.id.rlt_title);
-        liner_term = mRootView.findViewById(R.id.liner_term);
+        img_totop = mRootView.findViewById(R.id.img_totop);
         line_start = mRootView.findViewById(R.id.line_start);
+        img_start = mRootView.findViewById(R.id.img_start);
         line_end = mRootView.findViewById(R.id.line_end);
+        img_end = mRootView.findViewById(R.id.img_end);
         line_screen = mRootView.findViewById(R.id.line_screen);
         rec_order = mRootView.findViewById(R.id.rec_order);
         tv_start = mRootView.findViewById(R.id.tv_start);
@@ -116,22 +113,26 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
             }
         });
         //设置rec_order滑动事件
-        setRecyclerviewMoveEvent();
+        //        setRecyclerviewMoveEvent();
         line_start.setOnClickListener(this);
         line_end.setOnClickListener(this);
         line_screen.setOnClickListener(this);
         img_refresh.setOnClickListener(this);
-        animatorXz = ObjectAnimator.ofFloat(img_refresh, "rotation", 0f, 90f, 180f, 360f);
+        img_totop.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.img_refresh://按钮刷新列表
-                animatorXz.setDuration(2000);
-                animatorXz.start();
+                mData.clear();
+                orderAdapter.notifyDataSetChanged();
+                MyAnimationUtils.rotateView(img_refresh, 2000, 0f, 90f, 180f, 360f);
                 //获取订单列表信息
                 getOrderList(1, 10);
+                break;
+            case R.id.img_totop://滑动顶端按钮
+                nestscroll.scrollTo(0, line_start.getHeight());
                 break;
             case R.id.line_start:
                 //选择运输起点
@@ -211,14 +212,47 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     private void initOrderList() {
         mData = new ArrayList();
         rec_order.setLayoutManager(new LinearLayoutManager(getContext()));
+        //解决数据加载不完的问题
+        //            rec_order.setNestedScrollingEnabled(false);
+        //            rec_order.setHasFixedSize(true);
+        //解决数据加载完成后, 没有停留在顶部的问题
+        rec_order.setFocusable(false);
+        rec_order.setNestedScrollingEnabled(false);
         orderAdapter = new RecyOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
         rec_order.setAdapter(orderAdapter);
         orderAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (!"3".equals(MyApplication.checkStatus)) {
+                    ToastUtils.showToast(getContext(), "请先提交资料，认证通过才能联系货主哦！");
+                    //弹出dialog提示
+                    showCheckWarning();
+                    return;
+                }
                 Intent intent = new Intent(getContext(), OrderDetailActivity.class);
                 intent.putExtra("orderID", mData.get(position).getId());
                 startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
+            }
+        });
+    }
+
+    private void showCheckWarning() {
+        final MyAlertDialogHelper dialogHelper = new MyAlertDialogHelper();
+        View view = View.inflate(getContext(), R.layout.dialog_check_warning, null);
+        dialogHelper.setDIYView(getContext(), view);
+        dialogHelper.show();
+        TextView tv_cancel = view.findViewById(R.id.tv_cancel);
+        TextView tv_sure = view.findViewById(R.id.tv_sure);
+        tv_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogHelper.disMiss();
+            }
+        });
+        tv_sure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogHelper.disMiss();
             }
         });
     }
@@ -273,29 +307,28 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                             scDownY = (int) motionEvent.getRawY();
                         }
                         scMoveY = (int) motionEvent.getRawY();
-                        rltTop = rltTop + (scMoveY - scDownY);
+                        //                        rltTop = rltTop + (scMoveY - scDownY);
                         imgTop = imgTop + (scDownY - scMoveY);
-                        rltBot = rltTop + liner_top.getHeight();
+                        //                        rltBot = rltTop + liner_top.getHeight();
                         //标题的位置
-                        if (rltTop >= 0) {
-                            rltTop = 0;
-                            rltBot = liner_top.getHeight();
-                            swiperefresh.layout(0, 0, liner_top.getWidth(), liner_top.getHeight());
-                        }
-                        if (rltBot < 0) {
-                            rltBot = 0;
-                            rltTop = rltBot - liner_top.getHeight();
-                        }
-                        //刷新按钮的位置
-                        if (imgTop > view_b.getTop()) {
-                            imgTop = view_b.getTop();
-                        }
-                        if (imgTop < view_a.getTop()) {
-                            imgTop = view_a.getTop();
-                        }
+                        //                        if (rltTop >= 0) {
+                        //                            rltTop = 0;
+                        //                            rltBot = liner_top.getHeight();
+                        //                        }
+                        //                        if (rltBot < 0) {
+                        //                            rltBot = 0;
+                        //                            rltTop = rltBot - liner_top.getHeight();
+                        //                        }
+                        //                        //刷新按钮的位置
+                        //                        if (imgTop > view_b.getTop()) {
+                        //                            imgTop = view_b.getTop();
+                        //                        }
+                        //                        if (imgTop < view_a.getTop()) {
+                        //                            imgTop = view_a.getTop();
+                        //                        }
                         //设置位置
-                        liner_top.layout(0, rltTop, liner_top.getWidth(), rltBot);
-                        rec_order.layout(0, rltTop + liner_top.getHeight(), liner_top.getWidth(), view_b.getTop());
+                        //                        liner_top.layout(0, rltTop, liner_top.getWidth(), rltBot);
+                        //                        rec_order.layout(0, rltTop + liner_top.getHeight(), liner_top.getWidth(), view_b.getTop());
                         img_refresh.layout(img_refresh.getLeft(), imgTop, img_refresh.getLeft() + img_refresh.getWidth(), imgTop + img_refresh.getHeight());
                         //平和滑动
                         scDownY = (int) motionEvent.getRawY();
@@ -320,17 +353,36 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     private PopupOpenHelper                openHelper;
 
     private void choiceStartPlace(final int kind) {
+        if (kind == 1) {
+            MyAnimationUtils.rotateView(img_end, 500, 0f, 180f);
+        } else {
+            MyAnimationUtils.rotateView(img_start, 500, 0f, 180f);
+        }
         openHelper = new PopupOpenHelper(getContext(), line_start, R.layout.popup_choice_start);
         openHelper.openPopupWindowWithView(true, 0, (int) line_start.getY() + line_start.getHeight());
         openHelper.setOnPopupViewClick(new PopupOpenHelper.ViewClickListener() {
             @Override
-            public void onViewClickListener(PopupWindow popupWindow, View inflateView) {
+            public void onViewListener(PopupWindow popupWindow, View inflateView) {
                 RecyclerView recy_city = inflateView.findViewById(R.id.recy_city);
                 final TextView tv_back = inflateView.findViewById(R.id.tv_back);
                 final TextView tv_cancel = inflateView.findViewById(R.id.tv_cancel);
                 if (stCityLevel != 0) {
                     tv_back.setVisibility(View.VISIBLE);
                 }
+                popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        //设置背景色
+                        WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
+                        lp.alpha = 1.0f;
+                        getActivity().getWindow().setAttributes(lp);
+                        if (kind == 1) {
+                            MyAnimationUtils.rotateView(img_end, 500, 180f, 0f);
+                        } else {
+                            MyAnimationUtils.rotateView(img_start, 500, 180f, 0f);
+                        }
+                    }
+                });
                 recy_city.setLayoutManager(new GridLayoutManager(getContext(), 4));
                 final RecyPlaceAdapter recyPlaceAdapter = new RecyPlaceAdapter(R.layout.adpter_pop_city_place, getContext(), mDataPopEd);
                 recy_city.setAdapter(recyPlaceAdapter);
