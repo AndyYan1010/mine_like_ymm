@@ -43,6 +43,7 @@ import okhttp3.Request;
 public class OrderListByLineFragment extends Fragment implements View.OnClickListener {
     private View                            mRootView;
     private ImageView                       img_back;
+    private ImageView                       img_empty;
     private TextView                        tv_title;
     private TextView                        tv_lineName;
     private RecyclerView                    recy_order;
@@ -63,6 +64,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
 
     private void initView() {
         img_back = mRootView.findViewById(R.id.img_back);
+        img_empty = mRootView.findViewById(R.id.img_empty);
         tv_title = mRootView.findViewById(R.id.tv_title);
         tv_lineName = mRootView.findViewById(R.id.tv_lineName);
         recy_order = mRootView.findViewById(R.id.recy_order);
@@ -72,13 +74,16 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
         img_back.setVisibility(View.VISIBLE);
         tv_title.setText("货源列表");
         lineID = getActivity().getIntent().getStringExtra("lineID");
-        line_name=getActivity().getIntent().getStringExtra("lineName");
+        line_name = getActivity().getIntent().getStringExtra("lineName");
+
+        tv_lineName.setText(line_name);
         //初始化货源列表数据
         initOrderList();
         //获取线路货源
         getOrdersByLine();
 
         img_back.setOnClickListener(this);
+        img_empty.setOnClickListener(this);
     }
 
     @Override
@@ -86,6 +91,10 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
         switch (view.getId()) {
             case R.id.img_back:
                 getActivity().finish();
+                break;
+            case R.id.img_empty:
+                //获取线路货源
+                getOrdersByLine();
                 break;
         }
     }
@@ -101,6 +110,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
     }
 
     private void getOrdersByLine() {
+        img_empty.setVisibility(View.VISIBLE);
         RequestParamsFM headParam = new RequestParamsFM();
         headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
         HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.DRIVERJOURNEYCONTROLLER + "/getOrder/" + lineID, headParam, new HttpOkhUtils.HttpCallBack() {
@@ -122,6 +132,9 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
                 ToastUtils.showToast(getContext(), linesOrderInfo.getMessage());
                 if (linesOrderInfo.isOk()) {
                     mData.clear();
+                    if (linesOrderInfo.getData().size() > 0) {
+                        img_empty.setVisibility(View.GONE);
+                    }
                     for (LinesOrderInfo.DataBean bean : linesOrderInfo.getData()) {
                         AllOrderListInfo.DataBean bean1 = new AllOrderListInfo.DataBean();
                         bean1.setFhAddress(bean.getFh_address());

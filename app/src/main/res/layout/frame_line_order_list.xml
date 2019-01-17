@@ -20,6 +20,8 @@
         android:background="@color/white"
         android:gravity="center"
         android:minHeight="30dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
         android:text="海门 → 苏州"
         android:textColor="@color/word_black"
         android:textSize="14sp"/>
@@ -27,8 +29,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/gray_ea"
-        android:minHeight="45dp">
+        android:background="@color/white"
+        android:minHeight="35dp">
 
         <TextView
             android:id="@+id/tv_lenmol"
@@ -44,9 +46,23 @@
             android:textColor="@color/word_black"
             android:textSize="14sp"/>
     </RelativeLayout>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recy_order"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recy_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </android.support.v7.widget.RecyclerView>
+
+        <ImageView
+            android:id="@+id/img_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:clickable="true"
+            android:src="@drawable/msg_empty"/>
+    </RelativeLayout>
 </LinearLayout>

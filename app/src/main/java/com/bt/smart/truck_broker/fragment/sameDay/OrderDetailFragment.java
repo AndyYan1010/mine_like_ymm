@@ -82,11 +82,16 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         img_back.setOnClickListener(this);
         tv_cont.setOnClickListener(this);
         tv_take.setOnClickListener(this);
+        img_empty.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.img_empty:
+                //获取货源详情
+                getOrderDetail();
+                break;
             case R.id.img_back:
                 MyFragmentManagerUtil.closeFragmentOnAct(this);
                 break;
@@ -135,6 +140,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     }
 
     private void getOrderDetail() {
+        ProgressDialogUtil.startShow(getContext(),"正在获取详情...");
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.ALL_ORDER_DETAIL + "/" + orderID, headParams, new HttpOkhUtils.HttpCallBack() {

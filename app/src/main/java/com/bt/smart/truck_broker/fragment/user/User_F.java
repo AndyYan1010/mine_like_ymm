@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -45,12 +46,16 @@ public class User_F extends Fragment implements View.OnClickListener {
     private View               mRootView;
     private TextView           tv_title;
     private SwipeRefreshLayout swiperefresh;
-    private ImageView          img_head;
+    private ImageView          img_head;//头像
     private TextView           tv_phone;
-    private TextView           tv_isCheck;
-    private TextView           tv_checked;
-    private TextView           tv_warn;
-    private TextView           tv_submit;
+    private TextView           tv_isCheck;//认证进度
+    private TextView           tv_checked;//已认证
+    private TextView           tv_warn;//未通过认证前提示
+    private TextView           tv_submit;//认证
+    private TextView           tv_money;//余额
+    private LinearLayout       linear_money;
+    private LinearLayout       linear_order;
+    private TextView           tv_orderNum;//运单数
     private RelativeLayout     rtv_address;
     private RelativeLayout     rtv_phone;
     private RelativeLayout     rtv_serv;
@@ -75,6 +80,8 @@ public class User_F extends Fragment implements View.OnClickListener {
         tv_checked = mRootView.findViewById(R.id.tv_checked);
         tv_warn = mRootView.findViewById(R.id.tv_warn);
         tv_submit = mRootView.findViewById(R.id.tv_submit);
+        linear_money = mRootView.findViewById(R.id.linear_money);
+        linear_order = mRootView.findViewById(R.id.linear_order);
         rtv_address = mRootView.findViewById(R.id.rtv_address);
         rtv_phone = mRootView.findViewById(R.id.rtv_phone);
         rtv_serv = mRootView.findViewById(R.id.rtv_serv);
@@ -85,9 +92,9 @@ public class User_F extends Fragment implements View.OnClickListener {
 
     private void initData() {
         tv_title.setText("我的");
-        if ("".equals(MyApplication.userName)){
+        if ("".equals(MyApplication.userName)) {
             tv_phone.setText(MyApplication.userPhone);
-        }else {
+        } else {
             tv_phone.setText(MyApplication.userName);
         }
         tv_submit.setOnClickListener(this);
@@ -205,9 +212,9 @@ public class User_F extends Fragment implements View.OnClickListener {
     private void changeUFUI() {
         //根据认证状态判断
         checkCheckStatues();
-        if ("".equals(MyApplication.userName)){
+        if ("".equals(MyApplication.userName)) {
             tv_phone.setText(MyApplication.userPhone);
-        }else {
+        } else {
             tv_phone.setText(MyApplication.userName);
         }
         GlideLoaderUtil.showImgWithIcon(getContext(), NetConfig.IMG_HEAD + MyApplication.userHeadPic, R.drawable.iman, R.drawable.iman, img_head);
