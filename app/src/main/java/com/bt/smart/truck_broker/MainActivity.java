@@ -1,6 +1,9 @@
 package com.bt.smart.truck_broker;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -16,9 +19,16 @@ import com.bt.smart.truck_broker.fragment.home.Home_F;
 import com.bt.smart.truck_broker.fragment.sameDay.SameDay_F;
 import com.bt.smart.truck_broker.fragment.serviceApply.ServApply_F;
 import com.bt.smart.truck_broker.fragment.user.User_F;
+import com.bt.smart.truck_broker.messageInfo.NewApkInfo;
+import com.bt.smart.truck_broker.utils.HttpOkhUtils;
+import com.bt.smart.truck_broker.utils.MyAlertDialogHelper;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Request;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private long        exitTime   = 0;//记录点击物理返回键的时间
@@ -61,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tv_menu_1 = findViewById(R.id.tv_menu_1);
         tv_menu_2 = findViewById(R.id.tv_menu_2);
         tv_menu_3 = findViewById(R.id.tv_menu_3);
+        //获取最新的版本
+        //        getNewApkInfo();
     }
 
     private void setData() {
@@ -170,6 +182,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             sameDay_F.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void getNewApkInfo() {
+        HttpOkhUtils.getInstance().doGet(NetConfig.GETNEWAPPVERSION, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                Gson gson = new Gson();
+                //                NewApkInfo newApkInfo = gson.fromJson(resbody, NewApkInfo.class);
+                //                if (1 == newApkInfo.getCode()) {
+                //                    int appVersionCode = getAppVersionCode(FirstActivity.this);
+                //                    if (null != newApkInfo.getNewAppVersion()) {
+                //                        if (appVersionCode < newApkInfo.getNewAppVersion().getId()) {
+                //                            //弹出dailog，提示用户是否下载
+                //                            showDialogToDown(newApkInfo);
+                //                        }
+                //                    }
+                //                }
+            }
+        });
+    }
+
+    private void showDialogToDown(NewApkInfo newApkInfo) {
+        //        MyApplication.loadUrl = NetConfig.IMG_HEAD_IP + newApkInfo.getNewAppVersion().getApk_file();
+        //        UpdateAppUtil.from(this)
+        //                .serverVersionCode(newApkInfo.getNewAppVersion().getId())  //服务器versionCode
+        //                .serverVersionName(newApkInfo.getNewAppVersion().getShow_code()) //服务器versionName
+        //                .apkPath(MyApplication.loadUrl) //最新apk下载地址
+        //                .updateInfo(newApkInfo.getNewAppVersion().getChange_message())
+        //                .update();
+    }
+
+    //获取当前版本号
+    private int getAppVersionCode(Context context) {
+        int versionCode = 0;
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+            versionCode = packageInfo.versionCode;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return versionCode;
+    }
+
     private void changeTVColor(int item) {
         for (int i = 0; i < tv_menu.size(); i++) {
             if (i == item) {
@@ -183,7 +242,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            exit();
+            //            exit();
+
+            final MyAlertDialogHelper dialogHelper = new MyAlertDialogHelper();
+            View view = View.inflate(this, R.layout.dialog_commen_title, null);
+            dialogHelper.setDIYView(this, view);
+            dialogHelper.show();
+            TextView tv_sure = view.findViewById(R.id.tv_sure);
+            TextView tv_cancel = view.findViewById(R.id.tv_cancel);
+            tv_sure.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finish();
+                    MyApplication.exit();
+                }
+            });
+            tv_cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialogHelper.disMiss();
+                }
+            });
             return false;
         }
         return super.onKeyDown(keyCode, event);

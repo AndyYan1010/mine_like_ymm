@@ -11,11 +11,11 @@ package com.bt.smart.truck_broker;
 
 public class NetConfig {
     //服务器总地址
-            public static String ROOT        = "http://116.62.171.244:8082/yingsu/rest/";
-//    public static String ROOT     = "http://205.168.1.118/yingsu_war_exploded/rest/";
+    public static String ROOT     = "http://116.62.171.244:8082/yingsu/rest/";
+    //    public static String ROOT     = "http://205.168.1.118/yingsu_war_exploded/rest/";
     //图片地址
-        public static String IMG_HEAD    = "http://116.62.171.244:8082/yingsu/";
-//    public static String IMG_HEAD = "http://205.168.1.118/yingsu_war_exploded/";
+    public static String IMG_HEAD = "http://116.62.171.244:8082/yingsu/";
+    //    public static String IMG_HEAD = "http://205.168.1.118/yingsu_war_exploded/";
 
 
     //获取最新版本apk信息
@@ -52,8 +52,6 @@ public class NetConfig {
 
     //根据司机id获取个人线路
     public static String DRIVERJOURNEYCONTROLLER = ROOT + "driverJourneyController";
-    //创建司机行驶路线
-    //    public static String DRIVERJOURNEYCONTROLLER = ROOT + "driverJourneyController";
 
     //获取省市区
     public static String REGIONSELECT = ROOT + "registerDriverController/regionSelect";

@@ -1,9 +1,7 @@
 package com.bt.smart.truck_broker.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -12,11 +10,16 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.bt.smart.truck_broker.MainActivity;
 import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
-import com.bt.smart.truck_broker.messageInfo.NewApkInfo;
+import com.bt.smart.truck_broker.messageInfo.LoginInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
+import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
+import com.bt.smart.truck_broker.utils.RequestParamsFM;
+import com.bt.smart.truck_broker.utils.SpUtils;
+import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -57,9 +60,14 @@ public class FirstActivity extends Activity implements View.OnClickListener {
     private void setData() {
         tv_new.setOnClickListener(this);
         tv_old.setOnClickListener(this);
-        //获取最新的版本
-        getNewApkInfo();
 
+        Boolean isRemem = SpUtils.getBoolean(this, "isRem", false);
+        if (isRemem) {
+            String name = SpUtils.getString(this, "name");
+            String psd = SpUtils.getString(this, "psd");
+            //直接登录
+            loginToService(name, psd);
+        }
     }
 
     @Override
@@ -80,51 +88,40 @@ public class FirstActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    private void getNewApkInfo() {
-        HttpOkhUtils.getInstance().doGet(NetConfig.GETNEWAPPVERSION, new HttpOkhUtils.HttpCallBack() {
+    private void loginToService(String phone, final String psd) {
+        ProgressDialogUtil.startShow(FirstActivity.this, "正在登录请稍后");
+        RequestParamsFM params = new RequestParamsFM();
+        params.put("fmobile", phone);
+        params.put("password", psd);
+        HttpOkhUtils.getInstance().doPost(NetConfig.LOGINURL, params, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
-
+                ProgressDialogUtil.hideDialog();
+                ToastUtils.showToast(FirstActivity.this, "网络连接错误");
             }
 
             @Override
             public void onSuccess(int code, String resbody) {
+                ProgressDialogUtil.hideDialog();
+                if (code != 200) {
+                    ToastUtils.showToast(FirstActivity.this, "网络错误" + code);
+                    return;
+                }
                 Gson gson = new Gson();
-//                NewApkInfo newApkInfo = gson.fromJson(resbody, NewApkInfo.class);
-//                if (1 == newApkInfo.getCode()) {
-//                    int appVersionCode = getAppVersionCode(FirstActivity.this);
-//                    if (null != newApkInfo.getNewAppVersion()) {
-//                        if (appVersionCode < newApkInfo.getNewAppVersion().getId()) {
-//                            //弹出dailog，提示用户是否下载
-//                            showDialogToDown(newApkInfo);
-//                        }
-//                    }
-//                }
+                LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
+                ToastUtils.showToast(FirstActivity.this, loginInfo.getMessage());
+                if (loginInfo.isOk()) {
+                    MyApplication.userToken = loginInfo.getData().getToken();
+                    MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();
+                    MyApplication.userName = loginInfo.getData().getRegisterDriver().getFname();
+                    MyApplication.userPhone = loginInfo.getData().getRegisterDriver().getFmobile();
+                    MyApplication.checkStatus = loginInfo.getData().getRegisterDriver().getCheckStatus();
+                    MyApplication.userHeadPic = loginInfo.getData().getRegisterDriver().getFphoto();
+                    startActivity(new Intent(FirstActivity.this, MainActivity.class));
+                    finish();
+                }
             }
         });
-    }
-
-    private void showDialogToDown(NewApkInfo newApkInfo) {
-//        MyApplication.loadUrl = NetConfig.IMG_HEAD_IP + newApkInfo.getNewAppVersion().getApk_file();
-//        UpdateAppUtil.from(this)
-//                .serverVersionCode(newApkInfo.getNewAppVersion().getId())  //服务器versionCode
-//                .serverVersionName(newApkInfo.getNewAppVersion().getShow_code()) //服务器versionName
-//                .apkPath(MyApplication.loadUrl) //最新apk下载地址
-//                .updateInfo(newApkInfo.getNewAppVersion().getChange_message())
-//                .update();
-    }
-
-    //获取当前版本号
-    private int getAppVersionCode(Context context) {
-        int versionCode = 0;
-        try {
-            PackageManager packageManager = context.getPackageManager();
-            PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
-            versionCode = packageInfo.versionCode;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return versionCode;
     }
 
     private static final int      REQUEST_EXTERNAL_STORAGE = 1;

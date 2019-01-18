@@ -114,6 +114,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             edit_num.setSelection(name.length());
             edit_psd.setText(psd);
             edit_psd.setSelection(psd.length());
+            //            //直接登录
+            //            loginToService(name, psd);
         }
         ck_remPas.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -263,7 +265,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 Gson gson = new Gson();
                 LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
                 ToastUtils.showToast(LoginActivity.this, loginInfo.getMessage());
-                if (loginInfo.isOk()){
+                if (loginInfo.isOk()) {
                     MyApplication.userToken = loginInfo.getData().getToken();
                     MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();
                     MyApplication.userName = loginInfo.getData().getRegisterDriver().getFname();
@@ -299,7 +301,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 Gson gson = new Gson();
                 LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
                 ToastUtils.showToast(LoginActivity.this, loginInfo.getMessage());
-                if (loginInfo.isOk()){
+                if (loginInfo.isOk()) {
                     MyApplication.userToken = loginInfo.getData().getToken();
                     MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();
                     MyApplication.userName = loginInfo.getData().getRegisterDriver().getFname();

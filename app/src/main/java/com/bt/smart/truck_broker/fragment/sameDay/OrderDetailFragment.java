@@ -83,6 +83,10 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         tv_cont.setOnClickListener(this);
         tv_take.setOnClickListener(this);
         img_empty.setOnClickListener(this);
+        String touchKind = getActivity().getIntent().getStringExtra("touchKind");
+        if (null != touchKind && "accepted".equals(touchKind)) {
+            tv_take.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -140,7 +144,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     }
 
     private void getOrderDetail() {
-        ProgressDialogUtil.startShow(getContext(),"正在获取详情...");
+        ProgressDialogUtil.startShow(getContext(), "正在获取详情...");
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.ALL_ORDER_DETAIL + "/" + orderID, headParams, new HttpOkhUtils.HttpCallBack() {

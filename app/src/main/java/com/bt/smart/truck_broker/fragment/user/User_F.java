@@ -19,6 +19,7 @@ import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.activity.LoginActivity;
+import com.bt.smart.truck_broker.activity.userAct.AcceptOrderListActivity;
 import com.bt.smart.truck_broker.activity.userAct.AuthenticationActivity;
 import com.bt.smart.truck_broker.messageInfo.LoginInfo;
 import com.bt.smart.truck_broker.utils.GlideLoaderUtil;
@@ -98,6 +99,8 @@ public class User_F extends Fragment implements View.OnClickListener {
             tv_phone.setText(MyApplication.userName);
         }
         tv_submit.setOnClickListener(this);
+        linear_money.setOnClickListener(this);
+        linear_order.setOnClickListener(this);
         rtv_address.setOnClickListener(this);
         rtv_phone.setOnClickListener(this);
         rtv_serv.setOnClickListener(this);
@@ -120,6 +123,10 @@ public class User_F extends Fragment implements View.OnClickListener {
             case R.id.tv_submit:
                 //跳转身份认证界面
                 toSubmitPersonInfo();
+                break;
+            case R.id.linear_order://查看运输单列表
+                Intent intent = new Intent(getContext(), AcceptOrderListActivity.class);
+                startActivity(intent);
                 break;
             case R.id.rtv_address:
                 //跳转收货地址界面
