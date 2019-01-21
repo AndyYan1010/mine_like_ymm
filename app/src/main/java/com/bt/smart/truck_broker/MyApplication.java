@@ -33,7 +33,7 @@ public class MyApplication extends Application {
     public static String checkStatus;
     public static String userHeadPic;
     public static String userName;
-    public static String pasword;
+    public static int    userOrderNum;
 
     @Override
     public void onCreate() {

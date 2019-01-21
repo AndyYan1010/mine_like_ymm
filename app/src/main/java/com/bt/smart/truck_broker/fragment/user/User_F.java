@@ -154,6 +154,7 @@ public class User_F extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        tv_orderNum.setText(MyApplication.userOrderNum + "单");
         //根据认证状态判断
         checkCheckStatues();
     }
@@ -209,6 +210,7 @@ public class User_F extends Fragment implements View.OnClickListener {
                     MyApplication.userPhone = loginInfo.getData().getRegisterDriver().getFmobile();
                     MyApplication.checkStatus = loginInfo.getData().getRegisterDriver().getCheckStatus();
                     MyApplication.userHeadPic = loginInfo.getData().getRegisterDriver().getFphoto();
+                    MyApplication.userOrderNum = loginInfo.getData().getOrderno();
                     //更改界面UI
                     changeUFUI();
                 }
@@ -225,6 +227,7 @@ public class User_F extends Fragment implements View.OnClickListener {
             tv_phone.setText(MyApplication.userName);
         }
         GlideLoaderUtil.showImgWithIcon(getContext(), NetConfig.IMG_HEAD + MyApplication.userHeadPic, R.drawable.iman, R.drawable.iman, img_head);
+        tv_orderNum.setText(MyApplication.userOrderNum + "单");
     }
 
     private void exitLogin() {

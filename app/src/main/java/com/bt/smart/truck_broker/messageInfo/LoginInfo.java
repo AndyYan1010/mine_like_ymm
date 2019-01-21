@@ -13,7 +13,7 @@ public class LoginInfo {
 
     /**
      * message : 成功
-     * data : {"registerDriver":{"fcarno":"","fid":"","faccountEncryption":"","fname":"","fphoto":"","companyName":"","fcartype":"","checkReason":"","faccount":0,"fpassword":"e10adc3949ba59abbe56e057f20f883e","idNumber":"","fmobile":"18036215618","fpoints":0,"checkStatus":"","fcarlength":"","drivingLicense":"","idCard1":"","idCard2":"","driverLicense":"","id":"2c9084dd683aff1c01683b8356530028"},"token":"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxODAzNjIxNTYxOCIsInN1YiI6IjE4MDM2MjE1NjE4IiwiaWF0IjoxNTQ3NDQ2OTgwfQ.w24VFXNsfNTXbbfUnsMJgskp_SzLg4VcqESrEZUpEoA"}
+     * data : {"registerDriver":{"fcarno":"","fid":"","faccountEncryption":"","fname":"","fphoto":"","companyName":"","fcartype":"","checkReason":"","faccount":0,"fpassword":"e10adc3949ba59abbe56e057f20f883e","idNumber":"","fmobile":"18036215618","fpoints":0,"checkStatus":"0","fcarlength":"","drivingLicense":"","idCard1":"","idCard2":"","driverLicense":"","id":"2c979074686e2cc701686e42737b0002"},"orderno":0,"token":"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxODAzNjIxNTYxOCIsInN1YiI6IjE4MDM2MjE1NjE4IiwiaWF0IjoxNTQ4MDQwNjc4fQ.T4Wte0LfJi_w-reamhNhuvEC0XUirfwQ67nGYE0vwjc"}
      * respCode : 0
      * ok : true
      */
@@ -57,11 +57,13 @@ public class LoginInfo {
 
     public static class DataBean {
         /**
-         * registerDriver : {"fcarno":"","fid":"","faccountEncryption":"","fname":"","fphoto":"","companyName":"","fcartype":"","checkReason":"","faccount":0,"fpassword":"e10adc3949ba59abbe56e057f20f883e","idNumber":"","fmobile":"18036215618","fpoints":0,"checkStatus":"","fcarlength":"","drivingLicense":"","idCard1":"","idCard2":"","driverLicense":"","id":"2c9084dd683aff1c01683b8356530028"}
-         * token : eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxODAzNjIxNTYxOCIsInN1YiI6IjE4MDM2MjE1NjE4IiwiaWF0IjoxNTQ3NDQ2OTgwfQ.w24VFXNsfNTXbbfUnsMJgskp_SzLg4VcqESrEZUpEoA
+         * registerDriver : {"fcarno":"","fid":"","faccountEncryption":"","fname":"","fphoto":"","companyName":"","fcartype":"","checkReason":"","faccount":0,"fpassword":"e10adc3949ba59abbe56e057f20f883e","idNumber":"","fmobile":"18036215618","fpoints":0,"checkStatus":"0","fcarlength":"","drivingLicense":"","idCard1":"","idCard2":"","driverLicense":"","id":"2c979074686e2cc701686e42737b0002"}
+         * orderno : 0
+         * token : eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxODAzNjIxNTYxOCIsInN1YiI6IjE4MDM2MjE1NjE4IiwiaWF0IjoxNTQ4MDQwNjc4fQ.T4Wte0LfJi_w-reamhNhuvEC0XUirfwQ67nGYE0vwjc
          */
 
         private RegisterDriverBean registerDriver;
+        private int    orderno;
         private String token;
 
         public RegisterDriverBean getRegisterDriver() {
@@ -70,6 +72,14 @@ public class LoginInfo {
 
         public void setRegisterDriver(RegisterDriverBean registerDriver) {
             this.registerDriver = registerDriver;
+        }
+
+        public int getOrderno() {
+            return orderno;
+        }
+
+        public void setOrderno(int orderno) {
+            this.orderno = orderno;
         }
 
         public String getToken() {
@@ -95,13 +105,13 @@ public class LoginInfo {
              * idNumber :
              * fmobile : 18036215618
              * fpoints : 0
-             * checkStatus :
+             * checkStatus : 0
              * fcarlength :
              * drivingLicense :
              * idCard1 :
              * idCard2 :
              * driverLicense :
-             * id : 2c9084dd683aff1c01683b8356530028
+             * id : 2c979074686e2cc701686e42737b0002
              */
 
             private String fcarno;
