@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -30,7 +29,7 @@ import java.util.List;
 
 import okhttp3.Request;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private long        exitTime   = 0;//记录点击物理返回键的时间
     // 界面底部的菜单按钮
     private ImageView[] bt_menu    = new ImageView[4];
