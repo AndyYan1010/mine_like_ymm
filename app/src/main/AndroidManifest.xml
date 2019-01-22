@@ -35,6 +35,7 @@
         <activity android:name=".activity.homeAct.FindByLinesActivity"/>
         <activity android:name=".activity.userAct.GetDrivingCardPhotoActivity"/>
         <activity android:name=".activity.userAct.AcceptOrderListActivity"/>
+        <activity android:name=".activity.userAct.AllOrderListActivity"/>
     </application>
 
 </manifest>

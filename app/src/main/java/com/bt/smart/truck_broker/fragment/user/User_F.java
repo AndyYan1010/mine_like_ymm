@@ -20,6 +20,7 @@ import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.activity.LoginActivity;
 import com.bt.smart.truck_broker.activity.userAct.AcceptOrderListActivity;
+import com.bt.smart.truck_broker.activity.userAct.AllOrderListActivity;
 import com.bt.smart.truck_broker.activity.userAct.AuthenticationActivity;
 import com.bt.smart.truck_broker.messageInfo.LoginInfo;
 import com.bt.smart.truck_broker.utils.GlideLoaderUtil;
@@ -62,6 +63,7 @@ public class User_F extends Fragment implements View.OnClickListener {
     private RelativeLayout     rtv_serv;
     private RelativeLayout     rtv_about;
     private RelativeLayout     rtv_exit;
+    private RelativeLayout     rlt_allOrder;//更多订单
 
 
     @Override
@@ -88,6 +90,7 @@ public class User_F extends Fragment implements View.OnClickListener {
         rtv_serv = mRootView.findViewById(R.id.rtv_serv);
         rtv_about = mRootView.findViewById(R.id.rtv_about);
         rtv_exit = mRootView.findViewById(R.id.rtv_exit);
+        rlt_allOrder = mRootView.findViewById(R.id.rlt_allOrder);
 
     }
 
@@ -106,6 +109,7 @@ public class User_F extends Fragment implements View.OnClickListener {
         rtv_serv.setOnClickListener(this);
         rtv_about.setOnClickListener(this);
         rtv_exit.setOnClickListener(this);
+        rlt_allOrder.setOnClickListener(this);
         GlideLoaderUtil.showImgWithIcon(getContext(), NetConfig.IMG_HEAD + MyApplication.userHeadPic, R.drawable.iman, R.drawable.iman, img_head);
         swiperefresh.setColorSchemeColors(getResources().getColor(R.color.blue_icon), getResources().getColor(R.color.yellow_40), getResources().getColor(R.color.red_160));
         swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -147,6 +151,10 @@ public class User_F extends Fragment implements View.OnClickListener {
             case R.id.rtv_exit:
                 //退出登录
                 exitLogin();
+                break;
+            case R.id.rlt_allOrder://跳转订单分类界面
+                Intent intentAllOrder = new Intent(getContext(), AllOrderListActivity.class);
+                startActivity(intentAllOrder);
                 break;
         }
     }

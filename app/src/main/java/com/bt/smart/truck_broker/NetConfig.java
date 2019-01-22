@@ -43,11 +43,13 @@ public class NetConfig {
     public static String REGISTERDRIVERCONTROLLER = ROOT + "registerDriverController/{id}";
 
     //获取当天货源信息列表
-    public static String ALL_ORDER_LIST        = ROOT + "orderController/list";
+    public static String ALL_ORDER_LIST              = ROOT + "orderController/list";
     //获取当天货源条目详情
-    public static String ALL_ORDER_DETAIL      = ROOT + "orderController";
+    public static String ALL_ORDER_DETAIL            = ROOT + "orderController";
     //司机接单
-    public static String DRIVERORDERCONTROLLER = ROOT + "driverOrderController";
+    public static String DRIVERORDERCONTROLLER       = ROOT + "driverOrderController";
+    //根据ID司机订单表信息
+    public static String DRIVERORDERCONTROLLER_ORDER = ROOT + "driverOrderController/order";
 
 
     //根据司机id获取个人线路

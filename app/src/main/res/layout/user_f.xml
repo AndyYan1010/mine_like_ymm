@@ -482,6 +482,10 @@
                         android:layout_marginRight="15dp"
                         android:src="@drawable/me_next2"/>
                 </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"/>
             </LinearLayout>
         </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
