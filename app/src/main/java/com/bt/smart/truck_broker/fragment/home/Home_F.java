@@ -144,6 +144,7 @@ public class Home_F extends Fragment implements View.OnClickListener {
                 Intent intent = new Intent(getContext(), FindByLinesActivity.class);
                 intent.putExtra("lineID", mData.get(i).getId());
                 intent.putExtra("lineName", mData.get(i).getOrigin() + "  →  " + mData.get(i).getDestination());
+                intent.putExtra("lineModel", mData.get(i).getCar_long() + "  →  " + mData.get(i).getCar_type());
                 startActivity(intent);
             }
         });

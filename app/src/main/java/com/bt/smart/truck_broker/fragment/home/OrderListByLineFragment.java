@@ -19,6 +19,7 @@ import com.bt.smart.truck_broker.adapter.RecyOrderAdapter;
 import com.bt.smart.truck_broker.messageInfo.AllOrderListInfo;
 import com.bt.smart.truck_broker.messageInfo.LinesOrderInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
+import com.bt.smart.truck_broker.utils.MyAlertDialogHelper;
 import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.ToastUtils;
@@ -46,6 +47,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
     private ImageView                       img_empty;
     private TextView                        tv_title;
     private TextView                        tv_lineName;
+    private TextView                        tv_lenmol;
     private RecyclerView                    recy_order;
     private List<AllOrderListInfo.DataBean> mData;
     private RecyOrderAdapter                orderAdapter;
@@ -53,6 +55,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
     private int RESULT_TAKE_ORDER      = 12088;//接单成功响应值
     private String lineID;
     private String line_name;
+    private String line_model;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,6 +70,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
         img_empty = mRootView.findViewById(R.id.img_empty);
         tv_title = mRootView.findViewById(R.id.tv_title);
         tv_lineName = mRootView.findViewById(R.id.tv_lineName);
+        tv_lenmol = mRootView.findViewById(R.id.tv_lenmol);
         recy_order = mRootView.findViewById(R.id.recy_order);
     }
 
@@ -75,8 +79,10 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
         tv_title.setText("货源列表");
         lineID = getActivity().getIntent().getStringExtra("lineID");
         line_name = getActivity().getIntent().getStringExtra("lineName");
+        line_model = getActivity().getIntent().getStringExtra("lineModel");
 
         tv_lineName.setText(line_name);
+        tv_lenmol.setText(line_model);
         //初始化货源列表数据
         initOrderList();
         //获取线路货源
@@ -157,20 +163,38 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
         recy_order.setLayoutManager(new LinearLayoutManager(getContext()));
         orderAdapter = new RecyOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
         recy_order.setAdapter(orderAdapter);
-        orderAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-            @Override
-            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                switch (view.getId()) {
-
-                }
-            }
-        });
         orderAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (!"3".equals(MyApplication.checkStatus)) {
+                    ToastUtils.showToast(getContext(), "请先提交资料，认证通过才能联系货主哦！");
+                    //弹出dialog提示
+                    showCheckWarning();
+                    return;
+                }
                 Intent intent = new Intent(getContext(), OrderDetailActivity.class);
                 intent.putExtra("orderID", mData.get(position).getId());
                 startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
+            }
+        });
+    }
+    private void showCheckWarning() {
+        final MyAlertDialogHelper dialogHelper = new MyAlertDialogHelper();
+        View view = View.inflate(getContext(), R.layout.dialog_check_warning, null);
+        dialogHelper.setDIYView(getContext(), view);
+        dialogHelper.show();
+        TextView tv_cancel = view.findViewById(R.id.tv_cancel);
+        TextView tv_sure = view.findViewById(R.id.tv_sure);
+        tv_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogHelper.disMiss();
+            }
+        });
+        tv_sure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogHelper.disMiss();
             }
         });
     }

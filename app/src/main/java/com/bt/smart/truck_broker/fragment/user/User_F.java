@@ -96,7 +96,7 @@ public class User_F extends Fragment implements View.OnClickListener {
     }
 
     private void initData() {
-        tv_title.setText("我的");
+        tv_title.setText("个人资料");
         if ("".equals(MyApplication.userName)) {
             tv_phone.setText(MyApplication.userPhone);
         } else {
