@@ -12,9 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="40dp"
+        android:background="@color/gray_ef"
         app:tabMode="scrollable"
         app:tabSelectedTextColor="@color/deepskyblue"
-        app:tabTextColor="@color/black">
+        app:tabTextColor="@color/word_gray">
     </android.support.design.widget.TabLayout>
 
     <com.bt.smart.truck_broker.viewmodel.MyFixedViewpager

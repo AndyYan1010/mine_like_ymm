@@ -83,6 +83,7 @@ public class User_F extends Fragment implements View.OnClickListener {
         tv_checked = mRootView.findViewById(R.id.tv_checked);
         tv_warn = mRootView.findViewById(R.id.tv_warn);
         tv_submit = mRootView.findViewById(R.id.tv_submit);
+        tv_orderNum = mRootView.findViewById(R.id.tv_orderNum);
         linear_money = mRootView.findViewById(R.id.linear_money);
         linear_order = mRootView.findViewById(R.id.linear_order);
         rtv_address = mRootView.findViewById(R.id.rtv_address);

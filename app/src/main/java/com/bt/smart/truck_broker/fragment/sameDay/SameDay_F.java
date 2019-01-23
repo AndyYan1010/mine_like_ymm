@@ -58,13 +58,13 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     private TextView           tv_title;
     private SwipeRefreshLayout swiperefresh;
     private NestedScrollView   nestscroll;
-    private ImageView          img_refresh,img_totop;
-    private TextView           tv_start;//起点
-    private TextView           tv_end;//终点
-    private LinearLayout       line_start;
-    private LinearLayout       line_end;
-    private LinearLayout       line_screen;
-    private ImageView          img_start, img_end;//起点终点的箭头
+    private ImageView          img_refresh, img_totop;
+    private TextView     tv_start;//起点
+    private TextView     tv_end;//终点
+    private LinearLayout line_start;
+    private LinearLayout line_end;
+    private LinearLayout line_screen;
+    private ImageView    img_start, img_end;//起点终点的箭头
     private RecyclerView                    rec_order;
     private RecyOrderAdapter                orderAdapter;
     private List<AllOrderListInfo.DataBean> mData;
@@ -102,14 +102,14 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         //初始化起点线路
         initStartPlace();
         //获取订单列表信息
-        getOrderList(1, 10);
+        getOrderList(1, 10, 0, null);
 
         swiperefresh.setColorSchemeColors(getResources().getColor(R.color.blue_icon), getResources().getColor(R.color.yellow_40), getResources().getColor(R.color.red_160));
         swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 //获取订单列表信息
-                getOrderList(1, 10);
+                getOrderList(1, 10, 0, null);
             }
         });
         //设置rec_order滑动事件
@@ -129,7 +129,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                 orderAdapter.notifyDataSetChanged();
                 MyAnimationUtils.rotateView(img_refresh, 2000, 0f, 90f, 180f, 360f);
                 //获取订单列表信息
-                getOrderList(1, 10);
+                getOrderList(1, 10, 0, null);
                 break;
             case R.id.img_totop://滑动顶端按钮
                 nestscroll.scrollTo(0, line_start.getHeight());
@@ -154,7 +154,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data);
         if (REQUEST_FOR_TAKE_ORDER == requestCode && RESULT_TAKE_ORDER == resultCode) {
             //刷新界面
-            getOrderList(1, 10);
+            getOrderList(1, 10, 0, null);
         }
     }
 
@@ -257,11 +257,16 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void getOrderList(int no, int size) {
+    private void getOrderList(int no, int size, int isAppoint, String id) {
         swiperefresh.setRefreshing(true);
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
-        String finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size;
+        String finalUrl;
+        if (null == id || "".equals(id)) {
+            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}";
+        } else {
+            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}?appointId=" + id;
+        }
         HttpOkhUtils.getInstance().doGetWithOnlyHeader(finalUrl, headParams, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {

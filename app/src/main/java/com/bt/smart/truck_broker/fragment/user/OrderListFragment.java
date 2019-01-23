@@ -12,7 +12,8 @@ import android.view.ViewGroup;
 import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
-import com.bt.smart.truck_broker.adapter.RecyDriverOrderAdapter;
+import com.bt.smart.truck_broker.adapter.ReadyRecDriverOrderAdapter;
+import com.bt.smart.truck_broker.messageInfo.ReadyRecOrderInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.ToastUtils;
@@ -34,12 +35,12 @@ import okhttp3.Request;
  */
 
 public class OrderListFragment extends Fragment {
-    private View                   mRootView;
-    private SwipeRefreshLayout     swiperefresh;
-    private RecyclerView           recyview;
-    private RecyDriverOrderAdapter orderAdapter;
-    private List                   mData;
-    private int                    mType;//fragment需要展示的订单种类//0接单、1运输、2待确认、3已取消、4签收
+    private View                             mRootView;
+    private SwipeRefreshLayout               swiperefresh;
+    private RecyclerView                     recyview;
+    private ReadyRecDriverOrderAdapter       orderAdapter;
+    private List<ReadyRecOrderInfo.DataBean> mData;
+    private int                              mType;//fragment需要展示的订单种类//0接单、1运输、2待确认、3已取消、4签收
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,6 +63,12 @@ public class OrderListFragment extends Fragment {
         setSwipRefresh();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getDrivierOrderList(MyApplication.userID, "" + mType);
+    }
+
     private void setSwipRefresh() {
         swiperefresh.setColorSchemeColors(getResources().getColor(R.color.blue_icon), getResources().getColor(R.color.yellow_40), getResources().getColor(R.color.red_160));
         swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -76,14 +83,15 @@ public class OrderListFragment extends Fragment {
     private void initRecyclerview() {
         mData = new ArrayList();
         recyview.setLayoutManager(new LinearLayoutManager(getContext()));
-        orderAdapter = new RecyDriverOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
+        orderAdapter = new ReadyRecDriverOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
         recyview.setAdapter(orderAdapter);
     }
 
     private void getDrivierOrderList(String userID, String type) {
         swiperefresh.setRefreshing(true);
+        mData.clear();
         RequestParamsFM heardParam = new RequestParamsFM();
-        heardParam.put("X-AUTH-TOKEN  ", MyApplication.userToken);
+        heardParam.put("X-AUTH-TOKEN", MyApplication.userToken);
         RequestParamsFM params = new RequestParamsFM();
         params.put("id", userID);
         params.put("status", type);
@@ -102,7 +110,14 @@ public class OrderListFragment extends Fragment {
                     return;
                 }
                 Gson gson = new Gson();
-
+                ReadyRecOrderInfo readyRecOrderInfo = gson.fromJson(resbody, ReadyRecOrderInfo.class);
+                ToastUtils.showToast(getContext(), readyRecOrderInfo.getMessage());
+                if (readyRecOrderInfo.isOk()) {
+                    if (readyRecOrderInfo.getData().size() > 0) {
+                        mData.addAll(readyRecOrderInfo.getData());
+                        orderAdapter.notifyDataSetChanged();
+                    }
+                }
             }
         });
     }
@@ -113,6 +128,7 @@ public class OrderListFragment extends Fragment {
 
     public void refreshData() {
         //获取司机个人订单列表
-        getDrivierOrderList(MyApplication.userID, "" + mType);
+        if (isVisible())
+            getDrivierOrderList(MyApplication.userID, "" + mType);
     }
 }

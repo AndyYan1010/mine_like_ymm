@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.adapter.MyPagerAdapter;
@@ -25,6 +26,7 @@ import java.util.List;
 
 public class AllOrderFragment extends Fragment {
     private View                    mRootView;
+    private TextView                tv_title;
     private TabLayout               tablayout;
     private MyFixedViewpager        view_pager;
     private List<OrderListFragment> fragmentsList;
@@ -40,12 +42,14 @@ public class AllOrderFragment extends Fragment {
     }
 
     private void initView() {
+        tv_title = mRootView.findViewById(R.id.tv_title);
         tablayout = mRootView.findViewById(R.id.tablayout);
         view_pager = mRootView.findViewById(R.id.view_pager);
 
     }
 
     private void initData() {
+        tv_title.setText("订单列表");
         contsList = new ArrayList<>();
         contsList.add("已接单");
         contsList.add("运输单");
@@ -57,22 +61,23 @@ public class AllOrderFragment extends Fragment {
         orderListFgt0.setType(0);
         fragmentsList.add(orderListFgt0);
         OrderListFragment orderListFgt1 = new OrderListFragment();
-        orderListFgt0.setType(1);
+        orderListFgt1.setType(1);
         fragmentsList.add(orderListFgt1);
         OrderListFragment orderListFgt2 = new OrderListFragment();
-        orderListFgt0.setType(2);
+        orderListFgt2.setType(2);
         fragmentsList.add(orderListFgt2);
         OrderListFragment orderListFgt3 = new OrderListFragment();
-        orderListFgt0.setType(3);
+        orderListFgt3.setType(3);
         fragmentsList.add(orderListFgt3);
         OrderListFragment orderListFgt4 = new OrderListFragment();
-        orderListFgt0.setType(4);
+        orderListFgt4.setType(4);
         fragmentsList.add(orderListFgt4);
         // 创建ViewPager适配器
-        myPagerAdapter = new MyPagerAdapter(getActivity().getSupportFragmentManager());//getChildFragmentManager()
+        myPagerAdapter = new MyPagerAdapter(getFragmentManager());//getChildFragmentManager()
         myPagerAdapter.setFragments((ArrayList<OrderListFragment>) fragmentsList);
         // 给ViewPager设置适配器
         view_pager.setAdapter(myPagerAdapter);
+        //        view_pager.setCanScroll(true);
         tablayout.setupWithViewPager(view_pager);
         for (int i = 0; i < contsList.size(); i++) {
             tablayout.getTabAt(i).setText(contsList.get(i));
@@ -80,7 +85,6 @@ public class AllOrderFragment extends Fragment {
         tablayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                view_pager.resetHeight(tab.getPosition());
                 fragmentsList.get(tab.getPosition()).refreshData();
             }
 
@@ -91,7 +95,6 @@ public class AllOrderFragment extends Fragment {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                view_pager.resetHeight(tab.getPosition());
                 fragmentsList.get(tab.getPosition()).refreshData();
             }
         });

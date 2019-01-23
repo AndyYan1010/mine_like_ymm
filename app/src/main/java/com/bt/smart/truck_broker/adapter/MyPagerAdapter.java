@@ -2,7 +2,7 @@ package com.bt.smart.truck_broker.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import com.bt.smart.truck_broker.fragment.user.OrderListFragment;
 
@@ -19,7 +19,7 @@ import java.util.List;
  * @更新描述 ${TODO}
  */
 
-public class MyPagerAdapter extends FragmentStatePagerAdapter {
+public class MyPagerAdapter extends FragmentPagerAdapter {
     private List<OrderListFragment> mFragmentList;
 
     public MyPagerAdapter(FragmentManager fm) {

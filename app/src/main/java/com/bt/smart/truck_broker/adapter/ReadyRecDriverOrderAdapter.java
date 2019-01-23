@@ -8,7 +8,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.bt.smart.truck_broker.R;
-import com.bt.smart.truck_broker.messageInfo.DrivierOrderInfo;
+import com.bt.smart.truck_broker.messageInfo.ReadyRecOrderInfo;
 import com.bt.smart.truck_broker.utils.MyAlertDialogHelper;
 import com.bt.smart.truck_broker.utils.ShowCallUtil;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -25,17 +25,17 @@ import java.util.List;
  * @更新描述 ${TODO}
  */
 
-public class RecyDriverOrderAdapter extends BaseQuickAdapter<DrivierOrderInfo.DataBean, BaseViewHolder> {
+public class ReadyRecDriverOrderAdapter extends BaseQuickAdapter<ReadyRecOrderInfo.DataBean, BaseViewHolder> {
     private Context mContext;
     private String  selecPhone;//选择的电话
 
-    public RecyDriverOrderAdapter(int layoutResId, Context context, List<DrivierOrderInfo.DataBean> data) {
+    public ReadyRecDriverOrderAdapter(int layoutResId, Context context, List<ReadyRecOrderInfo.DataBean> data) {
         super(layoutResId, data);
         this.mContext = context;
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, final DrivierOrderInfo.DataBean item) {
+    protected void convert(BaseViewHolder helper, final ReadyRecOrderInfo.DataBean item) {
         //        (ImageView) helper.getView(R.id.img_call)
         helper.setText(R.id.tv_place, item.getFh_address() + "  →  " + item.getSh_address());
         helper.setText(R.id.tv_goodsname, item.getGoods_name());
