@@ -13,7 +13,7 @@ public class AddDriverLinesInfo {
 
     /**
      * message : 成功
-     * data : {"id":"4d2881f66835ca5a0168363ad0d00001","origin":"苏州","destination":"南通","driverId":"2c9084dd6831e10501683266018b0003","carType":"平板","carLong":"2米"}
+     * data : {"id":"4d2881e468838fe2016883f815d80003","origin2":"安远县","origin3":"潜山县","destination2":"怀宁县","destination3":"枞阳县","addDate":"2019-01-25 15:45","destination1":"宜秀区","origin1":"大观区","carLong":"2.3米","driverId":"2c979074687943f3016879727bc70001","carType":"2米"}
      * ok : true
      * respCode : 0
      */
@@ -57,20 +57,30 @@ public class AddDriverLinesInfo {
 
     public static class DataBean {
         /**
-         * id : 4d2881f66835ca5a0168363ad0d00001
-         * origin : 苏州
-         * destination : 南通
-         * driverId : 2c9084dd6831e10501683266018b0003
-         * carType : 平板
-         * carLong : 2米
+         * id : 4d2881e468838fe2016883f815d80003
+         * origin2 : 安远县
+         * origin3 : 潜山县
+         * destination2 : 怀宁县
+         * destination3 : 枞阳县
+         * addDate : 2019-01-25 15:45
+         * destination1 : 宜秀区
+         * origin1 : 大观区
+         * carLong : 2.3米
+         * driverId : 2c979074687943f3016879727bc70001
+         * carType : 2米
          */
 
         private String id;
-        private String origin;
-        private String destination;
+        private String origin2;
+        private String origin3;
+        private String destination2;
+        private String destination3;
+        private String addDate;
+        private String destination1;
+        private String origin1;
+        private String carLong;
         private String driverId;
         private String carType;
-        private String carLong;
 
         public String getId() {
             return id;
@@ -80,20 +90,68 @@ public class AddDriverLinesInfo {
             this.id = id;
         }
 
-        public String getOrigin() {
-            return origin;
+        public String getOrigin2() {
+            return origin2;
         }
 
-        public void setOrigin(String origin) {
-            this.origin = origin;
+        public void setOrigin2(String origin2) {
+            this.origin2 = origin2;
         }
 
-        public String getDestination() {
-            return destination;
+        public String getOrigin3() {
+            return origin3;
         }
 
-        public void setDestination(String destination) {
-            this.destination = destination;
+        public void setOrigin3(String origin3) {
+            this.origin3 = origin3;
+        }
+
+        public String getDestination2() {
+            return destination2;
+        }
+
+        public void setDestination2(String destination2) {
+            this.destination2 = destination2;
+        }
+
+        public String getDestination3() {
+            return destination3;
+        }
+
+        public void setDestination3(String destination3) {
+            this.destination3 = destination3;
+        }
+
+        public String getAddDate() {
+            return addDate;
+        }
+
+        public void setAddDate(String addDate) {
+            this.addDate = addDate;
+        }
+
+        public String getDestination1() {
+            return destination1;
+        }
+
+        public void setDestination1(String destination1) {
+            this.destination1 = destination1;
+        }
+
+        public String getOrigin1() {
+            return origin1;
+        }
+
+        public void setOrigin1(String origin1) {
+            this.origin1 = origin1;
+        }
+
+        public String getCarLong() {
+            return carLong;
+        }
+
+        public void setCarLong(String carLong) {
+            this.carLong = carLong;
         }
 
         public String getDriverId() {
@@ -110,14 +168,6 @@ public class AddDriverLinesInfo {
 
         public void setCarType(String carType) {
             this.carType = carType;
-        }
-
-        public String getCarLong() {
-            return carLong;
-        }
-
-        public void setCarLong(String carLong) {
-            this.carLong = carLong;
         }
     }
 }

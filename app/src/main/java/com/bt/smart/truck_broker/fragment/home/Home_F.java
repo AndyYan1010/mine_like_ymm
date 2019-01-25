@@ -55,6 +55,8 @@ public class Home_F extends Fragment implements View.OnClickListener {
     private int Result_FOR_SELECT_LINES  = 10067;//设置线路响应值
     private List<SearchDriverLinesInfo.DataBean> mData;
     private LvLinesAdapter                       linesAdapter;
+    private String                               oriLine;//线路起点
+    private String                               desLine;//线路终点
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +80,7 @@ public class Home_F extends Fragment implements View.OnClickListener {
     private void initData() {
         //初始化路线
         initLinesData();
-        swiperefresh.setColorSchemeColors(getResources().getColor(R.color.blue_icon),getResources().getColor(R.color.yellow_40),getResources().getColor(R.color.red_160));
+        swiperefresh.setColorSchemeColors(getResources().getColor(R.color.blue_icon), getResources().getColor(R.color.yellow_40), getResources().getColor(R.color.red_160));
 
         swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -143,7 +145,19 @@ public class Home_F extends Fragment implements View.OnClickListener {
                 //跳转线路查找货源列表
                 Intent intent = new Intent(getContext(), FindByLinesActivity.class);
                 intent.putExtra("lineID", mData.get(i).getId());
-                intent.putExtra("lineName", mData.get(i).getOrigin() + "  →  " + mData.get(i).getDestination());
+                oriLine = mData.get(i).getOrigin1();
+                desLine = mData.get(i).getDestination1();
+                if (null != mData.get(i).getOrigin2() && !"".equals(mData.get(i).getOrigin2())) {
+                    oriLine = oriLine + "/" + mData.get(i).getOrigin2();
+                } else if (null != mData.get(i).getOrigin3() && !"".equals(mData.get(i).getOrigin3())) {
+                    oriLine = oriLine + "/" + mData.get(i).getOrigin3();
+                }
+                if (null != mData.get(i).getDestination2() && !"".equals(mData.get(i).getDestination2())) {
+                    desLine = desLine + "/" + mData.get(i).getDestination2();
+                } else if (null != mData.get(i).getDestination3() && !"".equals(mData.get(i).getDestination3())) {
+                    desLine = desLine + "/" + mData.get(i).getDestination3();
+                }
+                intent.putExtra("lineName", oriLine + "  →  " + desLine);
                 intent.putExtra("lineModel", mData.get(i).getCar_long() + "  →  " + mData.get(i).getCar_type());
                 startActivity(intent);
             }
@@ -161,6 +175,8 @@ public class Home_F extends Fragment implements View.OnClickListener {
 
     private void getPersonalLines() {
         swiperefresh.setRefreshing(true);
+        canEdit = false;
+        tv_edit.setText("编辑");
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.DRIVERJOURNEYCONTROLLER + "/getRoute/" + MyApplication.userID, headParams, new HttpOkhUtils.HttpCallBack() {

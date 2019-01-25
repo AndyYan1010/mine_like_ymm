@@ -71,7 +71,19 @@ public class LvLinesAdapter extends BaseAdapter {
         } else {
             viewholder = (MyViewHolder) view.getTag();
         }
-        viewholder.tv_place.setText(mList.get(i).getOrigin() + "  →  " + mList.get(i).getDestination());
+        String oriLine = mList.get(i).getOrigin1();
+        String desLine = mList.get(i).getDestination1();
+        if (null != mList.get(i).getOrigin2() && !"".equals(mList.get(i).getOrigin2())) {
+            oriLine = oriLine + "/" + mList.get(i).getOrigin2();
+        } else if (null != mList.get(i).getOrigin3() && !"".equals(mList.get(i).getOrigin3())) {
+            oriLine = oriLine + "/" + mList.get(i).getOrigin3();
+        }
+        if (null != mList.get(i).getDestination2() && !"".equals(mList.get(i).getDestination2())) {
+            desLine = desLine + "/" + mList.get(i).getDestination2();
+        } else if (null != mList.get(i).getDestination3() && !"".equals(mList.get(i).getDestination3())) {
+            desLine = desLine + "/" + mList.get(i).getDestination3();
+        }
+        viewholder.tv_place.setText(oriLine + "  →  " + desLine);
         viewholder.tv_explain.setText(mList.get(i).getCar_long() + "  /  " + mList.get(i).getCar_type());
         if (mList.get(i).isCanDel()) {
             viewholder.tv_del.setVisibility(View.VISIBLE);
@@ -113,7 +125,7 @@ public class LvLinesAdapter extends BaseAdapter {
                     mList.remove(i);
                     if (mList.size() == 0) {
                         homeF.setUIChange();
-                    }else {
+                    } else {
                         homeF.changeTitle();
                     }
                     notifyDataSetChanged();

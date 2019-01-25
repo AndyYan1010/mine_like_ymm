@@ -109,7 +109,7 @@ public class FirstActivity extends Activity implements View.OnClickListener {
                 }
                 Gson gson = new Gson();
                 LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
-                ToastUtils.showToast(FirstActivity.this, loginInfo.getMessage());
+                //ToastUtils.showToast(FirstActivity.this, loginInfo.getMessage());
                 if (loginInfo.isOk()) {
                     MyApplication.userToken = loginInfo.getData().getToken();
                     MyApplication.userID = loginInfo.getData().getRegisterDriver().getId();

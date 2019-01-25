@@ -199,8 +199,12 @@ public class SetLinesAddressFragment extends Fragment implements View.OnClickLis
         });
     }
 
-    private String origin      = "";
-    private String destination = "";
+    private String origin1      = "";
+    private String origin2      = "";
+    private String origin3      = "";
+    private String destination1 = "";
+    private String destination2 = "";
+    private String destination3 = "";
 
     private void sendDriverLine() {
         if (mDataSt.size() == 0) {
@@ -213,16 +217,20 @@ public class SetLinesAddressFragment extends Fragment implements View.OnClickLis
         }
         for (int i = 0; i < mDataSt.size(); i++) {
             if (i == 0) {
-                origin = mDataSt.get(i).getId();
-            } else {
-                origin = origin + "," + mDataSt.get(i).getId();
+                origin1 = mDataSt.get(i).getId();
+            } else if (i == 1) {
+                origin2 = mDataSt.get(i).getId();
+            } else if (i == 2) {
+                origin3 = mDataSt.get(i).getId();
             }
         }
         for (int i = 0; i < mDataEd.size(); i++) {
             if (i == 0) {
-                destination = mDataEd.get(i).getId();
-            } else {
-                destination = destination + "," + mDataEd.get(i).getId();
+                destination1 = mDataEd.get(i).getId();
+            } else if (i == 1) {
+                destination2 = mDataEd.get(i).getId();
+            } else if (i == 2) {
+                destination3 = mDataEd.get(i).getId();
             }
         }
         RequestParamsFM headParams = new RequestParamsFM();
@@ -232,8 +240,12 @@ public class SetLinesAddressFragment extends Fragment implements View.OnClickLis
         params.put("carLong", carLeng);
         params.put("driverId", MyApplication.userID);
         params.put("id", MyApplication.userID);
-        params.put("origin", origin);
-        params.put("destination", destination);
+        params.put("origin1", origin1);
+        params.put("origin2", origin2);
+        params.put("origin3", origin3);
+        params.put("destination1", destination1);
+        params.put("destination2", destination2);
+        params.put("destination3", destination3);
         params.setUseJsonStreamer(true);
         HttpOkhUtils.getInstance().doPostWithHeader(NetConfig.DRIVERJOURNEYCONTROLLER, headParams, params, new HttpOkhUtils.HttpCallBack() {
             @Override
