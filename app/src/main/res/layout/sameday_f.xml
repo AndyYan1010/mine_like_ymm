@@ -13,8 +13,8 @@
             android:id="@+id/rlt_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="45dp"
             android:background="@color/colorAccent"
+            android:minHeight="45dp"
             app:layout_scrollFlags="scroll">
 
             <TextView
@@ -136,57 +136,58 @@
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <RelativeLayout
+        <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/nestscroll"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-            <android.support.v4.widget.NestedScrollView
-                android:id="@+id/nestscroll"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <LinearLayout
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rec_order"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </android.support.v7.widget.RecyclerView>
+
+                <TextView
+                    android:id="@+id/tv_nomore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:gravity="center"
+                    android:minHeight="35dp"
+                    android:text="没有更多数据了"/>
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/rec_order"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                    </android.support.v7.widget.RecyclerView>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"/>
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:minHeight="35dp"
-                        android:text="没有更多数据了"/>
+        <!--<ImageView-->
+        <!--android:id="@+id/img_refresh"-->
+        <!--android:layout_width="45dp"-->
+        <!--android:layout_height="45dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_marginBottom="55dp"-->
+        <!--android:layout_marginRight="20dp"-->
+        <!--android:src="@drawable/icon_refresh"/>-->
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"/>
-                </LinearLayout>
-            </android.support.v4.widget.NestedScrollView>
-
-            <ImageView
-                android:id="@+id/img_refresh"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginBottom="55dp"
-                android:layout_marginRight="20dp"
-                android:src="@drawable/icon_refresh"/>
-
-            <ImageView
-                android:id="@+id/img_totop"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="55dp"
-                android:layout_marginLeft="20dp"
-                android:src="@drawable/icon_arrow_top"/>
-        </RelativeLayout>
+        <!--<ImageView-->
+        <!--android:id="@+id/img_totop"-->
+        <!--android:layout_width="45dp"-->
+        <!--android:layout_height="45dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginBottom="55dp"-->
+        <!--android:layout_marginLeft="20dp"-->
+        <!--android:src="@drawable/icon_arrow_top"/>-->
+        <!--</RelativeLayout>-->
     </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.design.widget.CoordinatorLayout>

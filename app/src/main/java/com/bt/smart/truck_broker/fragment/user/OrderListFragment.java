@@ -35,12 +35,12 @@ import okhttp3.Request;
  */
 
 public class OrderListFragment extends Fragment {
-    private View                             mRootView;
-    private SwipeRefreshLayout               swiperefresh;
-    private RecyclerView                     recyview;
-    private ReadyRecDriverOrderAdapter       orderAdapter;
-    private List<ReadyRecOrderInfo.DataBean> mData;
-    private int                              mType;//fragment需要展示的订单种类//0接单、1运输、2待确认、3已取消、4签收
+    private View                                  mRootView;
+    private SwipeRefreshLayout                    swiperefresh;
+    private RecyclerView                          recyview;
+    private ReadyRecDriverOrderAdapter            orderAdapter;
+    private List<ReadyRecOrderInfo.OrderListBean> mData;
+    private int                                   mType;//fragment需要展示的订单种类//0接单、1运输、2待确认、3已取消、4签收
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,7 +66,7 @@ public class OrderListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getDrivierOrderList(MyApplication.userID, "" + mType);
+        getDrivierOrderList(0, 10, MyApplication.userID, "" + mType);
     }
 
     private void setSwipRefresh() {
@@ -75,7 +75,7 @@ public class OrderListFragment extends Fragment {
             @Override
             public void onRefresh() {
                 //获取司机个人订单列表
-                getDrivierOrderList(MyApplication.userID, "" + mType);
+                getDrivierOrderList(0, 10, MyApplication.userID, "" + mType);
             }
         });
     }
@@ -87,15 +87,14 @@ public class OrderListFragment extends Fragment {
         recyview.setAdapter(orderAdapter);
     }
 
-    private void getDrivierOrderList(String userID, String type) {
+    private void getDrivierOrderList(int no, int size, String userID, String type) {
         swiperefresh.setRefreshing(true);
-        mData.clear();
         RequestParamsFM heardParam = new RequestParamsFM();
         heardParam.put("X-AUTH-TOKEN", MyApplication.userToken);
         RequestParamsFM params = new RequestParamsFM();
         params.put("id", userID);
         params.put("status", type);
-        HttpOkhUtils.getInstance().doGetWithHeadParams(NetConfig.DRIVERORDERCONTROLLER_ORDER, heardParam, params, new HttpOkhUtils.HttpCallBack() {
+        HttpOkhUtils.getInstance().doGetWithHeadParams(NetConfig.DRIVERORDERCONTROLLER_ORDER + "/" + no + "/" + size, heardParam, params, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
                 swiperefresh.setRefreshing(false);
@@ -112,9 +111,10 @@ public class OrderListFragment extends Fragment {
                 Gson gson = new Gson();
                 ReadyRecOrderInfo readyRecOrderInfo = gson.fromJson(resbody, ReadyRecOrderInfo.class);
                 ToastUtils.showToast(getContext(), readyRecOrderInfo.getMessage());
-                if (readyRecOrderInfo.isOk()) {
-                    if (readyRecOrderInfo.getData().size() > 0) {
-                        mData.addAll(readyRecOrderInfo.getData());
+                if (1==readyRecOrderInfo.getCode()) {
+                    if (readyRecOrderInfo.getOrderList().size() > 0) {
+                        mData.clear();
+                        mData.addAll(readyRecOrderInfo.getOrderList());
                         orderAdapter.notifyDataSetChanged();
                     }
                 }
@@ -129,6 +129,6 @@ public class OrderListFragment extends Fragment {
     public void refreshData() {
         //获取司机个人订单列表
         if (isVisible())
-            getDrivierOrderList(MyApplication.userID, "" + mType);
+            getDrivierOrderList(0, 10, MyApplication.userID, "" + mType);
     }
 }

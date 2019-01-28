@@ -42,20 +42,23 @@ import okhttp3.Request;
  */
 
 public class OrderListByLineFragment extends Fragment implements View.OnClickListener {
-    private View                            mRootView;
-    private ImageView                       img_back;
-    private ImageView                       img_empty;
-    private TextView                        tv_title;
-    private TextView                        tv_lineName;
-    private TextView                        tv_lenmol;
-    private RecyclerView                    recy_order;
-    private List<AllOrderListInfo.DataBean> mData;
-    private RecyOrderAdapter                orderAdapter;
+    private View                                mRootView;
+    private ImageView                           img_back;
+    private ImageView                           img_empty;
+    private TextView                            tv_title;
+    private TextView                            tv_lineName;
+    private TextView                            tv_lenmol;
+    private RecyclerView                        recy_order;
+    private List<AllOrderListInfo.PageListBean> mData;
+    private RecyOrderAdapter                    orderAdapter;
     private int REQUEST_FOR_TAKE_ORDER = 12087;//接单返回
     private int RESULT_TAKE_ORDER      = 12088;//接单成功响应值
     private String lineID;
     private String line_name;
     private String line_model;
+    private int    mOrderSize;//总条目
+    private int    mSumPageSize;//总共页数
+    private int    mWhichPage;//获取哪页数据
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -86,7 +89,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
         //初始化货源列表数据
         initOrderList();
         //获取线路货源
-        getOrdersByLine();
+        getOrdersByLine(1, 10);
 
         img_back.setOnClickListener(this);
         img_empty.setOnClickListener(this);
@@ -100,7 +103,7 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
                 break;
             case R.id.img_empty:
                 //获取线路货源
-                getOrdersByLine();
+                getOrdersByLine(1, 10);
                 break;
         }
     }
@@ -111,15 +114,15 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
         if (REQUEST_FOR_TAKE_ORDER == requestCode && RESULT_TAKE_ORDER == resultCode) {
             //刷新界面
             //获取线路货源
-            getOrdersByLine();
+            getOrdersByLine(1, 10);
         }
     }
 
-    private void getOrdersByLine() {
+    private void getOrdersByLine(int no, int size) {
         img_empty.setVisibility(View.VISIBLE);
         RequestParamsFM headParam = new RequestParamsFM();
         headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
-        HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.DRIVERJOURNEYCONTROLLER + "/getOrder/" + lineID, headParam, new HttpOkhUtils.HttpCallBack() {
+        HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.DRIVERJOURNEYCONTROLLER + "/getOrder/" + no + "/" + size + "/" + lineID, headParam, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
                 ProgressDialogUtil.hideDialog();
@@ -138,16 +141,19 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
                 ToastUtils.showToast(getContext(), linesOrderInfo.getMessage());
                 if (linesOrderInfo.isOk()) {
                     mData.clear();
+                    mOrderSize = linesOrderInfo.getSize();
+                    mSumPageSize = mOrderSize % 10 == 0 ? mOrderSize / 10 : mOrderSize / 10 + 1;
+                    mWhichPage = 1;
                     if (linesOrderInfo.getData().size() > 0) {
                         img_empty.setVisibility(View.GONE);
                     }
                     for (LinesOrderInfo.DataBean bean : linesOrderInfo.getData()) {
-                        AllOrderListInfo.DataBean bean1 = new AllOrderListInfo.DataBean();
+                        AllOrderListInfo.PageListBean bean1 = new AllOrderListInfo.PageListBean();
                         bean1.setFhAddress(bean.getFh_address());
                         bean1.setShAddress(bean.getSh_address());
                         bean1.setId(bean.getId());
                         bean1.setGoodsName(bean.getGoods_name());
-                        bean1.setZhTime(bean.getZh_time());
+                        bean1.setZh_time(bean.getZh_time());
                         bean1.setFhName(bean.getFh_name());
                         bean1.setFhTelephone(bean.getFh_telephone());
                         mData.add(bean1);
@@ -177,7 +183,63 @@ public class OrderListByLineFragment extends Fragment implements View.OnClickLis
                 startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
             }
         });
+        orderAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                //上拉加载更多
+                getMorePageInfo();
+            }
+        }, recy_order);
     }
+
+    private void getMorePageInfo() {
+        if (mSumPageSize > 1 && mWhichPage < mSumPageSize) {
+            getMoreOrderList(mWhichPage + 1, 10);
+        } else {
+            orderAdapter.disableLoadMoreIfNotFullPage();
+            ToastUtils.showToast(getContext(), "没有更多数据了");
+        }
+    }
+
+    private void getMoreOrderList(int no, int size) {
+        RequestParamsFM headParam = new RequestParamsFM();
+        headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
+        HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.DRIVERJOURNEYCONTROLLER + "/getOrder/" + no + "/" + size + "/" + lineID, headParam, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ProgressDialogUtil.hideDialog();
+                ToastUtils.showToast(getContext(), "网络连接错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                ProgressDialogUtil.hideDialog();
+                if (code != 200) {
+                    ToastUtils.showToast(getContext(), "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                LinesOrderInfo linesOrderInfo = gson.fromJson(resbody, LinesOrderInfo.class);
+                ToastUtils.showToast(getContext(), linesOrderInfo.getMessage());
+                if (linesOrderInfo.isOk()) {
+                    mWhichPage++;
+                    for (LinesOrderInfo.DataBean bean : linesOrderInfo.getData()) {
+                        AllOrderListInfo.PageListBean bean1 = new AllOrderListInfo.PageListBean();
+                        bean1.setFhAddress(bean.getFh_address());
+                        bean1.setShAddress(bean.getSh_address());
+                        bean1.setId(bean.getId());
+                        bean1.setGoodsName(bean.getGoods_name());
+                        bean1.setZh_time(bean.getZh_time());
+                        bean1.setFhName(bean.getFh_name());
+                        bean1.setFhTelephone(bean.getFh_telephone());
+                        mData.add(bean1);
+                    }
+                    orderAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
     private void showCheckWarning() {
         final MyAlertDialogHelper dialogHelper = new MyAlertDialogHelper();
         View view = View.inflate(getContext(), R.layout.dialog_check_warning, null);

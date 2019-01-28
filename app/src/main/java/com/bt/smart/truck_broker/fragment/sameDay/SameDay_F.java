@@ -58,18 +58,21 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
     private TextView           tv_title;
     private SwipeRefreshLayout swiperefresh;
     private NestedScrollView   nestscroll;
-    private ImageView          img_refresh, img_totop;
-    private TextView     tv_start;//起点
-    private TextView     tv_end;//终点
-    private LinearLayout line_start;
-    private LinearLayout line_end;
-    private LinearLayout line_screen;
-    private ImageView    img_start, img_end;//起点终点的箭头
-    private RecyclerView                    rec_order;
-    private RecyOrderAdapter                orderAdapter;
-    private List<AllOrderListInfo.DataBean> mData;
+    //    private ImageView          img_refresh, img_totop;
+    private TextView           tv_start;//起点
+    private TextView           tv_end;//终点
+    private LinearLayout       line_start;
+    private LinearLayout       line_end;
+    private LinearLayout       line_screen;
+    private ImageView          img_start, img_end;//起点终点的箭头
+    private RecyclerView                        rec_order;
+    private RecyOrderAdapter                    orderAdapter;
+    private List<AllOrderListInfo.PageListBean> mData;
     private int REQUEST_FOR_TAKE_ORDER = 12087;//接单返回
     private int RESULT_TAKE_ORDER      = 12088;//接单成功响应值
+    private int mOrderSize;//总条目
+    private int mSumPageSize;//总共页数
+    private int mWhichPage;//获取哪页数据
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -83,8 +86,8 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         tv_title = mRootView.findViewById(R.id.tv_title);
         swiperefresh = mRootView.findViewById(R.id.swiperefresh);
         nestscroll = mRootView.findViewById(R.id.nestscroll);
-        img_refresh = mRootView.findViewById(R.id.img_refresh);
-        img_totop = mRootView.findViewById(R.id.img_totop);
+        //        img_refresh = mRootView.findViewById(R.id.img_refresh);
+        //        img_totop = mRootView.findViewById(R.id.img_totop);
         line_start = mRootView.findViewById(R.id.line_start);
         img_start = mRootView.findViewById(R.id.img_start);
         line_end = mRootView.findViewById(R.id.line_end);
@@ -117,23 +120,23 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         line_start.setOnClickListener(this);
         line_end.setOnClickListener(this);
         line_screen.setOnClickListener(this);
-        img_refresh.setOnClickListener(this);
-        img_totop.setOnClickListener(this);
+        //        img_refresh.setOnClickListener(this);
+        //        img_totop.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.img_refresh://按钮刷新列表
-                mData.clear();
-                orderAdapter.notifyDataSetChanged();
-                MyAnimationUtils.rotateView(img_refresh, 2000, 0f, 90f, 180f, 360f);
-                //获取订单列表信息
-                getOrderList(1, 10, 0, null);
-                break;
-            case R.id.img_totop://滑动顶端按钮
-                nestscroll.scrollTo(0, line_start.getHeight());
-                break;
+            //            case R.id.img_refresh://按钮刷新列表
+            //                mData.clear();
+            //                orderAdapter.notifyDataSetChanged();
+            //                //                MyAnimationUtils.rotateView(img_refresh, 2000, 0f, 90f, 180f, 360f);
+            //                //获取订单列表信息
+            //                getOrderList(1, 10, 0, null);
+            //                break;
+            //            case R.id.img_totop://滑动顶端按钮
+            //                nestscroll.scrollTo(0, line_start.getHeight());
+            //                break;
             case R.id.line_start:
                 //选择运输起点
                 choiceStartPlace(0);
@@ -166,6 +169,155 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         //选择窗数据
         mDataPopEd = new ArrayList<>();
         getShengFen();
+    }
+
+    private void initOrderList() {
+        mData = new ArrayList();
+        rec_order.setLayoutManager(new LinearLayoutManager(getContext()));
+        //解决数据加载不完的问题
+        //            rec_order.setNestedScrollingEnabled(false);
+        //            rec_order.setHasFixedSize(true);
+        //解决数据加载完成后, 没有停留在顶部的问题
+        rec_order.setFocusable(false);
+        rec_order.setNestedScrollingEnabled(false);
+        orderAdapter = new RecyOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
+        rec_order.setAdapter(orderAdapter);
+        orderAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (!"3".equals(MyApplication.checkStatus)) {
+                    ToastUtils.showToast(getContext(), "请先提交资料，认证通过才能联系货主哦！");
+                    //弹出dialog提示
+                    showCheckWarning();
+                    return;
+                }
+                Intent intent = new Intent(getContext(), OrderDetailActivity.class);
+                intent.putExtra("orderID", mData.get(position).getId());
+                startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
+            }
+        });
+        orderAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                //上拉加载
+                getMorePageInfo();
+            }
+        },rec_order);
+
+        //        rec_order.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        //            @Override
+        //            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        //                super.onScrollStateChanged(recyclerView, newState);
+        //                LinearLayoutManager layoutManager = (LinearLayoutManager) rec_order.getLayoutManager();
+        //                int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+        //                if (lastVisibleItemPosition == mData.size() - 1) {//&& mData.get(lastVisibleItemPosition) instanceof FootType
+        //                    //上拉加载
+        //                    getMorePageInfo();
+        //                }
+        //            }
+        //        });
+    }
+
+    private void getMorePageInfo() {
+        if (mSumPageSize > 1 && mWhichPage < mSumPageSize) {
+            getMoreOrderList(mWhichPage + 1, 10, 0, null);
+        } else {
+            orderAdapter.disableLoadMoreIfNotFullPage();
+            ToastUtils.showToast(getContext(), "没有更多数据了");
+        }
+    }
+
+    private void getMoreOrderList(int no, int size, int isAppoint, String id) {
+        RequestParamsFM headParams = new RequestParamsFM();
+        headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
+        String finalUrl;
+        if (null == id || "".equals(id)) {
+            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}";
+        } else {
+            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}?appointId=" + id;
+        }
+        HttpOkhUtils.getInstance().doGetWithOnlyHeader(finalUrl, headParams, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ToastUtils.showToast(getContext(), "网络连接错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                if (code != 200) {
+                    ToastUtils.showToast(getContext(), "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                AllOrderListInfo allOrderListInfo = gson.fromJson(resbody, AllOrderListInfo.class);
+                ToastUtils.showToast(getContext(), allOrderListInfo.getMessage());
+                if (1 == allOrderListInfo.getCode()) {
+                    mWhichPage++;
+                    mData.addAll(allOrderListInfo.getPageList());
+                    orderAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
+    private void getOrderList(int no, int size, int isAppoint, String id) {
+        swiperefresh.setRefreshing(true);
+        RequestParamsFM headParams = new RequestParamsFM();
+        headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
+        String finalUrl;
+        if (null == id || "".equals(id)) {
+            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}";
+        } else {
+            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}?appointId=" + id;
+        }
+        HttpOkhUtils.getInstance().doGetWithOnlyHeader(finalUrl, headParams, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                swiperefresh.setRefreshing(false);
+                ToastUtils.showToast(getContext(), "网络连接错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                swiperefresh.setRefreshing(false);
+                if (code != 200) {
+                    ToastUtils.showToast(getContext(), "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                AllOrderListInfo allOrderListInfo = gson.fromJson(resbody, AllOrderListInfo.class);
+                ToastUtils.showToast(getContext(), allOrderListInfo.getMessage());
+                if (1 == allOrderListInfo.getCode()) {
+                    mData.clear();
+                    mOrderSize = allOrderListInfo.getPageSize();
+                    mSumPageSize = mOrderSize % 10 == 0 ? mOrderSize / 10 : mOrderSize / 10 + 1;
+                    mWhichPage = 1;
+                    mData.addAll(allOrderListInfo.getPageList());
+                    orderAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
+    private void showCheckWarning() {
+        final MyAlertDialogHelper dialogHelper = new MyAlertDialogHelper();
+        View view = View.inflate(getContext(), R.layout.dialog_check_warning, null);
+        dialogHelper.setDIYView(getContext(), view);
+        dialogHelper.show();
+        TextView tv_cancel = view.findViewById(R.id.tv_cancel);
+        TextView tv_sure = view.findViewById(R.id.tv_sure);
+        tv_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogHelper.disMiss();
+            }
+        });
+        tv_sure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogHelper.disMiss();
+            }
+        });
     }
 
     private void getShengFen() {
@@ -208,147 +360,6 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
             }
         });
     }
-
-    private void initOrderList() {
-        mData = new ArrayList();
-        rec_order.setLayoutManager(new LinearLayoutManager(getContext()));
-        //解决数据加载不完的问题
-        //            rec_order.setNestedScrollingEnabled(false);
-        //            rec_order.setHasFixedSize(true);
-        //解决数据加载完成后, 没有停留在顶部的问题
-        rec_order.setFocusable(false);
-        rec_order.setNestedScrollingEnabled(false);
-        orderAdapter = new RecyOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
-        rec_order.setAdapter(orderAdapter);
-        orderAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                if (!"3".equals(MyApplication.checkStatus)) {
-                    ToastUtils.showToast(getContext(), "请先提交资料，认证通过才能联系货主哦！");
-                    //弹出dialog提示
-                    showCheckWarning();
-                    return;
-                }
-                Intent intent = new Intent(getContext(), OrderDetailActivity.class);
-                intent.putExtra("orderID", mData.get(position).getId());
-                startActivityForResult(intent, REQUEST_FOR_TAKE_ORDER);
-            }
-        });
-    }
-
-    private void showCheckWarning() {
-        final MyAlertDialogHelper dialogHelper = new MyAlertDialogHelper();
-        View view = View.inflate(getContext(), R.layout.dialog_check_warning, null);
-        dialogHelper.setDIYView(getContext(), view);
-        dialogHelper.show();
-        TextView tv_cancel = view.findViewById(R.id.tv_cancel);
-        TextView tv_sure = view.findViewById(R.id.tv_sure);
-        tv_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialogHelper.disMiss();
-            }
-        });
-        tv_sure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialogHelper.disMiss();
-            }
-        });
-    }
-
-    private void getOrderList(int no, int size, int isAppoint, String id) {
-        swiperefresh.setRefreshing(true);
-        RequestParamsFM headParams = new RequestParamsFM();
-        headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
-        String finalUrl;
-        if (null == id || "".equals(id)) {
-            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}";
-        } else {
-            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}?appointId=" + id;
-        }
-        HttpOkhUtils.getInstance().doGetWithOnlyHeader(finalUrl, headParams, new HttpOkhUtils.HttpCallBack() {
-            @Override
-            public void onError(Request request, IOException e) {
-                swiperefresh.setRefreshing(false);
-                ToastUtils.showToast(getContext(), "网络连接错误");
-            }
-
-            @Override
-            public void onSuccess(int code, String resbody) {
-                swiperefresh.setRefreshing(false);
-                if (code != 200) {
-                    ToastUtils.showToast(getContext(), "网络错误" + code);
-                    return;
-                }
-                Gson gson = new Gson();
-                AllOrderListInfo allOrderListInfo = gson.fromJson(resbody, AllOrderListInfo.class);
-                ToastUtils.showToast(getContext(), allOrderListInfo.getMessage());
-                if (allOrderListInfo.isOk()) {
-                    mData.clear();
-                    mData.addAll(allOrderListInfo.getData());
-                    orderAdapter.notifyDataSetChanged();
-                }
-            }
-        });
-    }
-
-    private int scDownY;
-    private int scMoveY;
-    private int rltTop;
-    private int rltBot;
-    private int imgTop;
-
-    private void setRecyclerviewMoveEvent() {
-        rec_order.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        scDownY = (int) motionEvent.getRawY();
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        if (scDownY == 0) {
-                            scDownY = (int) motionEvent.getRawY();
-                        }
-                        scMoveY = (int) motionEvent.getRawY();
-                        //                        rltTop = rltTop + (scMoveY - scDownY);
-                        imgTop = imgTop + (scDownY - scMoveY);
-                        //                        rltBot = rltTop + liner_top.getHeight();
-                        //标题的位置
-                        //                        if (rltTop >= 0) {
-                        //                            rltTop = 0;
-                        //                            rltBot = liner_top.getHeight();
-                        //                        }
-                        //                        if (rltBot < 0) {
-                        //                            rltBot = 0;
-                        //                            rltTop = rltBot - liner_top.getHeight();
-                        //                        }
-                        //                        //刷新按钮的位置
-                        //                        if (imgTop > view_b.getTop()) {
-                        //                            imgTop = view_b.getTop();
-                        //                        }
-                        //                        if (imgTop < view_a.getTop()) {
-                        //                            imgTop = view_a.getTop();
-                        //                        }
-                        //设置位置
-                        //                        liner_top.layout(0, rltTop, liner_top.getWidth(), rltBot);
-                        //                        rec_order.layout(0, rltTop + liner_top.getHeight(), liner_top.getWidth(), view_b.getTop());
-                        img_refresh.layout(img_refresh.getLeft(), imgTop, img_refresh.getLeft() + img_refresh.getWidth(), imgTop + img_refresh.getHeight());
-                        //平和滑动
-                        scDownY = (int) motionEvent.getRawY();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        //抬起时要从新
-                        scDownY = 0;
-                        scMoveY = 0;
-                        break;
-                }
-                return false;
-            }
-        });
-    }
-
 
     private List<ChioceAdapterContentInfo> mDataPopEd;
     private List<ShengDataInfo.DataBean>   mSHEData;
@@ -544,5 +555,61 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
 
     private void screenAllTerm() {
 
+    }
+
+    private int scDownY;
+    private int scMoveY;
+    private int rltTop;
+    private int rltBot;
+    private int imgTop;
+
+    private void setRecyclerviewMoveEvent() {
+        rec_order.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        scDownY = (int) motionEvent.getRawY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (scDownY == 0) {
+                            scDownY = (int) motionEvent.getRawY();
+                        }
+                        scMoveY = (int) motionEvent.getRawY();
+                        //                        rltTop = rltTop + (scMoveY - scDownY);
+                        imgTop = imgTop + (scDownY - scMoveY);
+                        //                        rltBot = rltTop + liner_top.getHeight();
+                        //标题的位置
+                        //                        if (rltTop >= 0) {
+                        //                            rltTop = 0;
+                        //                            rltBot = liner_top.getHeight();
+                        //                        }
+                        //                        if (rltBot < 0) {
+                        //                            rltBot = 0;
+                        //                            rltTop = rltBot - liner_top.getHeight();
+                        //                        }
+                        //                        //刷新按钮的位置
+                        //                        if (imgTop > view_b.getTop()) {
+                        //                            imgTop = view_b.getTop();
+                        //                        }
+                        //                        if (imgTop < view_a.getTop()) {
+                        //                            imgTop = view_a.getTop();
+                        //                        }
+                        //设置位置
+                        //                        liner_top.layout(0, rltTop, liner_top.getWidth(), rltBot);
+                        //                        rec_order.layout(0, rltTop + liner_top.getHeight(), liner_top.getWidth(), view_b.getTop());
+                        //       later                 img_refresh.layout(img_refresh.getLeft(), imgTop, img_refresh.getLeft() + img_refresh.getWidth(), imgTop + img_refresh.getHeight());
+                        //平和滑动
+                        scDownY = (int) motionEvent.getRawY();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        //抬起时要从新
+                        scDownY = 0;
+                        scMoveY = 0;
+                        break;
+                }
+                return false;
+            }
+        });
     }
 }

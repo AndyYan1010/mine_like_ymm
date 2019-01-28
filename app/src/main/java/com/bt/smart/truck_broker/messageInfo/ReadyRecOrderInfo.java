@@ -14,16 +14,32 @@ import java.util.List;
 public class ReadyRecOrderInfo {
 
     /**
-     * data : [{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"},{"appoint_id":"","car_type":"2","destination":"甘肃省白银市会宁县","destination_area_id":"3270","destination_city_id":"339","destination_province_id":"29","fcheck":"0","ffee":2679.89,"fh":"1599","fh_address":"上海路111号","fh_name":"张三","fh_telephone":"18234567890","fmain_id":"yingsu0028","fstatus":"0","fsub_id":"","fweight":34,"goods_name":"服装","id":"2c90b4e3684feaef01684ffd1ff10001","is_appoint":"0","is_fapiao":"0","order_no":"11","origin":"福建省龙岩市长汀县","origin_area_id":"1599","origin_city_id":"157","origin_province_id":"14","sh":"3270","sh_address":"南京路222号","sh_area":"","sh_name":"李四","sh_telephone":"18234567898","zh_time":"2019-01-15 08:00"}]
-     * message : 成功
-     * ok : true
-     * respCode : 0
+     * code : 1
+     * size : 1
+     * orderList : [{"fh_address":"南通","order_no":"2019012501245971363","origin_province_id":"13","fh":"1447","origin":"安徽省安庆市大观区","destination":"北京市市辖区昌平区","origin_area_id":"1447","fh_name":"赵一","is_appoint":"0","destination_area_id":"390","car_type":"2","ffee":999.34,"destination_province_id":"2","fcheck":"0","fstatus":"1","fweight":34,"sh":"390","is_fapiao":"0","appoint_id":"","id":"2c90b4e36882e87c016883781fb","origin_city_id":"140","destination_city_id":"33","zh_time":{"date":25,"hours":0,"seconds":0,"month":0,"nanos":0,"timezoneOffset":-480,"year":119,"minutes":0,"time":1548345600000,"day":5},"goods_name":"服装","fh_telephone":"18234567890","sh_name":"李四","fsub_id":"","sh_address":"上海","sh_area":"","fmain_id":"yingsu0028","sh_telephone":"18234567898"}]
+     * message : 订单列表获取成功
      */
 
-    private String message;
-    private boolean        ok;
-    private String         respCode;
-    private List<DataBean> data;
+    private int code;
+    private int                 size;
+    private String              message;
+    private List<OrderListBean> orderList;
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
 
     public String getMessage() {
         return message;
@@ -33,111 +49,119 @@ public class ReadyRecOrderInfo {
         this.message = message;
     }
 
-    public boolean isOk() {
-        return ok;
+    public List<OrderListBean> getOrderList() {
+        return orderList;
     }
 
-    public void setOk(boolean ok) {
-        this.ok = ok;
+    public void setOrderList(List<OrderListBean> orderList) {
+        this.orderList = orderList;
     }
 
-    public String getRespCode() {
-        return respCode;
-    }
-
-    public void setRespCode(String respCode) {
-        this.respCode = respCode;
-    }
-
-    public List<DataBean> getData() {
-        return data;
-    }
-
-    public void setData(List<DataBean> data) {
-        this.data = data;
-    }
-
-    public static class DataBean {
+    public static class OrderListBean {
         /**
-         * appoint_id :
-         * car_type : 2
-         * destination : 甘肃省白银市会宁县
-         * destination_area_id : 3270
-         * destination_city_id : 339
-         * destination_province_id : 29
-         * fcheck : 0
-         * ffee : 2679.89
-         * fh : 1599
-         * fh_address : 上海路111号
-         * fh_name : 张三
-         * fh_telephone : 18234567890
-         * fmain_id : yingsu0028
-         * fstatus : 0
-         * fsub_id :
-         * fweight : 34.0
-         * goods_name : 服装
-         * id : 2c90b4e3684feaef01684ffd1ff10001
+         * fh_address : 南通
+         * order_no : 2019012501245971363
+         * origin_province_id : 13
+         * fh : 1447
+         * origin : 安徽省安庆市大观区
+         * destination : 北京市市辖区昌平区
+         * origin_area_id : 1447
+         * fh_name : 赵一
          * is_appoint : 0
+         * destination_area_id : 390
+         * car_type : 2
+         * ffee : 999.34
+         * destination_province_id : 2
+         * fcheck : 0
+         * fstatus : 1
+         * fweight : 34
+         * sh : 390
          * is_fapiao : 0
-         * order_no : 11
-         * origin : 福建省龙岩市长汀县
-         * origin_area_id : 1599
-         * origin_city_id : 157
-         * origin_province_id : 14
-         * sh : 3270
-         * sh_address : 南京路222号
-         * sh_area :
+         * appoint_id :
+         * id : 2c90b4e36882e87c016883781fb
+         * origin_city_id : 140
+         * destination_city_id : 33
+         * zh_time : {"date":25,"hours":0,"seconds":0,"month":0,"nanos":0,"timezoneOffset":-480,"year":119,"minutes":0,"time":1548345600000,"day":5}
+         * goods_name : 服装
+         * fh_telephone : 18234567890
          * sh_name : 李四
+         * fsub_id :
+         * sh_address : 上海
+         * sh_area :
+         * fmain_id : yingsu0028
          * sh_telephone : 18234567898
-         * zh_time : 2019-01-15 08:00
          */
 
-        private String appoint_id;
-        private String car_type;
-        private String destination;
-        private String destination_area_id;
-        private String destination_city_id;
-        private String destination_province_id;
-        private String fcheck;
-        private double ffee;
-        private String fh;
         private String fh_address;
-        private String fh_name;
-        private String fh_telephone;
-        private String fmain_id;
-        private String fstatus;
-        private String fsub_id;
-        private double fweight;
-        private String goods_name;
-        private String id;
-        private String is_appoint;
-        private String is_fapiao;
-        private String order_no;
-        private String origin;
-        private String origin_area_id;
-        private String origin_city_id;
-        private String origin_province_id;
-        private String sh;
-        private String sh_address;
-        private String sh_area;
-        private String sh_name;
-        private String sh_telephone;
-        private String zh_time;
+        private String     order_no;
+        private String     origin_province_id;
+        private String     fh;
+        private String     origin;
+        private String     destination;
+        private String     origin_area_id;
+        private String     fh_name;
+        private String     is_appoint;
+        private String     destination_area_id;
+        private String     car_type;
+        private double     ffee;
+        private String     destination_province_id;
+        private String     fcheck;
+        private String     fstatus;
+        private int        fweight;
+        private String     sh;
+        private String     is_fapiao;
+        private String     appoint_id;
+        private String     id;
+        private String     origin_city_id;
+        private String     destination_city_id;
+        private ZhTimeBean zh_time;
+        private String     goods_name;
+        private String     fh_telephone;
+        private String     sh_name;
+        private String     fsub_id;
+        private String     sh_address;
+        private String     sh_area;
+        private String     fmain_id;
+        private String     sh_telephone;
 
-        public String getAppoint_id() {
-            return appoint_id;
+        public String getFh_address() {
+            return fh_address;
         }
 
-        public void setAppoint_id(String appoint_id) {
-            this.appoint_id = appoint_id;
+        public void setFh_address(String fh_address) {
+            this.fh_address = fh_address;
         }
 
-        public String getCar_type() {
-            return car_type;
+        public String getOrder_no() {
+            return order_no;
         }
 
-        public void setCar_type(String car_type) {
-            this.car_type = car_type;
+        public void setOrder_no(String order_no) {
+            this.order_no = order_no;
+        }
+
+        public String getOrigin_province_id() {
+            return origin_province_id;
+        }
+
+        public void setOrigin_province_id(String origin_province_id) {
+            this.origin_province_id = origin_province_id;
+        }
+
+        public String getFh() {
+            return fh;
+        }
+
+        public void setFh(String fh) {
+            this.fh = fh;
+        }
+
+        public String getOrigin() {
+            return origin;
+        }
+
+        public void setOrigin(String origin) {
+            this.origin = origin;
         }
 
         public String getDestination() {
@@ -148,6 +172,30 @@ public class ReadyRecOrderInfo {
             this.destination = destination;
         }
 
+        public String getOrigin_area_id() {
+            return origin_area_id;
+        }
+
+        public void setOrigin_area_id(String origin_area_id) {
+            this.origin_area_id = origin_area_id;
+        }
+
+        public String getFh_name() {
+            return fh_name;
+        }
+
+        public void setFh_name(String fh_name) {
+            this.fh_name = fh_name;
+        }
+
+        public String getIs_appoint() {
+            return is_appoint;
+        }
+
+        public void setIs_appoint(String is_appoint) {
+            this.is_appoint = is_appoint;
+        }
+
         public String getDestination_area_id() {
             return destination_area_id;
         }
@@ -156,12 +204,20 @@ public class ReadyRecOrderInfo {
             this.destination_area_id = destination_area_id;
         }
 
-        public String getDestination_city_id() {
-            return destination_city_id;
+        public String getCar_type() {
+            return car_type;
         }
 
-        public void setDestination_city_id(String destination_city_id) {
-            this.destination_city_id = destination_city_id;
+        public void setCar_type(String car_type) {
+            this.car_type = car_type;
+        }
+
+        public double getFfee() {
+            return ffee;
+        }
+
+        public void setFfee(double ffee) {
+            this.ffee = ffee;
         }
 
         public String getDestination_province_id() {
@@ -180,54 +236,6 @@ public class ReadyRecOrderInfo {
             this.fcheck = fcheck;
         }
 
-        public double getFfee() {
-            return ffee;
-        }
-
-        public void setFfee(double ffee) {
-            this.ffee = ffee;
-        }
-
-        public String getFh() {
-            return fh;
-        }
-
-        public void setFh(String fh) {
-            this.fh = fh;
-        }
-
-        public String getFh_address() {
-            return fh_address;
-        }
-
-        public void setFh_address(String fh_address) {
-            this.fh_address = fh_address;
-        }
-
-        public String getFh_name() {
-            return fh_name;
-        }
-
-        public void setFh_name(String fh_name) {
-            this.fh_name = fh_name;
-        }
-
-        public String getFh_telephone() {
-            return fh_telephone;
-        }
-
-        public void setFh_telephone(String fh_telephone) {
-            this.fh_telephone = fh_telephone;
-        }
-
-        public String getFmain_id() {
-            return fmain_id;
-        }
-
-        public void setFmain_id(String fmain_id) {
-            this.fmain_id = fmain_id;
-        }
-
         public String getFstatus() {
             return fstatus;
         }
@@ -236,44 +244,20 @@ public class ReadyRecOrderInfo {
             this.fstatus = fstatus;
         }
 
-        public String getFsub_id() {
-            return fsub_id;
-        }
-
-        public void setFsub_id(String fsub_id) {
-            this.fsub_id = fsub_id;
-        }
-
-        public double getFweight() {
+        public int getFweight() {
             return fweight;
         }
 
-        public void setFweight(double fweight) {
+        public void setFweight(int fweight) {
             this.fweight = fweight;
         }
 
-        public String getGoods_name() {
-            return goods_name;
+        public String getSh() {
+            return sh;
         }
 
-        public void setGoods_name(String goods_name) {
-            this.goods_name = goods_name;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getIs_appoint() {
-            return is_appoint;
-        }
-
-        public void setIs_appoint(String is_appoint) {
-            this.is_appoint = is_appoint;
+        public void setSh(String sh) {
+            this.sh = sh;
         }
 
         public String getIs_fapiao() {
@@ -284,28 +268,20 @@ public class ReadyRecOrderInfo {
             this.is_fapiao = is_fapiao;
         }
 
-        public String getOrder_no() {
-            return order_no;
+        public String getAppoint_id() {
+            return appoint_id;
         }
 
-        public void setOrder_no(String order_no) {
-            this.order_no = order_no;
+        public void setAppoint_id(String appoint_id) {
+            this.appoint_id = appoint_id;
         }
 
-        public String getOrigin() {
-            return origin;
+        public String getId() {
+            return id;
         }
 
-        public void setOrigin(String origin) {
-            this.origin = origin;
-        }
-
-        public String getOrigin_area_id() {
-            return origin_area_id;
-        }
-
-        public void setOrigin_area_id(String origin_area_id) {
-            this.origin_area_id = origin_area_id;
+        public void setId(String id) {
+            this.id = id;
         }
 
         public String getOrigin_city_id() {
@@ -316,20 +292,52 @@ public class ReadyRecOrderInfo {
             this.origin_city_id = origin_city_id;
         }
 
-        public String getOrigin_province_id() {
-            return origin_province_id;
+        public String getDestination_city_id() {
+            return destination_city_id;
         }
 
-        public void setOrigin_province_id(String origin_province_id) {
-            this.origin_province_id = origin_province_id;
+        public void setDestination_city_id(String destination_city_id) {
+            this.destination_city_id = destination_city_id;
         }
 
-        public String getSh() {
-            return sh;
+        public ZhTimeBean getZh_time() {
+            return zh_time;
         }
 
-        public void setSh(String sh) {
-            this.sh = sh;
+        public void setZh_time(ZhTimeBean zh_time) {
+            this.zh_time = zh_time;
+        }
+
+        public String getGoods_name() {
+            return goods_name;
+        }
+
+        public void setGoods_name(String goods_name) {
+            this.goods_name = goods_name;
+        }
+
+        public String getFh_telephone() {
+            return fh_telephone;
+        }
+
+        public void setFh_telephone(String fh_telephone) {
+            this.fh_telephone = fh_telephone;
+        }
+
+        public String getSh_name() {
+            return sh_name;
+        }
+
+        public void setSh_name(String sh_name) {
+            this.sh_name = sh_name;
+        }
+
+        public String getFsub_id() {
+            return fsub_id;
+        }
+
+        public void setFsub_id(String fsub_id) {
+            this.fsub_id = fsub_id;
         }
 
         public String getSh_address() {
@@ -348,12 +356,12 @@ public class ReadyRecOrderInfo {
             this.sh_area = sh_area;
         }
 
-        public String getSh_name() {
-            return sh_name;
+        public String getFmain_id() {
+            return fmain_id;
         }
 
-        public void setSh_name(String sh_name) {
-            this.sh_name = sh_name;
+        public void setFmain_id(String fmain_id) {
+            this.fmain_id = fmain_id;
         }
 
         public String getSh_telephone() {
@@ -364,12 +372,110 @@ public class ReadyRecOrderInfo {
             this.sh_telephone = sh_telephone;
         }
 
-        public String getZh_time() {
-            return zh_time;
-        }
+        public static class ZhTimeBean {
+            /**
+             * date : 25
+             * hours : 0
+             * seconds : 0
+             * month : 0
+             * nanos : 0
+             * timezoneOffset : -480
+             * year : 119
+             * minutes : 0
+             * time : 1548345600000
+             * day : 5
+             */
 
-        public void setZh_time(String zh_time) {
-            this.zh_time = zh_time;
+            private int date;
+            private int  hours;
+            private int  seconds;
+            private int  month;
+            private int  nanos;
+            private int  timezoneOffset;
+            private int  year;
+            private int  minutes;
+            private long time;
+            private int  day;
+
+            public int getDate() {
+                return date;
+            }
+
+            public void setDate(int date) {
+                this.date = date;
+            }
+
+            public int getHours() {
+                return hours;
+            }
+
+            public void setHours(int hours) {
+                this.hours = hours;
+            }
+
+            public int getSeconds() {
+                return seconds;
+            }
+
+            public void setSeconds(int seconds) {
+                this.seconds = seconds;
+            }
+
+            public int getMonth() {
+                return month;
+            }
+
+            public void setMonth(int month) {
+                this.month = month;
+            }
+
+            public int getNanos() {
+                return nanos;
+            }
+
+            public void setNanos(int nanos) {
+                this.nanos = nanos;
+            }
+
+            public int getTimezoneOffset() {
+                return timezoneOffset;
+            }
+
+            public void setTimezoneOffset(int timezoneOffset) {
+                this.timezoneOffset = timezoneOffset;
+            }
+
+            public int getYear() {
+                return year;
+            }
+
+            public void setYear(int year) {
+                this.year = year;
+            }
+
+            public int getMinutes() {
+                return minutes;
+            }
+
+            public void setMinutes(int minutes) {
+                this.minutes = minutes;
+            }
+
+            public long getTime() {
+                return time;
+            }
+
+            public void setTime(long time) {
+                this.time = time;
+            }
+
+            public int getDay() {
+                return day;
+            }
+
+            public void setDay(int day) {
+                this.day = day;
+            }
         }
     }
 }

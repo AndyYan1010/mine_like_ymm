@@ -24,6 +24,11 @@ public class LinesOrderInfo {
     private String         respCode;
     private boolean        ok;
     private List<DataBean> data;
+    /**
+     * size : 1
+     */
+
+    private int size;
 
     public String getMessage() {
         return message;
@@ -55,6 +60,14 @@ public class LinesOrderInfo {
 
     public void setData(List<DataBean> data) {
         this.data = data;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     public static class DataBean {
