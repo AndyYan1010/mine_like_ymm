@@ -38,7 +38,9 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.Request;
@@ -202,7 +204,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                 //上拉加载
                 getMorePageInfo();
             }
-        },rec_order);
+        }, rec_order);
 
         //        rec_order.addOnScrollListener(new RecyclerView.OnScrollListener() {
         //            @Override
@@ -292,6 +294,9 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
                     mOrderSize = allOrderListInfo.getPageSize();
                     mSumPageSize = mOrderSize % 10 == 0 ? mOrderSize / 10 : mOrderSize / 10 + 1;
                     mWhichPage = 1;
+                    for (AllOrderListInfo.PageListBean bean : allOrderListInfo.getPageList()) {
+                        bean.setZh_time(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date(bean.getZhTime().getTime())));
+                    }
                     mData.addAll(allOrderListInfo.getPageList());
                     orderAdapter.notifyDataSetChanged();
                 }

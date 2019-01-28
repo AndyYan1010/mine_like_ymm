@@ -14,8 +14,6 @@ import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,7 +38,8 @@ public class RecyOrderAdapter extends BaseQuickAdapter<AllOrderListInfo.PageList
         //        (ImageView) helper.getView(R.id.img_call)
         helper.setText(R.id.tv_place, item.getFhAddress() + "  →  " + item.getShAddress());
         helper.setText(R.id.tv_goodsname, item.getGoodsName());
-        helper.setText(R.id.tv_loadtime, "装货时间：" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date(item.getZhTime().getTime())));
+
+        helper.setText(R.id.tv_loadtime, "装货时间：" + item.getZh_time());
         helper.setText(R.id.tv_name, item.getFhName());
         ImageView img_call = (ImageView) helper.getView(R.id.img_call);
         img_call.setOnClickListener(new View.OnClickListener() {
