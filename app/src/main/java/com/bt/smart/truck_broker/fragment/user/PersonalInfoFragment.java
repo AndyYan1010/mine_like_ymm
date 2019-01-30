@@ -94,6 +94,8 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
                 toPhotoDriveCard();
                 break;
             case R.id.tv_submit:
+
+
                 //下一步，填写车辆信息
                 toWriteCarInfo();
                 break;
@@ -143,6 +145,10 @@ public class PersonalInfoFragment extends Fragment implements View.OnClickListen
 
         if (EditTextUtils.isEmpty(et_code, "请输入身份证号")) {
             ToastUtils.showToast(getContext(), "身份证号不能为空");
+            return;
+        }
+        if (18 != EditTextUtils.getContent(et_code).length()) {
+            ToastUtils.showToast(getContext(), "身份证号长度不正确");
             return;
         }
         PersonalCarInfoFragment personalCarFt = new PersonalCarInfoFragment();

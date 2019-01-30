@@ -66,7 +66,7 @@ public class OrderListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getDrivierOrderList(0, 10, MyApplication.userID, "" + mType);
+        getDrivierOrderList(1, 10, MyApplication.userID, "" + mType);
     }
 
     private void setSwipRefresh() {
@@ -75,7 +75,7 @@ public class OrderListFragment extends Fragment {
             @Override
             public void onRefresh() {
                 //获取司机个人订单列表
-                getDrivierOrderList(0, 10, MyApplication.userID, "" + mType);
+                getDrivierOrderList(1, 10, MyApplication.userID, "" + mType);
             }
         });
     }
@@ -129,6 +129,6 @@ public class OrderListFragment extends Fragment {
     public void refreshData() {
         //获取司机个人订单列表
         if (isVisible())
-            getDrivierOrderList(0, 10, MyApplication.userID, "" + mType);
+            getDrivierOrderList(1, 10, MyApplication.userID, "" + mType);
     }
 }

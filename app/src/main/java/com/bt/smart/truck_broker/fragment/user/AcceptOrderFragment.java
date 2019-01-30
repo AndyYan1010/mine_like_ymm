@@ -74,7 +74,7 @@ public class AcceptOrderFragment extends Fragment implements View.OnClickListene
         setSwipRefresh();
         img_back.setOnClickListener(this);
         //获取司机个人订单列表
-        getDrivierOrderList(MyApplication.userID, "1");
+        getDrivierOrderList(0, 10, MyApplication.userID, "1");
     }
 
     @Override
@@ -92,12 +92,12 @@ public class AcceptOrderFragment extends Fragment implements View.OnClickListene
             @Override
             public void onRefresh() {
                 //获取司机个人订单列表
-                getDrivierOrderList(MyApplication.userID, "1");
+                getDrivierOrderList(0, 10, MyApplication.userID, "1");
             }
         });
     }
 
-    private void getDrivierOrderList(String userID, String type) {
+    private void getDrivierOrderList(int no, int size, String userID, String type) {
         swiperefresh.setRefreshing(true);
         mData.clear();
         RequestParamsFM headParam = new RequestParamsFM();
@@ -105,7 +105,7 @@ public class AcceptOrderFragment extends Fragment implements View.OnClickListene
         RequestParamsFM params = new RequestParamsFM();
         params.put("id", userID);
         params.put("status", type);
-        HttpOkhUtils.getInstance().doGetWithHeadParams(NetConfig.DRIVERORDERCONTROLLER_ORDER, headParam, params, new HttpOkhUtils.HttpCallBack() {
+        HttpOkhUtils.getInstance().doGetWithHeadParams(NetConfig.DRIVERORDERCONTROLLER_ORDER + "/" + no + "/" + size, headParam, params, new HttpOkhUtils.HttpCallBack() {
             @Override
             public void onError(Request request, IOException e) {
                 swiperefresh.setRefreshing(false);
