@@ -1,5 +1,6 @@
 package com.bt.smart.truck_broker.fragment.user;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,11 +13,13 @@ import android.view.ViewGroup;
 import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
+import com.bt.smart.truck_broker.activity.samedayAct.OrderDetailActivity;
 import com.bt.smart.truck_broker.adapter.ReadyRecDriverOrderAdapter;
 import com.bt.smart.truck_broker.messageInfo.ReadyRecOrderInfo;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.ToastUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -35,12 +38,12 @@ import okhttp3.Request;
  */
 
 public class OrderListFragment extends Fragment {
-    private View                                  mRootView;
-    private SwipeRefreshLayout                    swiperefresh;
-    private RecyclerView                          recyview;
-    private ReadyRecDriverOrderAdapter            orderAdapter;
-    private List<ReadyRecOrderInfo.OrderListBean> mData;
-    private int                                   mType;//fragment需要展示的订单种类//0接单、1运输、2待确认、3已取消、4签收
+    private View                             mRootView;
+    private SwipeRefreshLayout               swiperefresh;
+    private RecyclerView                     recyview;
+    private ReadyRecDriverOrderAdapter       orderAdapter;
+    private List<ReadyRecOrderInfo.DataBean> mData;
+    private int                              mType;//fragment需要展示的订单种类//0接单、1运输、2待确认、3已取消、4签收
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,6 +88,15 @@ public class OrderListFragment extends Fragment {
         recyview.setLayoutManager(new LinearLayoutManager(getContext()));
         orderAdapter = new ReadyRecDriverOrderAdapter(R.layout.adpter_sameday_order, getContext(), mData);
         recyview.setAdapter(orderAdapter);
+        orderAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                //跳转订单详情
+                Intent intent = new Intent(getContext(), OrderDetailActivity.class);
+                intent.putExtra("orderID", mData.get(position).getId());
+                startActivity(intent);
+            }
+        });
     }
 
     private void getDrivierOrderList(int no, int size, String userID, String type) {
@@ -111,10 +123,10 @@ public class OrderListFragment extends Fragment {
                 Gson gson = new Gson();
                 ReadyRecOrderInfo readyRecOrderInfo = gson.fromJson(resbody, ReadyRecOrderInfo.class);
                 ToastUtils.showToast(getContext(), readyRecOrderInfo.getMessage());
-                if (1==readyRecOrderInfo.getCode()) {
-                    if (readyRecOrderInfo.getOrderList().size() > 0) {
+                if (readyRecOrderInfo.isOk()) {
+                    if (readyRecOrderInfo.getData().size() > 0) {
                         mData.clear();
-                        mData.addAll(readyRecOrderInfo.getOrderList());
+                        mData.addAll(readyRecOrderInfo.getData());
                         orderAdapter.notifyDataSetChanged();
                     }
                 }

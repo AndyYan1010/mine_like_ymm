@@ -14,8 +14,6 @@ import com.bt.smart.truck_broker.utils.ShowCallUtil;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,21 +25,21 @@ import java.util.List;
  * @更新描述 ${TODO}
  */
 
-public class ReadyRecDriverOrderAdapter extends BaseQuickAdapter<ReadyRecOrderInfo.OrderListBean, BaseViewHolder> {
+public class ReadyRecDriverOrderAdapter extends BaseQuickAdapter<ReadyRecOrderInfo.DataBean, BaseViewHolder> {
     private Context mContext;
     private String  selecPhone;//选择的电话
 
-    public ReadyRecDriverOrderAdapter(int layoutResId, Context context, List<ReadyRecOrderInfo.OrderListBean> data) {
+    public ReadyRecDriverOrderAdapter(int layoutResId, Context context, List<ReadyRecOrderInfo.DataBean> data) {
         super(layoutResId, data);
         this.mContext = context;
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, final ReadyRecOrderInfo.OrderListBean item) {
+    protected void convert(BaseViewHolder helper, final ReadyRecOrderInfo.DataBean item) {
         //        (ImageView) helper.getView(R.id.img_call)
         helper.setText(R.id.tv_place, item.getFh_address() + "  →  " + item.getSh_address());
         helper.setText(R.id.tv_goodsname, item.getGoods_name());
-        helper.setText(R.id.tv_loadtime, "装货时间：" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date(item.getZh_time().getTime())));
+        helper.setText(R.id.tv_loadtime, "装货时间：" + item.getZh_time());
         helper.setText(R.id.tv_name, item.getFh_name() + "\n电话：" + item.getFh_telephone());
         helper.setText(R.id.tv_talk, "收货人：" + item.getSh_name() + "\n电话：" + item.getSh_telephone());
         ImageView img_call = (ImageView) helper.getView(R.id.img_call);

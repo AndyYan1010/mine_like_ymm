@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,8 +14,11 @@ import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.messageInfo.OrderDetailInfo;
 import com.bt.smart.truck_broker.messageInfo.TakeOrderResultInfo;
+import com.bt.smart.truck_broker.utils.EditTextUtils;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
+import com.bt.smart.truck_broker.utils.MyAlertDialogHelper;
 import com.bt.smart.truck_broker.utils.MyFragmentManagerUtil;
+import com.bt.smart.truck_broker.utils.MyNumUtils;
 import com.bt.smart.truck_broker.utils.ProgressDialogUtil;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.ShowCallUtil;
@@ -103,20 +107,47 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                 ShowCallUtil.showCallDialog(getContext(), orderDetailInfo.getData().getFh_telephone());
                 break;
             case R.id.tv_take:
-                //接单
-                takeOrder();
+                //弹出自定义的dailog让司机填写报价
+                show2WriteMoney();
                 break;
         }
     }
 
-    private void takeOrder() {
+    private void show2WriteMoney() {
+        final MyAlertDialogHelper dialogHelper = new MyAlertDialogHelper();
+        View inflate = View.inflate(getContext(), R.layout.dailog_write_money, null);
+        dialogHelper.setDIYView(getContext(), inflate);
+        final EditText et_money = inflate.findViewById(R.id.et_money);
+        TextView tv_cancle = inflate.findViewById(R.id.tv_cancle);
+        TextView tv_sure = inflate.findViewById(R.id.tv_sure);
+        tv_cancle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogHelper.disMiss();
+            }
+        });
+        tv_sure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String content = EditTextUtils.getContent(et_money);
+                double doubleNum = MyNumUtils.getDoubleNum(content);
+                //接单
+                takeOrder(doubleNum);
+                dialogHelper.disMiss();
+            }
+        });
+        dialogHelper.show();
+    }
+
+    private void takeOrder(double money) {
         RequestParamsFM headParams = new RequestParamsFM();
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         RequestParamsFM params = new RequestParamsFM();
         params.put("driverId", MyApplication.userID);
         params.put("id", MyApplication.userID);
         params.put("orderId", orderDetailInfo.getData().getId());
-        params.put("orderStatus", "0");
+        params.put("orderStatus", "5");
+        params.put("ffee", money);
         params.setUseJsonStreamer(true);
         HttpOkhUtils.getInstance().doPostWithHeader(NetConfig.DRIVERORDERCONTROLLER, headParams, params, new HttpOkhUtils.HttpCallBack() {
             @Override
