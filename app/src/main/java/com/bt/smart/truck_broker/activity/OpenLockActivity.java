@@ -331,7 +331,7 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
                     //获取到mac地址后，连接蓝牙开锁
                     String data = blueMacInfo.getData();
                     if (null != data && !"".equals(data))
-                        openBlueDevice(data);
+                        contactBlueDevice(data);
                 }
             }
         });
@@ -340,7 +340,7 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
     private int whichBle = -1;
     private BluetoothGatt mBLEGatt;
 
-    private void openBlueDevice(String data) {
+    private void contactBlueDevice(String data) {
         for (int i = 0; i < mBtData.size(); i++) {
             BLEDevice bleDevice = mBtData.get(i);
             if (bleDevice.getDevice().getAddress().equals(data)) {
@@ -354,6 +354,18 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
             scanLeDevice(false);
             //发起连接
             mBLEGatt = mBtData.get(whichBle).getDevice().connectGatt(this, false, mGattCallback);
+            //获取秘钥
+            if (mBLEGatt != null) {
+                byte[] crcOrder = CommandUtil.getCRCKeyCommand2();//*-获取秘钥
+                Log.i(TAG, "onDescriptorWrite: GET KEY COMM=" + getCommForHex(crcOrder));
+                mBLEGCWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+                mBLEGCWrite.setValue(crcOrder);
+                mBLEGatt.writeCharacteristic(mBLEGCWrite);
+            } else {
+                Toast.makeText(this, "请重新连接设备", Toast.LENGTH_SHORT).show();
+            }
+        }else {
+            ToastUtils.showToast(this,"请匹配订单对应的锁");
         }
     }
 
@@ -433,7 +445,7 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
             int uid = 1; // user login id
 
             byte[] crcOrder = CommandUtil.getCRCKeyCommand2();
-            //            Log.i(TAG, "onDescriptorWrite: GET KEY COMM=" + getCommForHex(crcOrder));
+            // Log.i(TAG, "onDescriptorWrite: GET KEY COMM=" + getCommForHex(crcOrder));
             mBLEGCWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
             mBLEGCWrite.setValue(crcOrder);
             mBLEGatt.writeCharacteristic(mBLEGCWrite);
@@ -442,7 +454,7 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             byte[] values = characteristic.getValue();
-            //            Log.i(TAG, "onCharacteristicChanged: values=" + getCommForHex(values));
+            // Log.i(TAG, "onCharacteristicChanged: values=" + getCommForHex(values));
             int start = 0;
             int copyLen = 0;
             for (int i = 0; i < values.length; i++) {
@@ -472,7 +484,7 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
                 handCommand(command);
             } else {
                 // CRC校验失败
-                //                Log.i(TAG, "onCharacteristicChanged: CRC校验失败");
+                // Log.i(TAG, "onCharacteristicChanged: CRC校验失败");
             }
         }
     };
