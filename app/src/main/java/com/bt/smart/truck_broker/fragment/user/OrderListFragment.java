@@ -43,7 +43,7 @@ public class OrderListFragment extends Fragment {
     private RecyclerView                     recyview;
     private ReadyRecDriverOrderAdapter       orderAdapter;
     private List<ReadyRecOrderInfo.DataBean> mData;
-    private int                              mType;//fragment需要展示的订单种类//0接单、1运输、2待确认、3已取消、4签收
+    private int                              mType;//fragment需要展示的订单种类//0接单、1运输、2待确认、3已取消、4签收、5预接单、6未中标
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -94,6 +94,7 @@ public class OrderListFragment extends Fragment {
                 //跳转订单详情
                 Intent intent = new Intent(getContext(), OrderDetailActivity.class);
                 intent.putExtra("orderID", mData.get(position).getId());
+                intent.putExtra("orderType", mType);
                 startActivity(intent);
             }
         });

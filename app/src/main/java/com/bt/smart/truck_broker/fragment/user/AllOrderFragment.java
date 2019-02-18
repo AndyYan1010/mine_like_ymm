@@ -52,6 +52,7 @@ public class AllOrderFragment extends Fragment {
         tv_title.setText("订单列表");
         contsList = new ArrayList<>();
         contsList.add("预接单");
+        contsList.add("未中标");
         contsList.add("已接单");
         contsList.add("运输单");
         contsList.add("取消待确认单");
@@ -61,6 +62,9 @@ public class AllOrderFragment extends Fragment {
         OrderListFragment orderListFgt5 = new OrderListFragment();
         orderListFgt5.setType(5);
         fragmentsList.add(orderListFgt5);
+        OrderListFragment orderListFgt6 = new OrderListFragment();
+        orderListFgt6.setType(6);
+        fragmentsList.add(orderListFgt6);
         OrderListFragment orderListFgt0 = new OrderListFragment();
         orderListFgt0.setType(0);
         fragmentsList.add(orderListFgt0);

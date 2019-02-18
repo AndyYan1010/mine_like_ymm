@@ -1,5 +1,6 @@
 package com.bt.smart.truck_broker.fragment.sameDay;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
+import com.bt.smart.truck_broker.activity.OpenLockActivity;
 import com.bt.smart.truck_broker.messageInfo.OrderDetailInfo;
 import com.bt.smart.truck_broker.messageInfo.TakeOrderResultInfo;
 import com.bt.smart.truck_broker.utils.EditTextUtils;
@@ -87,8 +89,14 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         tv_cont.setOnClickListener(this);
         tv_take.setOnClickListener(this);
         img_empty.setOnClickListener(this);
-        String touchKind = getActivity().getIntent().getStringExtra("touchKind");
-        if (null != touchKind && "accepted".equals(touchKind)) {
+        //        String touchKind = getActivity().getIntent().getStringExtra("touchKind");
+        //        if (null != touchKind && "accepted".equals(touchKind)) {
+        //            tv_take.setVisibility(View.GONE);
+        //        }
+        int orderType = getActivity().getIntent().getIntExtra("orderType", -1);
+        if (0 == orderType || 1 == orderType || 2 == orderType) {
+            tv_take.setText("开锁");
+        } else {
             tv_take.setVisibility(View.GONE);
         }
     }
@@ -107,10 +115,23 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                 ShowCallUtil.showCallDialog(getContext(), orderDetailInfo.getData().getFh_telephone());
                 break;
             case R.id.tv_take:
-                //弹出自定义的dailog让司机填写报价
-                show2WriteMoney();
+                String cont = String.valueOf(tv_take.getText());
+                if ("开锁".equals(cont)) {
+                    //跳转开锁页面
+                    openLockDevice();
+                } else {
+                    //弹出自定义的dailog让司机填写报价
+                    show2WriteMoney();
+                }
                 break;
         }
+    }
+
+    private void openLockDevice() {
+        //跳转开锁页面,传递订单id
+        Intent intent = new Intent(getActivity(), OpenLockActivity.class);
+        intent.putExtra("orderID", orderID);
+        startActivity(intent);
     }
 
     private void show2WriteMoney() {

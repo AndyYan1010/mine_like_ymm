@@ -43,5 +43,15 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:visibility="invisible"/>
+
+        <ImageView
+            android:id="@+id/img_scan"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/scan_code"
+            android:visibility="gone"/>
     </RelativeLayout>
 </LinearLayout>
