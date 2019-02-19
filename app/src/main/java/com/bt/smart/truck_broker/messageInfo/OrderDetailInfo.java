@@ -15,12 +15,14 @@ public class OrderDetailInfo {
 
     /**
      * message : 成功
-     * data : {"id":"2c90b4e368368c94016836a7ef26000a","fstatus":"0","fh_name":"发货人张三","fh_telephone":"18234567890","fh_address":"发货人地址南通","sh_name":"收货人李四","sh_telephone":"18234567898","sh_address":"收货人地址上海","sh_area":"收货人地区上海","car_type":"货车","zh_time":"2019-01-12","goods_name":"货物类别服装","fh":"1236","sh":"1235","fcheck":"0","fmain_id":"yingsu0028","fsub_id":"","is_fapiao":"0","origin":"江苏省南通市港闸区","destination":"江苏省南通市崇川区","ordergoods":[{"id":"2c90b4e368368c94016836a7ef28000b","goodsSpace":11,"goodsName":"上装","goodsWeight":12,"orderId":"2c90b4e368368c94016836a7ef26000a"},{"id":"2c90b4e368368c94016836a7ef29000c","goodsSpace":21,"goodsName":"下装","goodsWeight":22,"orderId":"2c90b4e368368c94016836a7ef26000a"}]}
+     * size : 0
+     * data : {"id":"2c90b4e368eede110168eedf279a0000","fstatus":"0","fh_name":"赵三","fh_telephone":"18234567890","fh_address":"南通","sh_name":"李四","sh_telephone":"18234567898","sh_address":"上海","sh_area":"","car_type":"2c90b4e368db82ef0168db8d8e9a0004","zh_time":"2019-02-15 09:56:34","goods_name":"4d2881f66850132a01685014c6e40007","fh":"2392","sh":"3262","fcheck":"0","fmain_id":"yingsu0028","fsub_id":"","is_fapiao":"0","fweight":34,"ffee":1234,"is_appoint":"0","appoint_id":"","order_no":"2019021500609093396","fmax_fee":9456,"is_box":"0","box_no":"201988","origin":"广东省惠州市惠阳区","destination":"甘肃省嘉峪关市市辖区","origin_province_id":"20","origin_city_id":"242","origin_area_id":"2392","destination_province_id":"29","destination_city_id":"337","destination_area_id":"3262","ordergoods":[{"id":"2c90b4e368eede110168eedf27bd0001","goodsName":"上装","goodsWeight":12,"goodsSpace":11,"orderId":"2c90b4e368eede110168eedf279a0000"},{"id":"2c90b4e368eede110168eedf27bd0002","goodsName":"下装","goodsWeight":22,"goodsSpace":21,"orderId":"2c90b4e368eede110168eedf279a0000"}]}
      * respCode : 0
      * ok : true
      */
 
     private String message;
+    private int      size;
     private DataBean data;
     private String   respCode;
     private boolean  ok;
@@ -31,6 +33,14 @@ public class OrderDetailInfo {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     public DataBean getData() {
@@ -59,27 +69,41 @@ public class OrderDetailInfo {
 
     public static class DataBean {
         /**
-         * id : 2c90b4e368368c94016836a7ef26000a
+         * id : 2c90b4e368eede110168eedf279a0000
          * fstatus : 0
-         * fh_name : 发货人张三
+         * fh_name : 赵三
          * fh_telephone : 18234567890
-         * fh_address : 发货人地址南通
-         * sh_name : 收货人李四
+         * fh_address : 南通
+         * sh_name : 李四
          * sh_telephone : 18234567898
-         * sh_address : 收货人地址上海
-         * sh_area : 收货人地区上海
-         * car_type : 货车
-         * zh_time : 2019-01-12
-         * goods_name : 货物类别服装
-         * fh : 1236
-         * sh : 1235
+         * sh_address : 上海
+         * sh_area :
+         * car_type : 2c90b4e368db82ef0168db8d8e9a0004
+         * zh_time : 2019-02-15 09:56:34
+         * goods_name : 4d2881f66850132a01685014c6e40007
+         * fh : 2392
+         * sh : 3262
          * fcheck : 0
          * fmain_id : yingsu0028
          * fsub_id :
          * is_fapiao : 0
-         * origin : 江苏省南通市港闸区
-         * destination : 江苏省南通市崇川区
-         * ordergoods : [{"id":"2c90b4e368368c94016836a7ef28000b","goodsSpace":11,"goodsName":"上装","goodsWeight":12,"orderId":"2c90b4e368368c94016836a7ef26000a"},{"id":"2c90b4e368368c94016836a7ef29000c","goodsSpace":21,"goodsName":"下装","goodsWeight":22,"orderId":"2c90b4e368368c94016836a7ef26000a"}]
+         * fweight : 34
+         * ffee : 1234
+         * is_appoint : 0
+         * appoint_id :
+         * order_no : 2019021500609093396
+         * fmax_fee : 9456
+         * is_box : 0
+         * box_no : 201988
+         * origin : 广东省惠州市惠阳区
+         * destination : 甘肃省嘉峪关市市辖区
+         * origin_province_id : 20
+         * origin_city_id : 242
+         * origin_area_id : 2392
+         * destination_province_id : 29
+         * destination_city_id : 337
+         * destination_area_id : 3262
+         * ordergoods : [{"id":"2c90b4e368eede110168eedf27bd0001","goodsName":"上装","goodsWeight":12,"goodsSpace":11,"orderId":"2c90b4e368eede110168eedf279a0000"},{"id":"2c90b4e368eede110168eedf27bd0002","goodsName":"下装","goodsWeight":22,"goodsSpace":21,"orderId":"2c90b4e368eede110168eedf279a0000"}]
          */
 
         private String id;
@@ -100,8 +124,22 @@ public class OrderDetailInfo {
         private String               fmain_id;
         private String               fsub_id;
         private String               is_fapiao;
+        private int                  fweight;
+        private int                  ffee;
+        private String               is_appoint;
+        private String               appoint_id;
+        private String               order_no;
+        private int                  fmax_fee;
+        private String               is_box;
+        private String               box_no;
         private String               origin;
         private String               destination;
+        private String               origin_province_id;
+        private String               origin_city_id;
+        private String               origin_area_id;
+        private String               destination_province_id;
+        private String               destination_city_id;
+        private String               destination_area_id;
         private List<OrdergoodsBean> ordergoods;
 
         public String getId() {
@@ -248,6 +286,70 @@ public class OrderDetailInfo {
             this.is_fapiao = is_fapiao;
         }
 
+        public int getFweight() {
+            return fweight;
+        }
+
+        public void setFweight(int fweight) {
+            this.fweight = fweight;
+        }
+
+        public int getFfee() {
+            return ffee;
+        }
+
+        public void setFfee(int ffee) {
+            this.ffee = ffee;
+        }
+
+        public String getIs_appoint() {
+            return is_appoint;
+        }
+
+        public void setIs_appoint(String is_appoint) {
+            this.is_appoint = is_appoint;
+        }
+
+        public String getAppoint_id() {
+            return appoint_id;
+        }
+
+        public void setAppoint_id(String appoint_id) {
+            this.appoint_id = appoint_id;
+        }
+
+        public String getOrder_no() {
+            return order_no;
+        }
+
+        public void setOrder_no(String order_no) {
+            this.order_no = order_no;
+        }
+
+        public int getFmax_fee() {
+            return fmax_fee;
+        }
+
+        public void setFmax_fee(int fmax_fee) {
+            this.fmax_fee = fmax_fee;
+        }
+
+        public String getIs_box() {
+            return is_box;
+        }
+
+        public void setIs_box(String is_box) {
+            this.is_box = is_box;
+        }
+
+        public String getBox_no() {
+            return box_no;
+        }
+
+        public void setBox_no(String box_no) {
+            this.box_no = box_no;
+        }
+
         public String getOrigin() {
             return origin;
         }
@@ -264,6 +366,54 @@ public class OrderDetailInfo {
             this.destination = destination;
         }
 
+        public String getOrigin_province_id() {
+            return origin_province_id;
+        }
+
+        public void setOrigin_province_id(String origin_province_id) {
+            this.origin_province_id = origin_province_id;
+        }
+
+        public String getOrigin_city_id() {
+            return origin_city_id;
+        }
+
+        public void setOrigin_city_id(String origin_city_id) {
+            this.origin_city_id = origin_city_id;
+        }
+
+        public String getOrigin_area_id() {
+            return origin_area_id;
+        }
+
+        public void setOrigin_area_id(String origin_area_id) {
+            this.origin_area_id = origin_area_id;
+        }
+
+        public String getDestination_province_id() {
+            return destination_province_id;
+        }
+
+        public void setDestination_province_id(String destination_province_id) {
+            this.destination_province_id = destination_province_id;
+        }
+
+        public String getDestination_city_id() {
+            return destination_city_id;
+        }
+
+        public void setDestination_city_id(String destination_city_id) {
+            this.destination_city_id = destination_city_id;
+        }
+
+        public String getDestination_area_id() {
+            return destination_area_id;
+        }
+
+        public void setDestination_area_id(String destination_area_id) {
+            this.destination_area_id = destination_area_id;
+        }
+
         public List<OrdergoodsBean> getOrdergoods() {
             return ordergoods;
         }
@@ -274,17 +424,17 @@ public class OrderDetailInfo {
 
         public static class OrdergoodsBean {
             /**
-             * id : 2c90b4e368368c94016836a7ef28000b
-             * goodsSpace : 11.0
+             * id : 2c90b4e368eede110168eedf27bd0001
              * goodsName : 上装
-             * goodsWeight : 12.0
-             * orderId : 2c90b4e368368c94016836a7ef26000a
+             * goodsWeight : 12
+             * goodsSpace : 11
+             * orderId : 2c90b4e368eede110168eedf279a0000
              */
 
             private String id;
-            private double goodsSpace;
             private String goodsName;
-            private double goodsWeight;
+            private int    goodsWeight;
+            private int    goodsSpace;
             private String orderId;
 
             public String getId() {
@@ -295,14 +445,6 @@ public class OrderDetailInfo {
                 this.id = id;
             }
 
-            public double getGoodsSpace() {
-                return goodsSpace;
-            }
-
-            public void setGoodsSpace(double goodsSpace) {
-                this.goodsSpace = goodsSpace;
-            }
-
             public String getGoodsName() {
                 return goodsName;
             }
@@ -311,12 +453,20 @@ public class OrderDetailInfo {
                 this.goodsName = goodsName;
             }
 
-            public double getGoodsWeight() {
+            public int getGoodsWeight() {
                 return goodsWeight;
             }
 
-            public void setGoodsWeight(double goodsWeight) {
+            public void setGoodsWeight(int goodsWeight) {
                 this.goodsWeight = goodsWeight;
+            }
+
+            public int getGoodsSpace() {
+                return goodsSpace;
+            }
+
+            public void setGoodsSpace(int goodsSpace) {
+                this.goodsSpace = goodsSpace;
             }
 
             public String getOrderId() {

@@ -1,19 +1,26 @@
 package com.bt.smart.truck_broker.fragment.sameDay;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bt.smart.truck_broker.MyApplication;
 import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.activity.OpenLockActivity;
+import com.bt.smart.truck_broker.activity.SaomiaoUIActivity;
+import com.bt.smart.truck_broker.messageInfo.BlueMacInfo;
 import com.bt.smart.truck_broker.messageInfo.OrderDetailInfo;
 import com.bt.smart.truck_broker.messageInfo.TakeOrderResultInfo;
 import com.bt.smart.truck_broker.utils.EditTextUtils;
@@ -26,6 +33,7 @@ import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.ShowCallUtil;
 import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.google.gson.Gson;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 
 import java.io.IOException;
 
@@ -45,7 +53,8 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     private ImageView       img_back;
     private ImageView       img_empty;
     private TextView        tv_title;
-    private String          orderID;
+    private String          orderID;//订单id
+    private String          mOrder_no;//订单号
     private TextView        tv_place;
     private TextView        tv_goodsname;
     private TextView        tv_carType;
@@ -94,7 +103,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         //            tv_take.setVisibility(View.GONE);
         //        }
         int orderType = getActivity().getIntent().getIntExtra("orderType", -1);
-        if (0 == orderType || 1 == orderType || 2 == orderType) {
+        if (0 == orderType || 1 == orderType || 2 == orderType || 5 == orderType) {
             tv_take.setText("开锁");
         } else {
             tv_take.setVisibility(View.GONE);
@@ -127,10 +136,107 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        /**
+         * 处理二维码扫描结果
+         */
+        if (requestCode == REQUEST_CODE) {
+            //处理扫描结果，将扫描获取到的编码上传给服务器
+            if (null != data) {
+                Bundle bundle = data.getExtras();
+                if (bundle == null) {
+                    return;
+                }
+                if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                    String result = bundle.getString(CodeUtils.RESULT_STRING);
+                    mBlueXlh = result;
+                    //上传给服务器,获取mac地址
+                    ToastUtils.showToast(getContext(), "获取设备锁信息");
+                    if (null == mBlueMac) {
+                        sendCode2Service(result);
+                    } else {
+                        //跳转连接蓝牙界面
+                        contactBlueDevice();
+                    }
+                } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
+                    Toast.makeText(getContext(), "解析二维码失败", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
     private void openLockDevice() {
-        //跳转开锁页面,传递订单id
+        //先通过扫描获取 设备编号，从服务器获取 蓝牙mac地址,在打开连接界面
+        //扫描二维码，提交服务器，获取对应蓝牙mac地址
+        getScanCode();
+    }
+
+    private int MY_PERMISSIONS_REQUEST_CALL_PHONE2 = 1001;//申请照相机权限结果
+    private int REQUEST_CODE                       = 1003;//接收扫描结果
+    private String mBlueMac;
+    private String mBlueXlh;
+
+    //扫描二维码
+    private void getScanCode() {
+        //第二个参数是需要申请的权限
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            //权限还没有授予，需要在这里写申请权限的代码
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
+                    MY_PERMISSIONS_REQUEST_CALL_PHONE2);
+        } else {
+            Intent intent = new Intent(getContext(), SaomiaoUIActivity.class);//这是一个自定义的扫描界面，扫描UI框放大了。
+            startActivityForResult(intent, REQUEST_CODE);
+        }
+    }
+
+    private void sendCode2Service(String result) {
+        ProgressDialogUtil.startShow(getContext(), "正在检索...");
+        RequestParamsFM headParam = new RequestParamsFM();
+        headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
+        HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.DRIVERORDERCONTROLLER + "/" + result + "/" + orderID, headParam, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ProgressDialogUtil.hideDialog();
+                ToastUtils.showToast(getContext(), "网络错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                ProgressDialogUtil.hideDialog();
+                if (code != 200) {
+                    ToastUtils.showToast(getContext(), "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                BlueMacInfo blueMacInfo = gson.fromJson(resbody, BlueMacInfo.class);
+                ToastUtils.showToast(getContext(), blueMacInfo.getMessage());
+                if (blueMacInfo.isOk()) {
+                    //获取到mac地址后，连接蓝牙开锁
+                    String data = blueMacInfo.getData();
+                    if (null != data && !"".equals(data)) {
+                        ToastUtils.showToast(getContext(), "获取到设备锁的信息");
+                        mBlueMac = data;
+                        //跳转链接界面
+                        contactBlueDevice();
+                    } else {
+                        ToastUtils.showToast(getContext(), "未获取到设备锁的信息");
+                    }
+                } else {
+                    ToastUtils.showToast(getContext(), "获取设备锁的信息失败");
+                }
+            }
+        });
+    }
+
+    private void contactBlueDevice() {
+        //跳转开锁页面,传递设备mac地址
         Intent intent = new Intent(getActivity(), OpenLockActivity.class);
-        intent.putExtra("orderID", orderID);
+        intent.putExtra("macID", mBlueMac);
+        intent.putExtra("blueXlh", mBlueXlh);
+        intent.putExtra("orderNo", mOrder_no);
         startActivity(intent);
     }
 
@@ -219,8 +325,9 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                 ToastUtils.showToast(getContext(), orderDetailInfo.getMessage());
                 if (orderDetailInfo.isOk()) {
                     img_empty.setVisibility(View.GONE);
+                    mOrder_no = orderDetailInfo.getData().getOrder_no();
                     tv_place.setText(orderDetailInfo.getData().getOrigin() + "  →  " + orderDetailInfo.getData().getDestination());
-                    tv_goodsname.setText(orderDetailInfo.getData().getGoods_name());
+                    tv_goodsname.setText(orderDetailInfo.getData().getCar_type());
                     tv_carType.setText(orderDetailInfo.getData().getCar_type());
                     tv_name.setText(orderDetailInfo.getData().getFh_name());
                     tv_fhPlace.setText(orderDetailInfo.getData().getFh_address());

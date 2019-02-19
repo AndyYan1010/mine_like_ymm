@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,18 +34,17 @@ import com.bt.smart.truck_broker.NetConfig;
 import com.bt.smart.truck_broker.R;
 import com.bt.smart.truck_broker.ble.BLEDevice;
 import com.bt.smart.truck_broker.ble.GattAttributes;
-import com.bt.smart.truck_broker.messageInfo.BlueMacInfo;
+import com.bt.smart.truck_broker.messageInfo.LoginInfo;
 import com.bt.smart.truck_broker.utils.CRCUtil;
 import com.bt.smart.truck_broker.utils.CommandUtil;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
+import com.bt.smart.truck_broker.utils.LocationUtils;
 import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.github.ring.CircleProgress;
 import com.google.gson.Gson;
-import com.uuzuche.lib_zxing.activity.CodeUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Request;
@@ -60,15 +60,15 @@ import okhttp3.Request;
 
 public class OpenLockActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "OpenLockActivity";
-    private String         mOrderID;
     private ImageView      img_back;
     private TextView       tv_title;
-    private ImageView      img_scan;
+    private TextView       tv_test;//显示连接进程
+    private TextView       tv_start;//
     private CircleProgress circleprogress;
     private Handler        mProhandler;
-    private int count                              = 60;//搜索时间、单位秒
-    private int MY_PERMISSIONS_REQUEST_CALL_PHONE2 = 1001;//申请照相机权限结果
-    private int REQUEST_CODE                       = 1003;//接收扫描结果
+    private String         mBlueMac;
+    private String         mOrderNo;
+    private String         mBlueXlh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,25 +81,26 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
     private void initView() {
         img_back = findViewById(R.id.img_back);
         tv_title = findViewById(R.id.tv_title);
-        img_scan = findViewById(R.id.img_scan);
+        tv_test = findViewById(R.id.tv_test);
+        tv_start = findViewById(R.id.tv_start);
         circleprogress = findViewById(R.id.circleprogress);
     }
 
     private void initData() {
-        mOrderID = getIntent().getStringExtra("orderID");
+        img_back.setVisibility(View.VISIBLE);
         tv_title.setText("开锁");
-        //初始化进度条
-        mProhandler = new Handler();
-        circleprogress.setProgress(0.0f);
-        circleprogress.setMaxProgress(60);
-
-        mBtData = new ArrayList();
-
-        img_back.setOnClickListener(this);
-        img_scan.setOnClickListener(this);
+        mBlueMac = getIntent().getStringExtra("macID");
+        mOrderNo = getIntent().getStringExtra("orderNo");
+        mBlueXlh = getIntent().getStringExtra("blueXlh");
         //先开启蓝牙搜索
         //searchBlueDevice();
         initBLE();
+
+        //初始化进度条
+        startReadScend();
+
+        img_back.setOnClickListener(this);
+        tv_start.setOnClickListener(this);
     }
 
     @Override
@@ -108,9 +109,18 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
             case R.id.img_back:
                 finish();
                 break;
-            case R.id.img_scan:
-                //扫描二维码，提交服务器，获取对应蓝牙mac地址
-                getScanCode();
+            case R.id.tv_start:
+                String tv_state = String.valueOf(tv_start.getText()).trim();
+                if ("开始搜索".equals(tv_state)) {
+                    if (!mScanning) {
+                        scanLeDevice(true);
+                    } else {
+                        if (null != findDevice) {
+                            //先连接，再获取key
+                            contactBlueDevice(findDevice);
+                        }
+                    }
+                }
                 break;
         }
     }
@@ -118,7 +128,7 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
-        needLoactionRight();
+        getPermission();
     }
 
     @Override
@@ -138,84 +148,45 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        /**
-         * 处理二维码扫描结果
-         */
-        if (requestCode == REQUEST_CODE) {
-            //处理扫描结果，将扫描获取到的编码上传给服务器
-            if (null != data) {
-                Bundle bundle = data.getExtras();
-                if (bundle == null) {
-                    return;
-                }
-                if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
-                    String result = bundle.getString(CodeUtils.RESULT_STRING);
-                    //上传给服务器 result
-                    sendCode2Service(result);
-                    //开始进度条读秒
-                    startReadScend();
-                } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
-                    Toast.makeText(this, "解析二维码失败", Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == 1) {//requestCode == REQUEST_ENABLE
+        if (requestCode == 2) {
             // 请求定位权限
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {//允许
-                //搜索
-                startSearchBluetooth();
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
             } else {
-                finish();
                 ToastUtils.showToast(this, "您未授予权限");
             }
         }
     }
 
-    private boolean isGetKey = false;//是否已获取通讯指令
+    private int maxTime = 180;//匹配时间单位s
+    private int count   = 180;//搜索时间、单位秒
+    private boolean isSendKey;//是否发送获取key的指令了。
 
     private void startReadScend() {
+        mProhandler = new Handler();
+        circleprogress.setProgress(0.0f);
+        circleprogress.setMaxProgress(maxTime);
         mProhandler.postDelayed(new Runnable() {
             public void run() {
                 mProhandler.postDelayed(this, 1000);//递归执行，一秒执行一次
                 count--;
-                circleprogress.setProgress(60 - count);
+                circleprogress.setProgress(maxTime - count);
                 if (count == 0) {
-                    //连接时间超过一分钟，可关闭界面
-                    circleprogress.setProgress(60);
+                    //连接时间超过*分钟，可关闭界面
+                    circleprogress.setProgress(maxTime);
                     mProhandler.removeCallbacks(this);
                 } else {
-                    //在一分钟内，可连接蓝牙开锁
-                    if (isGetKey) {
-                        lastTepOpenBlue();
+                    if (!isSendKey) {
+                        if (null != mBLEGCWrite) {
+                            //发送指令 获取key
+                            getTheKey();
+                            isSendKey = true;
+                        }
                     }
                 }
             }
         }, 1000);
-    }
-
-    private void lastTepOpenBlue() {
-        sendOpenCommand();
-    }
-
-    private void sendOpenCommand() {
-        if (mBLEGatt != null) {
-            int uid = 1;
-            long timestamp = System.currentTimeMillis() / 1000;
-            byte[] crcOrder = CommandUtil.getCRCOpenCommand(uid, bleCKey, timestamp);
-            Log.i(TAG, "sendOpenCommand: openComm=" + getCommForHex(crcOrder));
-            mBLEGCWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-            mBLEGCWrite.setValue(crcOrder);
-            mBLEGatt.writeCharacteristic(mBLEGCWrite);
-        } else {
-            Toast.makeText(this, "请退出重新连接蓝牙设备", Toast.LENGTH_SHORT).show();
-        }
-
     }
 
     private void initBLE() {
@@ -236,41 +207,91 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
     }
 
-    private List<BLEDevice> mBtData;//存放搜索到的蓝牙
-
-    private void needLoactionRight() {
-        //判断是否已经赋予权限
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //如果应用之前请求过此权限但用户拒绝了请求，此方法将返回 true。
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                //这里可以写个对话框之类的项向用户解释为什么要申请权限，并在对话框的确认键后续再次申请权限
-                ToastUtils.showToast(this, "请手动开启相关权限");
-            } else {
-                //申请权限，字符串数组内是一个或多个要申请的权限，1是申请权限结果的返回参数，在onRequestPermissionsResult可以得知申请结果
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,}, 1);
-            }
-        } else {
-            startSearchBluetooth();
-        }
-    }
-
-    private void startSearchBluetooth() {
-        if (!mScanning) {
-            mBtData.clear();
-            scanLeDevice(true);
-        }
-    }
-
     private Handler mHandler = new Handler();
     private boolean          mScanning;
     private BluetoothAdapter mBluetoothAdapter;
     // Stops scanning after 10 seconds
-    private static final long                            SCAN_PERIOD     = 10000; // 10s for scanning
-    private              BluetoothAdapter.LeScanCallback mLescanCallback = new BluetoothAdapter.LeScanCallback() {
+    private static final long SCAN_PERIOD = 180000; // 10s for scanning
+    private BLEDevice findDevice;//记录发现的蓝牙设备
+
+    private BluetoothAdapter.LeScanCallback mLescanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             final BLEDevice bleDevice = new BLEDevice(device, rssi);
-            mBtData.add(bleDevice);
+            //匹配到蓝牙设备，关闭搜索，开始连接
+            if (mBlueMac.equals(device.getAddress())) {
+                findDevice = bleDevice;
+                if (mScanning) {
+                    scanLeDevice(false);
+                }
+                tv_test.setText("发现设备");
+                //先连接，再获取key
+                contactBlueDevice(bleDevice);
+            }
+        }
+    };
+
+    //秘钥
+    private byte bleCKey = 0;
+    private BluetoothGatt               mBLEGatt;
+    //蓝牙设备所拥有的特征
+    private BluetoothGattCharacteristic mBLEGCWrite;
+    private BluetoothGattCharacteristic mBLEGCRead;
+    private static final String            ACTION_CONNECT_BLE          = "com.omni.bleDemo.ACTION_CONNECT_BLE";
+    private static final String            ACTION_DISCONNECT           = "com.omni.bleDemo.ACTION_DISCONNECT";
+    private static final String            ACTION_GET_LOCK_KEY         = "com.omni.bleDemo.ACTION_GET_LOCK_KEY";
+    private static final String            ACTION_LOCK_CLOSE           = "com.omni.bleDemo.ACTION_LOCK_CLOSE";
+    private static final String            ACTION_BLE_LOCK_OPEN_STATUS = "com.omni.bleDemo.ACTION_BLE_LOCK_OPEN_STATUS";
+    //广播接收器
+    private              BroadcastReceiver broadcastReceiver           = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ACTION_CONNECT_BLE.equals(intent.getAction())) {//连接上蓝牙
+                tv_test.setText("连接上设备1...");
+            } else if (ACTION_LOCK_CLOSE.equals(intent.getAction())) {
+                handler.sendEmptyMessage(HANDLER_CLOSE);
+            } else if (ACTION_GET_LOCK_KEY.equals(intent.getAction())) {//接收蓝牙传回的秘钥
+                //获取到key
+                handler.sendEmptyMessage(HANDLER_GETKEY);
+            } else if (ACTION_DISCONNECT.equals(intent.getAction())) {
+                //断开连接 、 重新搜索连接
+                tv_test.setText("断开连接,请退出重新开锁");
+            } else if (ACTION_BLE_LOCK_OPEN_STATUS.equals(intent.getAction())) {//锁打开了
+                //                int status = intent.getIntExtra("status", 0);
+                //                long timestamp = intent.getLongExtra("timestamp", 0L);
+                //                Log.i(TAG, "onReceive: status=" + status);
+                //                Log.i(TAG, "onReceive: timestamp=" + timestamp);
+                handler.sendEmptyMessage(HANDLER_OPEN);
+            }
+        }
+    };
+
+    public static final int     HANDLER_GETKEY = 1;
+    public static final int     HANDLER_CLOSE  = 2;
+    public static final int     HANDLER_OPEN   = 3;
+    private             Handler handler        = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case HANDLER_CLOSE:
+                    tv_test.setText("设备已关闭");
+                    sendLockResp();
+                    ToastUtils.showToast(OpenLockActivity.this, "设备已关闭");
+                    break;
+                case HANDLER_OPEN:
+                    //添加开锁记录
+                    addOpenRecord();
+                    tv_test.setText("设备已打开");
+                    sendOpenResponse();
+                    ToastUtils.showToast(OpenLockActivity.this, "设备已打开");
+                    break;
+                case HANDLER_GETKEY:
+                    //获取到秘钥
+                    tv_test.setText("正在开锁2...");
+                    //发送开锁指令
+                    sendOpenCommand();
+                    break;
+            }
         }
     };
 
@@ -287,99 +308,47 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLescanCallback);//扫描低功耗蓝牙设备
             //正在扫描
+            tv_test.setText("正在搜索设备锁");
         } else {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLescanCallback);
             //终止扫描了
+            tv_test.setText("--");
         }
     }
 
-    //扫描二维码
-    private void getScanCode() {
-        //第二个参数是需要申请的权限
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            //权限还没有授予，需要在这里写申请权限的代码
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
-                    MY_PERMISSIONS_REQUEST_CALL_PHONE2);
+    private void contactBlueDevice(BLEDevice bleDevice) {
+        tv_test.setText("开始连接设备...");
+        //发起连接
+        mBLEGatt = bleDevice.getDevice().connectGatt(this, false, mGattCallback);
+    }
+
+    private void getTheKey() {
+        //获取秘钥
+        if (mBLEGatt != null) {
+            byte[] crcOrder = CommandUtil.getCRCKeyCommand2();//*-获取秘钥  获取秘钥的指令
+            Log.i(TAG, "onDescriptorWrite: GET KEY COMM=" + getCommForHex(crcOrder));
+            mBLEGCWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+            mBLEGCWrite.setValue(crcOrder);//写入值
+            mBLEGatt.writeCharacteristic(mBLEGCWrite);
+            tv_test.setText("正在获取秘钥...");
         } else {
-            Intent intent = new Intent(this, SaomiaoUIActivity.class);//这是一个自定义的扫描界面，扫描UI框放大了。
-            startActivityForResult(intent, REQUEST_CODE);
+            Toast.makeText(this, "请重新连接设备", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void sendCode2Service(String result) {
-        //获取到mac地址后，连接蓝牙
-        RequestParamsFM headParam = new RequestParamsFM();
-        headParam.put("X-AUTH-TOKEN", MyApplication.userToken);
-        HttpOkhUtils.getInstance().doGetWithOnlyHeader(NetConfig.DRIVERORDERCONTROLLER + "/" + result + "/" + mOrderID, headParam, new HttpOkhUtils.HttpCallBack() {
-            @Override
-            public void onError(Request request, IOException e) {
-                ToastUtils.showToast(OpenLockActivity.this, "网络错误");
-            }
-
-            @Override
-            public void onSuccess(int code, String resbody) {
-                if (code != 200) {
-                    ToastUtils.showToast(OpenLockActivity.this, "网络错误" + code);
-                    return;
-                }
-                Gson gson = new Gson();
-                BlueMacInfo blueMacInfo = gson.fromJson(resbody, BlueMacInfo.class);
-                ToastUtils.showToast(OpenLockActivity.this, blueMacInfo.getMessage());
-                if (blueMacInfo.isOk()) {
-                    //获取到mac地址后，连接蓝牙开锁
-                    String data = blueMacInfo.getData();
-                    if (null != data && !"".equals(data))
-                        contactBlueDevice(data);
-                }
-            }
-        });
-    }
-
-    private int whichBle = -1;
-    private BluetoothGatt mBLEGatt;
-
-    private void contactBlueDevice(String data) {
-        for (int i = 0; i < mBtData.size(); i++) {
-            BLEDevice bleDevice = mBtData.get(i);
-            if (bleDevice.getDevice().getAddress().equals(data)) {
-                //订单的蓝牙设备在本地搜索到了
-                whichBle = i;
-                break;
-            }
+    private void sendOpenCommand() {//发送开锁指令
+        if (mBLEGatt != null) {
+            int uid = 1;
+            long timestamp = System.currentTimeMillis() / 1000;//当前时间 秒s
+            byte[] crcOrder = CommandUtil.getCRCOpenCommand(uid, bleCKey, timestamp);
+            Log.i(TAG, "sendOpenCommand: openComm=" + getCommForHex(crcOrder));
+            mBLEGCWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+            mBLEGCWrite.setValue(crcOrder);//写入值
+            mBLEGatt.writeCharacteristic(mBLEGCWrite);
+        } else {
+            Toast.makeText(this, "请退出重新连接蓝牙设备", Toast.LENGTH_SHORT).show();
         }
-
-        if (whichBle != -1) {
-            scanLeDevice(false);
-            //发起连接
-            mBLEGatt = mBtData.get(whichBle).getDevice().connectGatt(this, false, mGattCallback);
-            //获取秘钥
-            if (mBLEGatt != null) {
-                byte[] crcOrder = CommandUtil.getCRCKeyCommand2();//*-获取秘钥
-                Log.i(TAG, "onDescriptorWrite: GET KEY COMM=" + getCommForHex(crcOrder));
-                mBLEGCWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-                mBLEGCWrite.setValue(crcOrder);
-                mBLEGatt.writeCharacteristic(mBLEGCWrite);
-            } else {
-                Toast.makeText(this, "请重新连接设备", Toast.LENGTH_SHORT).show();
-            }
-        }else {
-            ToastUtils.showToast(this,"请匹配订单对应的锁");
-        }
-    }
-
-    private BluetoothGattCharacteristic mBLEGCWrite;
-    private BluetoothGattCharacteristic mBLEGCRead;
-    private static final String ACTION_CONNECT_BLE = "com.omni.bleDemo.ACTION_CONNECT_BLE";
-    private static final String ACTION_DISCONNECT  = "com.omni.bleDemo.ACTION_DISCONNECT";
-
-    private void sendLocalBroadcast(String action) {
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(action));
-    }
-
-    private void sendLocalBroadcast(Intent intent) {
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     //蓝牙返回接收器
@@ -391,7 +360,7 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
                 sendLocalBroadcast(ACTION_CONNECT_BLE);
                 gatt.discoverServices();
             } else {
-                //                Log.i(TAG, "onConnectionStateChange: ble disconnection");
+                Log.i(TAG, "onConnectionStateChange: ble disconnection");
                 //发送断开连接广播
                 sendLocalBroadcast(ACTION_DISCONNECT);
             }
@@ -505,38 +474,27 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    //秘钥
-    private              byte   bleCKey             = 0;
-    private static final String ACTION_GET_LOCK_KEY = "com.omni.bleDemo.ACTION_GET_LOCK_KEY";
-
     // get key 获取秘钥
     private void handKey(byte[] command) {
         //获取秘钥
         bleCKey = command[5];
-        //        Log.i(TAG, "handKey: key=0x" + String.format("%02X", bleCKey));
+        Log.i(TAG, "handKey: key=0x" + String.format("%02X", bleCKey));
         sendLocalBroadcast(ACTION_GET_LOCK_KEY);
     }
-
-    private static final String ACTION_LOCK_CLOSE = "com.omni.bleDemo.ACTION_LOCK_CLOSE";
 
     private void handLockClose(byte[] command) {
         int status = command[5];
         long timestamp = ((command[6] & 0xFF) << 24) | ((command[7] & 0xff) << 16) | ((command[8] & 0xFF) << 8) | (command[9] & 0xFF);
         int runTime = ((command[10] & 0xFF) << 24) | ((command[11] & 0xff) << 16) | ((command[12] & 0xFF) << 8) | (command[13] & 0xFF);
-
-
         //        Log.i(TAG, "handLockClose: status=" + status);
         //        Log.i(TAG, "handLockClose: timestamp=" + timestamp);
         //        Log.i(TAG, "handLockClose: runTime=" + runTime);
-
         Intent intent = new Intent(ACTION_LOCK_CLOSE);
         intent.putExtra("runTime", runTime);
         intent.putExtra("timestamp", timestamp);
         intent.putExtra("status", status);
         sendLocalBroadcast(intent);
     }
-
-    private static final String ACTION_BLE_LOCK_OPEN_STATUS = "com.omni.bleDemo.ACTION_BLE_LOCK_OPEN_STATUS";
 
     private void handLockOpen(byte[] command) {
         int status = command[5];
@@ -547,48 +505,13 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
         sendLocalBroadcast(intent);
     }
 
-    //广播接收器
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (ACTION_CONNECT_BLE.equals(intent.getAction())) {
+    private void sendLocalBroadcast(String action) {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(action));
+    }
 
-            } else if (ACTION_LOCK_CLOSE.equals(intent.getAction())) {
-                handler.sendEmptyMessage(HANDLER_CLOSE);
-            } else if (ACTION_GET_LOCK_KEY.equals(intent.getAction())) {//接收蓝牙传回的秘钥
-                handler.sendEmptyMessage(HANDLER_GETKEY);
-                isGetKey = true;
-            } else if (ACTION_DISCONNECT.equals(intent.getAction())) {
-                mBtData.clear();
-            } else if (ACTION_BLE_LOCK_OPEN_STATUS.equals(intent.getAction())) {//开锁
-                //                int status = intent.getIntExtra("status", 0);
-                //                long timestamp = intent.getLongExtra("timestamp", 0L);
-                //                Log.i(TAG, "onReceive: status=" + status);
-                //                Log.i(TAG, "onReceive: timestamp=" + timestamp);
-                handler.sendEmptyMessage(HANDLER_OPEN);
-            }
-        }
-    };
-
-    public static final int     HANDLER_GETKEY = 1;
-    public static final int     HANDLER_CLOSE  = 2;
-    public static final int     HANDLER_OPEN   = 3;
-    private             Handler handler        = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case HANDLER_CLOSE:
-                    sendLockResp();
-                    ToastUtils.showToast(OpenLockActivity.this, "设备已关闭");
-                    break;
-                case HANDLER_OPEN:
-                    sendOpenResponse();
-                    break;
-                case HANDLER_GETKEY:
-                    break;
-            }
-        }
-    };
+    private void sendLocalBroadcast(Intent intent) {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 
     private void sendLockResp() {
         int uid = 1;
@@ -620,6 +543,63 @@ public class OpenLockActivity extends BaseActivity implements View.OnClickListen
         return sb.toString();
     }
 
+    private void getPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // 检测定位权限
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+        }
+    }
+
+    private void addOpenRecord() {
+        final Location location = LocationUtils.getInstance(this).showLocation();
+       /* {
+            "lat": "31.896255",
+                "lng": "121.182962",
+                "lockXlh": "66755004297",
+                "orderno":"2019021500609093396",
+                "paddress": "",
+                "pid": "2c979074687943f3016879727bc70001",
+                "prole": 0
+        }*/
+        RequestParamsFM heardParam = new RequestParamsFM();
+        heardParam.put("X-AUTH-TOKEN", MyApplication.userToken);
+        RequestParamsFM params = new RequestParamsFM();
+        if (null != location) {
+            params.put("lat", "" + location.getLatitude());
+            params.put("lng", "" + location.getLongitude());
+            LocationUtils.getInstance(this).removeLocationUpdatesListener();
+        } else {
+            params.put("lat", 31.896255);
+            params.put("lng", 121.182962);
+        }
+        params.put("lockXlh", mBlueXlh);//锁的序列号
+        params.put("orderno", mOrderNo);//订单号
+        params.put("paddress", "");//开锁地址
+        params.put("pid", MyApplication.userID);//开锁人的id
+        params.put("prole", 0);//开锁人的角色
+        //params.put("ptime", );//开锁时间
+        params.setUseJsonStreamer(true);
+        HttpOkhUtils.getInstance().doPostWithHeader(NetConfig.DRIVERORDERCONTROLLER_ADDRECORD, heardParam, params, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+                ToastUtils.showToast(OpenLockActivity.this, "网络连接错误");
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+                //{"message":"成功","size":0,"data":"添加成功！","respCode":"0","ok":true}
+                if (code != 200) {
+                    ToastUtils.showToast(OpenLockActivity.this, "网络错误" + code);
+                    return;
+                }
+                Gson gson = new Gson();
+                LoginInfo loginInfo = gson.fromJson(resbody, LoginInfo.class);
+                if (loginInfo.isOk()) {
+                    ToastUtils.showToast(OpenLockActivity.this, "添加开锁记录成功");
+                }
+            }
+        });
+    }
     //    private int REQUEST_ENABLE                  = 400;
     //    private int BLUETOOTH_DISCOVERABLE_DURATION = 120;//Bluetooth 设备可见时间，单位：秒，不设置默认120s。
     //    private void searchBlueDevice() {

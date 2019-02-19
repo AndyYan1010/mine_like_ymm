@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import com.bt.smart.truck_broker.utils.ExceptionUtil;
 import com.bt.smart.truck_broker.utils.SoundPoolUtil;
 import com.bt.smart.truck_broker.utils.SpUtils;
+import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 
 import java.util.ArrayList;
 
@@ -41,6 +42,7 @@ public class MyApplication extends Application {
         //        JPushInterface.setDebugMode(true);
         //        JPushInterface.init(this);
         application = this;
+        ZXingLibrary.initDisplayOpinion(this);
         openVoice();
     }
 
