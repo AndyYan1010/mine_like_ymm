@@ -16,7 +16,7 @@ public class OrderDetailInfo {
     /**
      * message : 成功
      * size : 0
-     * data : {"id":"2c90b4e368eede110168eedf279a0000","fstatus":"0","fh_name":"赵三","fh_telephone":"18234567890","fh_address":"南通","sh_name":"李四","sh_telephone":"18234567898","sh_address":"上海","sh_area":"","car_type":"2c90b4e368db82ef0168db8d8e9a0004","zh_time":"2019-02-15 09:56:34","goods_name":"4d2881f66850132a01685014c6e40007","fh":"2392","sh":"3262","fcheck":"0","fmain_id":"yingsu0028","fsub_id":"","is_fapiao":"0","fweight":34,"ffee":1234,"is_appoint":"0","appoint_id":"","order_no":"2019021500609093396","fmax_fee":9456,"is_box":"0","box_no":"201988","origin":"广东省惠州市惠阳区","destination":"甘肃省嘉峪关市市辖区","origin_province_id":"20","origin_city_id":"242","origin_area_id":"2392","destination_province_id":"29","destination_city_id":"337","destination_area_id":"3262","ordergoods":[{"id":"2c90b4e368eede110168eedf27bd0001","goodsName":"上装","goodsWeight":12,"goodsSpace":11,"orderId":"2c90b4e368eede110168eedf279a0000"},{"id":"2c90b4e368eede110168eedf27bd0002","goodsName":"下装","goodsWeight":22,"goodsSpace":21,"orderId":"2c90b4e368eede110168eedf279a0000"}]}
+     * data : {"id":"2c90b4e368eede110168eedf279a0000","fstatus":"0","fh_name":"赵三","fh_telephone":"18234567890","fh_address":"南通","sh_name":"李四","sh_telephone":"18234567890","sh_address":"上海","sh_area":"","car_type":"2c90b4e368db82ef0168db8d8e9a0004","zh_time":{"date":15,"hours":9,"seconds":34,"month":1,"timezoneOffset":-480,"year":119,"minutes":56,"time":1550195794000,"day":5},"goods_name":"4d2881f66850132a01685014c6e40007","fh":"2392","sh":"3262","fcheck":"0","fmain_id":"yingsu0028","fsub_id":"","is_fapiao":"0","fweight":34,"ffee":1234,"is_appoint":"0","appoint_id":"","order_no":"2019021500609093396","fmax_fee":9456,"is_box":"0","box_no":"1","origin":"广东省惠州市惠阳区","destination":"甘肃省嘉峪关市市辖区","origin_province_id":"20","origin_city_id":"242","origin_area_id":"2392","destination_province_id":"29","destination_city_id":"337","destination_area_id":"3262","ordergoods":[{"id":"2c90b4e368eede110168eedf27bd0001","goodsName":"上装","goodsSpace":11,"goodsWeight":12,"orderId":"2c90b4e368eede110168eedf279a0000"},{"id":"2c90b4e368eede110168eedf27bd0002","goodsName":"下装","goodsSpace":21,"goodsWeight":22,"orderId":"2c90b4e368eede110168eedf279a0000"}]}
      * respCode : 0
      * ok : true
      */
@@ -75,11 +75,11 @@ public class OrderDetailInfo {
          * fh_telephone : 18234567890
          * fh_address : 南通
          * sh_name : 李四
-         * sh_telephone : 18234567898
+         * sh_telephone : 18234567890
          * sh_address : 上海
          * sh_area :
          * car_type : 2c90b4e368db82ef0168db8d8e9a0004
-         * zh_time : 2019-02-15 09:56:34
+         * zh_time : {"date":15,"hours":9,"seconds":34,"month":1,"timezoneOffset":-480,"year":119,"minutes":56,"time":1550195794000,"day":5}
          * goods_name : 4d2881f66850132a01685014c6e40007
          * fh : 2392
          * sh : 3262
@@ -94,7 +94,7 @@ public class OrderDetailInfo {
          * order_no : 2019021500609093396
          * fmax_fee : 9456
          * is_box : 0
-         * box_no : 201988
+         * box_no : 1
          * origin : 广东省惠州市惠阳区
          * destination : 甘肃省嘉峪关市市辖区
          * origin_province_id : 20
@@ -103,7 +103,7 @@ public class OrderDetailInfo {
          * destination_province_id : 29
          * destination_city_id : 337
          * destination_area_id : 3262
-         * ordergoods : [{"id":"2c90b4e368eede110168eedf27bd0001","goodsName":"上装","goodsWeight":12,"goodsSpace":11,"orderId":"2c90b4e368eede110168eedf279a0000"},{"id":"2c90b4e368eede110168eedf27bd0002","goodsName":"下装","goodsWeight":22,"goodsSpace":21,"orderId":"2c90b4e368eede110168eedf279a0000"}]
+         * ordergoods : [{"id":"2c90b4e368eede110168eedf27bd0001","goodsName":"上装","goodsSpace":11,"goodsWeight":12,"orderId":"2c90b4e368eede110168eedf279a0000"},{"id":"2c90b4e368eede110168eedf27bd0002","goodsName":"下装","goodsSpace":21,"goodsWeight":22,"orderId":"2c90b4e368eede110168eedf279a0000"}]
          */
 
         private String id;
@@ -116,7 +116,7 @@ public class OrderDetailInfo {
         private String               sh_address;
         private String               sh_area;
         private String               car_type;
-        private String               zh_time;
+        private ZhTimeBean           zh_time;
         private String               goods_name;
         private String               fh;
         private String               sh;
@@ -222,11 +222,11 @@ public class OrderDetailInfo {
             this.car_type = car_type;
         }
 
-        public String getZh_time() {
+        public ZhTimeBean getZh_time() {
             return zh_time;
         }
 
-        public void setZh_time(String zh_time) {
+        public void setZh_time(ZhTimeBean zh_time) {
             this.zh_time = zh_time;
         }
 
@@ -422,19 +422,115 @@ public class OrderDetailInfo {
             this.ordergoods = ordergoods;
         }
 
+        public static class ZhTimeBean {
+            /**
+             * date : 15
+             * hours : 9
+             * seconds : 34
+             * month : 1
+             * timezoneOffset : -480
+             * year : 119
+             * minutes : 56
+             * time : 1550195794000
+             * day : 5
+             */
+
+            private int date;
+            private int  hours;
+            private int  seconds;
+            private int  month;
+            private int  timezoneOffset;
+            private int  year;
+            private int  minutes;
+            private long time;
+            private int  day;
+
+            public int getDate() {
+                return date;
+            }
+
+            public void setDate(int date) {
+                this.date = date;
+            }
+
+            public int getHours() {
+                return hours;
+            }
+
+            public void setHours(int hours) {
+                this.hours = hours;
+            }
+
+            public int getSeconds() {
+                return seconds;
+            }
+
+            public void setSeconds(int seconds) {
+                this.seconds = seconds;
+            }
+
+            public int getMonth() {
+                return month;
+            }
+
+            public void setMonth(int month) {
+                this.month = month;
+            }
+
+            public int getTimezoneOffset() {
+                return timezoneOffset;
+            }
+
+            public void setTimezoneOffset(int timezoneOffset) {
+                this.timezoneOffset = timezoneOffset;
+            }
+
+            public int getYear() {
+                return year;
+            }
+
+            public void setYear(int year) {
+                this.year = year;
+            }
+
+            public int getMinutes() {
+                return minutes;
+            }
+
+            public void setMinutes(int minutes) {
+                this.minutes = minutes;
+            }
+
+            public long getTime() {
+                return time;
+            }
+
+            public void setTime(long time) {
+                this.time = time;
+            }
+
+            public int getDay() {
+                return day;
+            }
+
+            public void setDay(int day) {
+                this.day = day;
+            }
+        }
+
         public static class OrdergoodsBean {
             /**
              * id : 2c90b4e368eede110168eedf27bd0001
              * goodsName : 上装
-             * goodsWeight : 12
              * goodsSpace : 11
+             * goodsWeight : 12
              * orderId : 2c90b4e368eede110168eedf279a0000
              */
 
             private String id;
             private String goodsName;
-            private int    goodsWeight;
             private int    goodsSpace;
+            private int    goodsWeight;
             private String orderId;
 
             public String getId() {
@@ -453,20 +549,20 @@ public class OrderDetailInfo {
                 this.goodsName = goodsName;
             }
 
-            public int getGoodsWeight() {
-                return goodsWeight;
-            }
-
-            public void setGoodsWeight(int goodsWeight) {
-                this.goodsWeight = goodsWeight;
-            }
-
             public int getGoodsSpace() {
                 return goodsSpace;
             }
 
             public void setGoodsSpace(int goodsSpace) {
                 this.goodsSpace = goodsSpace;
+            }
+
+            public int getGoodsWeight() {
+                return goodsWeight;
+            }
+
+            public void setGoodsWeight(int goodsWeight) {
+                this.goodsWeight = goodsWeight;
             }
 
             public String getOrderId() {

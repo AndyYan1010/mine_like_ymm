@@ -196,7 +196,7 @@ public class CommandUtil {
     }
 
     private static byte[] getKeyCommand2() {
-        byte randKey = (byte) (new Random().nextInt(255) & 0xff);
+        byte randKey = (byte) (new Random().nextInt(255) & 0xff);//随机int值 & 0xff
 
         byte[] command = new byte[13];// 不包含CRC校验的长度
         command[0] = (byte) 0xFE;
