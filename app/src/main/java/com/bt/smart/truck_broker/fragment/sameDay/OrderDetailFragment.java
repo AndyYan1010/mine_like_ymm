@@ -105,7 +105,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         int orderType = getActivity().getIntent().getIntExtra("orderType", -1);
         if (0 == orderType || 1 == orderType || 2 == orderType || 5 == orderType) {
             tv_take.setText("开锁");
-        } else {
+        } else if (3 == orderType || 4 == orderType || 6 == orderType) {
             tv_take.setVisibility(View.GONE);
         }
     }

@@ -34,6 +34,7 @@
             android:minHeight="30dp"
             android:minWidth="100dp"
             android:padding="5dp"
+            android:numeric="decimal"
             android:textColor="@color/green_100"
             android:textSize="14sp"/>
 

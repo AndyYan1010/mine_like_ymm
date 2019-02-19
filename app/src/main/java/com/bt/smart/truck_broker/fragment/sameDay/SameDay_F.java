@@ -268,7 +268,7 @@ public class SameDay_F extends Fragment implements View.OnClickListener {
         headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
         String finalUrl;
         if (null == id || "".equals(id)) {
-            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}";
+            finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}";//TODO:
         } else {
             finalUrl = NetConfig.ALL_ORDER_LIST + "/" + no + "/" + size + "/" + isAppoint + "/" + "{appointId}?appointId=" + id;
         }
