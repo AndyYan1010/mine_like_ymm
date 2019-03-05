@@ -16,6 +16,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    //设置debug打包模式
+//    signingConfigs{
+//        debug{
+//            keyAlias 'culturecloud'
+//            keyPassword '123456'
+//            storeFile file('../zhihaoshi.jks')
+//            storePassword('123456')
+//        }
+//        release{
+//            keyAlias 'culturecloud'
+//            keyPassword '123456'
+//            storeFile file('../zhihaoshi.jks')
+//            storePassword('123456')
+//        }
+//    }
 }
 
 dependencies {

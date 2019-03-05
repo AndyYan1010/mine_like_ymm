@@ -1,9 +1,14 @@
 package com.bt.smart.truck_broker.fragment.sameDay;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -23,6 +28,7 @@ import com.bt.smart.truck_broker.activity.SaomiaoUIActivity;
 import com.bt.smart.truck_broker.messageInfo.BlueMacInfo;
 import com.bt.smart.truck_broker.messageInfo.OrderDetailInfo;
 import com.bt.smart.truck_broker.messageInfo.TakeOrderResultInfo;
+import com.bt.smart.truck_broker.servicefile.SendLocationService;
 import com.bt.smart.truck_broker.utils.EditTextUtils;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.MyAlertDialogHelper;
@@ -61,10 +67,12 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     private TextView        tv_name;
     private TextView        tv_fhPlace;
     private TextView        tv_phone;
+    private TextView        tv_local;//开始定位按钮
     private TextView        tv_cont;//联系货主
     private TextView        tv_take;//接单
     private OrderDetailInfo orderDetailInfo;//订单详情
     private int RESULT_TAKE_ORDER = 12088;//接单成功响应值
+    private Handler mProhandler;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -86,6 +94,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         tv_phone = mRootView.findViewById(R.id.tv_phone);
         tv_cont = mRootView.findViewById(R.id.tv_cont);
         tv_take = mRootView.findViewById(R.id.tv_take);
+        tv_local = mRootView.findViewById(R.id.tv_local);
     }
 
     private void initData() {
@@ -97,6 +106,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         img_back.setOnClickListener(this);
         tv_cont.setOnClickListener(this);
         tv_take.setOnClickListener(this);
+        tv_local.setOnClickListener(this);
         img_empty.setOnClickListener(this);
         //        String touchKind = getActivity().getIntent().getStringExtra("touchKind");
         //        if (null != touchKind && "accepted".equals(touchKind)) {
@@ -108,6 +118,8 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         } else if (3 == orderType || 4 == orderType || 6 == orderType) {
             tv_take.setVisibility(View.GONE);
         }
+        //初始化定时刷新器
+        initHandlerPost();
     }
 
     @Override
@@ -133,7 +145,21 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                     show2WriteMoney();
                 }
                 break;
+            case R.id.tv_local:
+                //开始定位
+                ToastUtils.showToast(getContext(), "开始定位...");
+                startSendLanAlat();
+                break;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isBinded = false;
+        if (null != mProhandler)
+            mProhandler.removeCallbacksAndMessages(null);
+        mProhandler = null;
     }
 
     @Override
@@ -165,6 +191,45 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                 }
             }
         }
+    }
+
+    private void initHandlerPost() {
+        mProhandler = new Handler();
+        mProhandler.postDelayed(new Runnable() {
+            public void run() {
+                mProhandler.postDelayed(this, 5000);//递归执行，一秒执行一次
+                if (isBinded && null != service && null != service.getLocation()) {
+                    ToastUtils.showToast(getContext(), "经度：" + service.getLocation().getLongitude() + "纬度：" + service.getLocation().getLatitude());
+                }
+            }
+        }, 1000);
+
+    }
+
+    private SendLocationService service;
+    private boolean             isBinded;
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            isBinded = true;
+            ToastUtils.showToast(getContext(), "连上服务");
+            SendLocationService.MyBinder myBinder = (SendLocationService.MyBinder) iBinder;
+            service = myBinder.getService();
+            service.startGetLoaction();
+            service.creatNotifacation();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            isBinded = false;
+            ToastUtils.showToast(getContext(), "服务断开");
+        }
+    };
+
+    private void startSendLanAlat() {
+        Intent intent = new Intent(getContext(), SendLocationService.class);
+        getActivity().bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+
     }
 
     private void openLockDevice() {
