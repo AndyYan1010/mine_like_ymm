@@ -113,10 +113,6 @@ public class SendLocationService extends Service {
 
     public void startGetLoaction() {
         instance = LocationUtils.getInstance(this);
-        //        if (null != location) {
-        //            lat = location.getLatitude();
-        //            lon = location.getLongitude();
-        //        }
     }
 
     public Location getLocation() {
