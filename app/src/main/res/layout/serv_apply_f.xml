@@ -10,4 +10,5 @@
         app:banner_default_image="@drawable/msg_empty"
         android:layout_height="160dp">
     </com.youth.banner.Banner>
+
 </LinearLayout>

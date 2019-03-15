@@ -147,8 +147,9 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                 break;
             case R.id.tv_local:
                 //开始定位
-                ToastUtils.showToast(getContext(), "开始定位...");
-                startSendLanAlat();
+                MyApplication.needLocationService = true;
+                //                ToastUtils.showToast(getContext(), "开始定位...");
+                //                startSendLanAlat();
                 break;
         }
     }
@@ -203,7 +204,6 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                 }
             }
         }, 1000);
-
     }
 
     private SendLocationService service;
@@ -229,7 +229,6 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     private void startSendLanAlat() {
         Intent intent = new Intent(getContext(), SendLocationService.class);
         getActivity().bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-
     }
 
     private void openLockDevice() {

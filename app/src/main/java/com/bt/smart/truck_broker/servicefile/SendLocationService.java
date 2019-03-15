@@ -25,7 +25,6 @@ import com.bt.smart.truck_broker.utils.LocationUtils;
 public class SendLocationService extends Service {
 
     private static final String TAG = SendLocationService.class.getSimpleName();
-    private Notification notification;
 
     @Override
     public void onCreate() {
@@ -36,7 +35,6 @@ public class SendLocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand()");
-
         return super.onStartCommand(intent, flags, startId);
     }
 

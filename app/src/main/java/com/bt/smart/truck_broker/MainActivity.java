@@ -1,10 +1,14 @@
 package com.bt.smart.truck_broker;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
@@ -19,8 +23,10 @@ import com.bt.smart.truck_broker.fragment.sameDay.SameDay_F;
 import com.bt.smart.truck_broker.fragment.serviceApply.ServApply_F;
 import com.bt.smart.truck_broker.fragment.user.User_F;
 import com.bt.smart.truck_broker.messageInfo.NewApkInfo;
+import com.bt.smart.truck_broker.servicefile.SendLocationService;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.MyAlertDialogHelper;
+import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -43,15 +49,37 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private int[]       linear_id  = {R.id.linear0, R.id.linear1, R.id.linear2, R.id.linear3};
     //底部字体
     private TextView tv_menu_0, tv_menu_1, tv_menu_2, tv_menu_3;
-    private List<TextView> tv_menu;
-    private LinearLayout   linear_home;//配送大厅
-    private LinearLayout   linear_shopp;//当天货源
-    private LinearLayout   linear_play;//服务
-    private LinearLayout   linear_mine;//个人中心
-    private Home_F         home_F;//配送大厅
-    private SameDay_F      sameDay_F;//当天货源
-    private ServApply_F    servApply_F;//服务
-    private User_F         user_F;//个人中心
+    private List<TextView>      tv_menu;
+    private LinearLayout        linear_home;//配送大厅
+    private LinearLayout        linear_shopp;//当天货源
+    private LinearLayout        linear_play;//服务
+    private LinearLayout        linear_mine;//个人中心
+    private Home_F              home_F;//配送大厅
+    private SameDay_F           sameDay_F;//当天货源
+    private ServApply_F         servApply_F;//服务
+    private User_F              user_F;//个人中心
+    private Handler             mProhandler;//定时播报经纬度
+    private SendLocationService service;//定位服务
+    private boolean             isBinded;//是否已绑定服务
+    //服务连接监听回调
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            isBinded = true;
+            ToastUtils.showToast(MainActivity.this, "连上服务");
+            SendLocationService.MyBinder myBinder = (SendLocationService.MyBinder) iBinder;
+            service = myBinder.getService();
+            service.startGetLoaction();
+            service.creatNotifacation();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            isBinded = false;
+            ToastUtils.showToast(MainActivity.this, "服务断开");
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +128,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
         // 设置默认首页为点击时的图片
         bt_menu[0].setImageResource(select_on[0]);
+
+        startSendLanAlat();
+        //初始化定时刷新器
+        //        initHandlerPost();
     }
 
     @Override
@@ -173,12 +205,45 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (null == mProhandler) {
+            initHandlerPost();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (null != mProhandler)
+            mProhandler.removeCallbacksAndMessages(null);
+        mProhandler = null;
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (null != home_F)
             home_F.onActivityResult(requestCode, resultCode, data);
         if (null != sameDay_F)
             sameDay_F.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void initHandlerPost() {
+        mProhandler = new Handler();
+        mProhandler.postDelayed(new Runnable() {
+            public void run() {
+                mProhandler.postDelayed(this, 5000);//递归执行
+                if (MyApplication.needLocationService && isBinded && null != service && null != service.getLocation()) {
+                    ToastUtils.showToast(MainActivity.this, "经度：" + service.getLocation().getLongitude() + "纬度：" + service.getLocation().getLatitude());
+                }
+            }
+        }, 1000);
+    }
+
+    private void startSendLanAlat() {
+        Intent intent = new Intent(this, SendLocationService.class);
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void getNewApkInfo() {

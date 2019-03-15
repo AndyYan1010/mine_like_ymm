@@ -62,7 +62,7 @@ public class User_F extends Fragment implements View.OnClickListener {
     private RelativeLayout     rtv_phone;
     private RelativeLayout     rtv_serv;
     private RelativeLayout     rtv_about;
-    private RelativeLayout     rtv_exit;
+    private RelativeLayout     rtv_exit;//退出登录
     private RelativeLayout     rlt_allOrder;//更多订单
 
 
@@ -248,6 +248,7 @@ public class User_F extends Fragment implements View.OnClickListener {
             public void onClick(DialogInterface dialog, int which) {
                 SpUtils.putBoolean(getContext(), "isRem", false);
                 MyApplication.isLogin = 0;
+                MyApplication.needLocationService = false;
                 Intent intent = new Intent();
                 intent.setClass(getContext(), LoginActivity.class);
                 startActivity(intent);
