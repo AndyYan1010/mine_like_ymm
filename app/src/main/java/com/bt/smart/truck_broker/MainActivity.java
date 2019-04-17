@@ -238,12 +238,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mProhandler = new Handler();
         mProhandler.postDelayed(new Runnable() {
             public void run() {
-                mProhandler.postDelayed(this, 1000*60*30);//递归执行//半小时执行一次
+                mProhandler.postDelayed(this, 1000 * 60 * 30);//递归执行//半小时执行一次
                 if (MyApplication.needLocationService && isBinded && null != service && null != service.getLocation()) {
                     lonData = service.getLocation().getLongitude();
                     latData = service.getLocation().getLatitude();
                     //上传经纬度
-                    ToastUtils.showToast(MainActivity.this, "经度：" + lonData + "纬度：" + latData);
+                    //                    ToastUtils.showToast(MainActivity.this, "经度：" + lonData + "纬度：" + latData);
                     upDataLocation(lonData, latData);
                 }
             }
