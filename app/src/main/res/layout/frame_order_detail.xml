@@ -223,11 +223,11 @@
         </ScrollView>
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
-            android:orientation="horizontal"
-            android:id="@+id/linearLayout">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tv_cont"
@@ -239,16 +239,16 @@
                 android:text="联系货主"
                 android:textColor="@color/word_gray"
                 android:textSize="14sp"/>
-            <TextView
-                android:id="@+id/tv_local"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@color/green_100"
-                android:gravity="center"
-                android:text="定位"
-                android:textColor="@color/white"
-                android:textSize="14sp"/>
+            <!--<TextView-->
+            <!--android:id="@+id/tv_local"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@color/green_100"-->
+            <!--android:gravity="center"-->
+            <!--android:text="定位"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:textSize="14sp"/>-->
             <TextView
                 android:id="@+id/tv_take"
                 android:layout_width="0dp"

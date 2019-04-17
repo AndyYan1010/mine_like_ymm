@@ -67,7 +67,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     private TextView        tv_name;
     private TextView        tv_fhPlace;
     private TextView        tv_phone;
-    private TextView        tv_local;//开始定位按钮
+    //    private TextView        tv_local;//开始定位按钮
     private TextView        tv_cont;//联系货主
     private TextView        tv_take;//接单
     private OrderDetailInfo orderDetailInfo;//订单详情
@@ -94,7 +94,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         tv_phone = mRootView.findViewById(R.id.tv_phone);
         tv_cont = mRootView.findViewById(R.id.tv_cont);
         tv_take = mRootView.findViewById(R.id.tv_take);
-        tv_local = mRootView.findViewById(R.id.tv_local);
+        //        tv_local = mRootView.findViewById(R.id.tv_local);
     }
 
     private void initData() {
@@ -106,8 +106,8 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         img_back.setOnClickListener(this);
         tv_cont.setOnClickListener(this);
         tv_take.setOnClickListener(this);
-        tv_local.setOnClickListener(this);
         img_empty.setOnClickListener(this);
+        //        tv_local.setOnClickListener(this);
         //        String touchKind = getActivity().getIntent().getStringExtra("touchKind");
         //        if (null != touchKind && "accepted".equals(touchKind)) {
         //            tv_take.setVisibility(View.GONE);
@@ -145,12 +145,12 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                     show2WriteMoney();
                 }
                 break;
-            case R.id.tv_local:
-                //开始定位
-                MyApplication.needLocationService = true;
-                //                ToastUtils.showToast(getContext(), "开始定位...");
-                //                startSendLanAlat();
-                break;
+            //            case R.id.tv_local:
+            //                //开始定位
+            //                MyApplication.needLocationService = true;
+            //                //                ToastUtils.showToast(getContext(), "开始定位...");
+            //                //                startSendLanAlat();
+            //                break;
         }
     }
 

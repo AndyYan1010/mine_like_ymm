@@ -58,4 +58,7 @@ public class NetConfig {
 
     //获取省市区
     public static String REGIONSELECT = ROOT + "registerDriverController/regionSelect";
+
+    //新增订单轨迹
+    public static String ADDTRAIL = ROOT + "orderController/addTrail";
 }

@@ -26,6 +26,7 @@ import com.bt.smart.truck_broker.messageInfo.NewApkInfo;
 import com.bt.smart.truck_broker.servicefile.SendLocationService;
 import com.bt.smart.truck_broker.utils.HttpOkhUtils;
 import com.bt.smart.truck_broker.utils.MyAlertDialogHelper;
+import com.bt.smart.truck_broker.utils.RequestParamsFM;
 import com.bt.smart.truck_broker.utils.ToastUtils;
 import com.google.gson.Gson;
 
@@ -61,6 +62,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Handler             mProhandler;//定时播报经纬度
     private SendLocationService service;//定位服务
     private boolean             isBinded;//是否已绑定服务
+    private double              lonData;//经度
+    private double              latData;//纬度
     //服务连接监听回调
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -132,6 +135,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         startSendLanAlat();
         //初始化定时刷新器
         //        initHandlerPost();
+        MyApplication.needLocationService = true;
     }
 
     @Override
@@ -229,16 +233,43 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             sameDay_F.onActivityResult(requestCode, resultCode, data);
     }
 
+    //上传经纬度
     private void initHandlerPost() {
         mProhandler = new Handler();
         mProhandler.postDelayed(new Runnable() {
             public void run() {
-                mProhandler.postDelayed(this, 5000);//递归执行
+                mProhandler.postDelayed(this, 1000*60*30);//递归执行//半小时执行一次
                 if (MyApplication.needLocationService && isBinded && null != service && null != service.getLocation()) {
-                    ToastUtils.showToast(MainActivity.this, "经度：" + service.getLocation().getLongitude() + "纬度：" + service.getLocation().getLatitude());
+                    lonData = service.getLocation().getLongitude();
+                    latData = service.getLocation().getLatitude();
+                    //上传经纬度
+                    ToastUtils.showToast(MainActivity.this, "经度：" + lonData + "纬度：" + latData);
+                    upDataLocation(lonData, latData);
                 }
             }
         }, 1000);
+    }
+
+    private void upDataLocation(double lonData, double latData) {
+        RequestParamsFM headParams = new RequestParamsFM();
+        headParams.put("X-AUTH-TOKEN", MyApplication.userToken);
+        RequestParamsFM params = new RequestParamsFM();
+        params.put("fid", MyApplication.userID);
+        params.put("lng", "" + lonData);
+        params.put("lat", "" + latData);
+        params.setUseJsonStreamer(true);
+        HttpOkhUtils.getInstance().doPostWithHeader(NetConfig.ADDTRAIL, headParams, params, new HttpOkhUtils.HttpCallBack() {
+            @Override
+            public void onError(Request request, IOException e) {
+
+            }
+
+            @Override
+            public void onSuccess(int code, String resbody) {
+
+            }
+        });
+
     }
 
     private void startSendLanAlat() {
